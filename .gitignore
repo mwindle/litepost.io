@@ -1,0 +1,19 @@
+
+# OSX custom attribute store
+.DS_Store
+
+# Sublime Text workspace and project files
+*.sublime-project
+*.sublime-workspace
+
+# Eclipse project files
+*.project
+
+# Node.js node_modules, installed later with npm install
+node_modules
+
+# Bower components
+public/components
+
+# Secrets that have no business in a public repo
+secrets.js
