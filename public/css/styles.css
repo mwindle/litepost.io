@@ -82,6 +82,7 @@ a, a:hover {
 	margin-left: auto;
 	margin-right: auto;
 	margin-top: 3em;
+	text-align: left;
 }
 .login-form input, .login-form button {
 	font-size: 2em;
@@ -90,20 +91,27 @@ a, a:hover {
 .login-form label {
 	color: #AAA;
 }
+.app-content {
+	width: 60%;
+	margin-left: auto;
+	margin-right: auto;
+}
 
 #top-bar { 
-	z-index: 2;
 	background: rgba(0,0,0,0.8); 
 	color: #FFF; 
 	padding: 5px; 
 	width: 100%; 
-	position: fixed; 
+	position: absolute; 
 	top: 0px;
 	left: 0px;
 	height: 4em;
 }
 #top-bar button { margin-left: 15px; }
 
+.event-status-bar {
+	border-bottom: 1px solid #CCC;
+}
 .typing-status {
 	background: url("/images/imessage-sending-animated-gif.gif") center center no-repeat;
 	height: 40px;
@@ -148,6 +156,10 @@ form button { background: rgb(130, 224, 255); border: none; padding: 10px; }
 }
 #preview-panel {
 	height: 100%;
+	overflow: auto;
+	border-top: 1px solid #CCC;
+	margin-top: 1em;
+	padding-bottom: 200px;
 }
 #message-preview { 
 	padding: 30px; 

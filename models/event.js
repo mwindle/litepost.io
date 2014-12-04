@@ -7,10 +7,11 @@ var EventUserSchema = mongoose.Schema({
 });
 
 var EventSchema = mongoose.Schema({
-	name: String,
-	channel: { type: String, unique: true },
+	name: { type: String, required: true, trim: true },
+	channel: { type: String, unique: true, required: true, trim: true },
+	hidden: { tyoe: Boolean, default: false },
 	users: [EventUserSchema],
-	css: String
+	start: Date
 });
 
 module.exports = mongoose.model('Event', EventSchema);

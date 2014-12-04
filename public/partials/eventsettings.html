@@ -1,0 +1,77 @@
+<div class="app-content">
+  <header>
+    <h2>
+      <span class="emphasize">{{event.name}}</span> settings
+    </h2>
+  </header>
+
+  <div class="panel panel-default">
+  	<div class="panel-heading">Basics</div>
+  	<div class="panel-body">
+	  	<div class="form-group">
+				<label for="name">Event name</label>
+	  		<div class="input-group">
+		  		<input type="text" class="form-control" id="name" name="name" placeholder="Event name" ng-model="updatedEvent.name" />
+		  		<span class="input-group-btn">
+		  			<button class="btn btn-default" ng-class="{'btn-default': isRenameDisabled(), 'btn-success': !isRenameDisabled()}" ng-disabled="isRenameDisabled()" ng-click="rename()">Rename</button>
+		  		</span>
+		  	</div>
+	  	</div>
+
+	  	<div class="form-group">
+		    <label class="control-label">When is this event?</label>
+		    <span ng-init="showStartChange = !!event.start" />
+				<div ng-show="!showStartChange">
+				 	This event 
+				 	<span ng-show="!isEventInPast()">is set to start </span>
+				 	<span ng-show="isEventInPast()">started </span>
+				 	<strong am-time-ago="event.start" /> on <strong>{{updatedEvent.start | amDateFormat:'dddd, MMMM Do YYYY, h:mm a (Z)'}}</strong>. <br />
+				 	<button class="btn btn-default" ng-click="showStartChange=true">Update start time</button>
+				</div>
+		    <div ng-show="showStartChange">
+		    	<div class="form-group">
+		      	<input size="10" class="form-control" ng-model="updatedEvent.start" data-autoclose="1" placeholder="Start date" bs-datepicker type="text" />
+			    </div>
+			    <div class="form-group">
+			      <input size="8" class="form-control" ng-model="updatedEvent.start" ng-show="updatedEvent.start" data-autoclose="1" placeholder="Start time" bs-timepicker data-time-format="hh:mm a" data-length="1" data-minute-step="15" data-arrow-behavior="picker" type="text" />
+			    </div>
+		  		<p>
+		  			Setting a start time on this event will help your viewers know when it will start, showing them a countdown to that start time on the event page. Setting a start time also ensures that any messages you post in this event will not be viewable until it starts. 
+		  		</p>
+		  		<div class="alert alert-warning" role="alert" ng-show="updatedEvent.start">
+		  			The start time of this event is in your local timezone, <span>{{updatedEvent.start | amDateFormat:'Z'}}</span>. 
+		  		</div>
+			    <div class="form-group">
+			    	<button class="btn btn-primary pull-right" ng-disabled="isSetStartDisabled()" ng-click="setStart()">Set start time</button>
+			    	<button class="btn btn-default pull-right" ng-disabled="isRemoveStartDisabled()" ng-click="removeStart()">Remove start time</button>
+			    </div>
+			   </div>
+			</div>
+  	</div>
+  </div>
+
+  <div class="panel panel-danger">
+  	<div class="panel-heading">Danger Zone</div>
+  	<div class="panel-body">
+	  	<div class="form-group">
+	  		<input type="checkbox" id="hidden" name="hidden" ng-model="updatedEvent.hidden" ng-change="setHidden()" /> 
+	  		<label for="hidden">Hidden</label>
+	  		<p>
+	  			Hiding this event would prevent viewers from seeing the entire event page, including any messages posted in it. You should only do this if you want to keep this event secret for a while.  
+	  		</p>
+	  	</div>
+	  	<div class="form-group">
+				<label for="delete">Delete this event</label>
+				<span ng-init="isDeleting = false" />
+				<div class="form-group" ng-show="!isDeleting">
+					<button class="btn btn-danger pull-right" id="delete" ng-click="isDeleting = true">Delete this event</button>
+				</div>
+				<div class="form-group" ng-show="isDeleting">
+					<label for="confirm-delete-name">Enter the exact event name to confirm permanent deletion.</label>
+					<input type="text" class="form-control" id="confirm-delete-name" placeholder="Confirm event name" ng-model="deleteConfirmationName" />
+					<button class="btn btn-danger pull-right" ng-click="delete()">Delete this event</button>
+					<button class="btn btn-default pull-right" ng-click="isDeleting = false">Cancel delete</button>
+			  </div>
+			</div>
+  	</div>
+</div>

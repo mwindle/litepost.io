@@ -1,0 +1,23 @@
+<h1 class="text-center event-title">
+	<span class="emphasize">{{event.name}}</span>
+</h1>
+<div class="event-status-bar">
+	<span class="message-count-panel">
+		<header>Messages</header>
+		<span class="message-count">{{messages.length || 0}}</span>
+	</span>
+	<span class="viewer-count-panel">
+		<header>Viewers</header>
+		<span class="viewer-count">{{viewers || 0}}
+	</span>
+	<a ui-sref="post({channel: event.channel})"><button id="toggle-edit" class="btn btn-primary"><span class="glyphicon glyphicon-pencil"></span> New Message</button></a>
+	<a href="#!{{event.channel}}/settings">
+		<small><button class="btn btn-xs btn-default"><span class="glyphicon glyphicon-cog"></span> Event Settings</button></small>
+	</a>
+</div>
+<div class="typing-status" ng-show="typing">
+	<span><span ng-show="typing.author">{{typing.author}} is </span>typing...</span>
+</div>
+<ol id="messages">
+	<li class="message" ng-repeat="message in messages" ng-include="'message-template.html'" />
+</ol>

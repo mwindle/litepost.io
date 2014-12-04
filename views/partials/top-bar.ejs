@@ -1,23 +1,18 @@
 <div id="top-bar" class="clearfix text-center">
-		<div class="button-group pull-left">
-			<h5 class="logo"><a href="/">LitePost<span class="emphasize">.io</span></a></h5>
-		</div>
-		<% if(page=='app') { %>
-		<button id="toggle-edit" class="btn btn-primary" ng-click="enableEditing()" ng-show="!editing"><span class="glyphicon glyphicon-edit"></span> New Message</button>
+	<div class="button-group pull-left">
+		<h5 class="logo"><a href="/">LitePost<span class="emphasize">.io</span></a></h5>
+	</div>
+	<div class="button-group pull-right">
+
+		<% if(page=='join' || page=='') { %>
+		<button class="btn btn-link">Learn more</button>
 		<% } %>
-		<div class="button-group pull-right">
-			<% if(page=='app') { %>
-			<button class="btn btn-default"><span class="glyphicon glyphicon-plus-sign"></span> New Event</button>
-			<% } %>
-			<% if(page=='join' || page=='') { %>
-			<button class="btn btn-link">Learn more</button>
-			<% } %>
-			<% if(locals.user) { %>
-			<a href="/logout"><button class="btn btn-link">Sign out</button></a>
-			<% } else if(page!='login') { %>
-			<a href="/login"><button class="btn btn-link">Sign in</button></a>
-			<% } else { %>
-			<a href="/join"><button class="btn btn-link">Join</button></a>
-			<% } %>
-	  </div>
+		<% if(locals.user) { %>
+		<a href="/logout"><button class="btn btn-link">Sign out</button></a>
+		<% } else if(page!='login') { %>
+		<a href="/login"><button class="btn btn-link">Sign in</button></a>
+		<% } else { %>
+		<a href="/join"><button class="btn btn-link">Join</button></a>
+		<% } %>
   </div>
+</div>

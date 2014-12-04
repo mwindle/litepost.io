@@ -1,0 +1,47 @@
+<div class="text-center app-content">
+  <header>
+    <h2>
+      <span class="emphasize">Your Events</span>
+    </h2>
+  </header>
+  <table class="table table-hover text-left">
+    <thead>
+      <tr>
+        <th></th>
+        <th>Event</th>
+        <th>Channel</th>
+        <th>When</th>
+        <th>Activity</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="event in user.events">
+        <td>
+          <span class="glyphicon text-muted" ng-class="{'glyphicon-eye-open': !event.hidden, 'glyphicon-eye-close': event.hidden}" />
+        </td>
+        <td><a ui-sref="event({channel: event.channel})">{{event.name}}</a></td>
+        <td>{{event.channel}}</td>
+        <td>
+          <span am-time-ago="event.start" />
+        </td>
+        <td>
+          <span ng-show="event.messages.$resolved" class="activity-box">
+            <span class="glyphicon glyphicon-pencil"></span> {{event.messages.length}} 
+          </span>
+          <span ng-show="event.viewers" class="activity-box">
+            <span class="glyphicon glyphicon-stats"></span> {{event.viewers}} 
+          </span>
+        </td>
+        <td>
+            <a ui-sref="editEvent({channel: event.channel})">
+              <button class="btn btn-xs btn-default"><span class="glyphicon glyphicon-cog"></span> Settings</button>
+            </a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="text-xlrg">
+    <a ui-sref="create"><button class="btn btn-primary">New event</button></a>
+  </div>
+</div>

@@ -15,6 +15,8 @@ var config = require('./config');
 var emitter = new (require('events').EventEmitter);
 var io = require('./socket')(server, emitter);
 var api = express.Router();
+var meApi = require('./api/me')(api, emitter);
+var eventApi = require('./api/events')(api, emitter);
 var messageApi = require('./api/messages')(api, emitter);
 
 passport.use(new LocalStrategy({
@@ -22,7 +24,6 @@ passport.use(new LocalStrategy({
 	passwordField: 'password'
 },
 function(email, password, done) {
-	console.log("authenticating user " + email + " with password " + password);
 	User.findOne({ email: email }, function(err, user) {
 		if(err) { return done(err); }
 		if(!user) { return done(null, false, { message: 'Invalid email.' }); }
@@ -58,19 +59,25 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/api', api);
-['/', '/join', '/login', '/app'].forEach(function(route) {
+['/', '/join', '/login'].forEach(function(route) {
 	app.get(route, function(req, res) {
 		var url = route.replace('/', '');
-		if(url !== 'app' && req.user) { return res.redirect('/app'); }
+		if(req.user) { return res.redirect('/app'); }
 		res.render(url, { page: url , user: req.user });
 	});
+});
+app.get(/^\/app(\/.*)?$/, function(req, res) {
+	res.render('app', { page: 'app', user: req.user });
 });
 app.get('/logout', function(req, res){
 	req.logout();
   req.session.destroy();
   res.redirect('/');
 });
-app.post('/login', passport.authenticate('local', { successRedirect: '/app', failureRedirect: '/login' }));
+app.post('/login', passport.authenticate('local', { 
+	failureRedirect: '/login',
+	successRedirect: '/app'
+}));
 app.post('/join', function(req, res) {
 	new User({ email: req.body.email, password: User.generateHash(req.body.password) }).save(function(err, user) {
 		if(err && err.code === 11000) {
@@ -106,6 +113,7 @@ db.on('disconnected', function() {
 	console.log('MongoDB disconnected!');
 	mongoose.connect(config.get('mongoUrl'), { server: { auto_reconnect: true } });
 });
-mongoose.connect(config.get('mongoUrl'), { server: { auto_reconnect: true } });
-
-app.start();
+mongoose.connect(config.get('mongoUrl'), { server: { auto_reconnect: true } }, function (error) {
+	if(error) { return console.error(error); }
+	app.start();
+});
