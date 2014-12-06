@@ -1,57 +1,51 @@
-(function (angular, io) {
+(function (angular, io, $, marked) {
 
 'use strict';
 
 // main module for single page todo application
 angular.module('liveBlogApp', [
   'ui.router', 
-  'mgcrea.ngStrap', 
+  'mgcrea.ngStrap',
+  'duParallax',
   'ngResource', 
   'ngSanitize', 
-  'ngCookies', 
   'angularMoment'
 ])
 
 .factory('Me', function ($resource) {
-  return $resource('api/me', {}, {
-    get: {
-      method: 'GET',
-      cache: true
-    }
-  });
+  return $resource('api/me');
 })
 
 .factory('MyEvents', function ($resource) {
-  return $resource('api/me/events', {}, {
-    query: {
-      method: 'GET',
-      isArray: true,
-      cache: true
-    }
-  });
+  return $resource('api/me/events');
 })
 
 .factory('Event', function ($resource) {
-  return $resource('api/events/:id', {id:'@_id'}, {
-    get: {
-      method: 'GET',
-      cache: true
-    }
-  });
+  return $resource('api/events/:id', {id:'@_id'});
 })
 
 .factory('Message', function ($resource) {
-  return $resource('api/events/:channel/messages/:id', {id:'@_id'}, {
-    get: {
-      method: 'GET',
-      cache: true
-    },
-    query: {
-      method: 'GET',
-      isArray: true,
-      cache: false
+  return $resource('api/events/:channel/messages/:id', {id:'@_id'});
+})
+
+.filter('unsafe', function ($sce) {
+  return function (value) {
+    return $sce.trustAsHtml(value);
+  };
+})
+
+.directive('compileTemplate', function ($compile, $parse) {
+  return {
+    link: function (scope, element, attr) {
+      var parsed = $parse(attr.ngBindHtml);
+      function getStringValue() { return (parsed(scope) || '').toString(); }
+
+      //Recompile if the template changes
+      scope.$watch(getStringValue, function() {
+        $compile(element, null, -9999)(scope);  //The -9999 makes it skip directives so that we do not recompile ourselves
+      });
     }
-  });
+  };
 })
 
 // Service for socket.io
@@ -167,6 +161,15 @@ angular.module('liveBlogApp', [
     $scope.event.$save();
   };
 
+  $scope.isSetDescriptionDisabled = function () {
+    return !$scope.updatedEvent || $scope.updatedEvent.description==$scope.event.description;
+  };
+
+  $scope.setDescription = function () {
+    $scope.event.description = $scope.updatedEvent.description;
+    $scope.event.$save();
+  };
+
   $scope.isEventInPast = function () {
     return $scope.event.start && moment($scope.event.start).unix() < moment().unix();
   };
@@ -178,8 +181,6 @@ angular.module('liveBlogApp', [
 
   $scope.delete = function () {
     if($scope.deleteConfirmationName !== $scope.event.name) { 
-      console.log($scope.deleteConfirmationName);
-      console.log($scope.event.name);
       return; 
     }
     $scope.event.$delete(function (event) {
@@ -189,23 +190,29 @@ angular.module('liveBlogApp', [
 })
 
 // event controller, shows the list of event messages and keeps them up to date
-.controller('EventCtrl', function ($scope, $stateParams, Event, Message, socket) {
+.controller('EventCtrl', function ($scope, $stateParams, $anchorScroll, parallaxHelper, $timeout, Event, Message, socket) {
   $scope.pageClass = 'event';
   $scope.channel = $stateParams.channel;
   $scope.messages = [];
+  $scope.background = parallaxHelper.createAnimator(-0.15);
   socket.connect($scope.channel);
+
   $scope.$on("$destroy", function () {
     socket.disconnect();
   });
+
   socket.on('typing', function () { 
     $scope.typing = true;
   });
+
   socket.on('stop-typing', function () { 
     $scope.typing = false;
   });
+
   socket.on('new-message', function (message) {
     $scope.messages.unshift(new Message(message));
   });
+
   socket.on('update-message', function (message) {
     for(var i=0; i<$scope.messages.length; i++) {
       if($scope.messages[i]._id == message._id) {
@@ -214,6 +221,7 @@ angular.module('liveBlogApp', [
       }
     }
   });
+
   socket.on('delete-message', function (message) {
     for(var i=0; i<$scope.messages.length; i++) {
       if($scope.messages[i]._id == message._id) {
@@ -222,19 +230,41 @@ angular.module('liveBlogApp', [
       }
     }
   });
+
   socket.on('event-meta-update', function (meta) {
     $scope.viewers = meta.viewers;
   });
+
   $scope.event = Event.get({ channel: $scope.channel }, function () {
-    $scope.title = $scope.event.name
+    $scope.title = $scope.event.name;
+    $scope.updateCountdown();
   });
+
+  $scope.isEventInPast = function () {
+    return !!$scope.event.start && moment($scope.event.start).unix() < moment().unix();
+  };
+
+  $scope.updateCountdown = function () {
+    if(!$scope.isEventInPast()) {
+      var duration = moment.duration(moment($scope.event.start).diff(moment(), 'milliseconds', true));
+      $scope.countdownClock = $('#countdown-clock').FlipClock(duration.asSeconds(), {
+        clockFace: 'DailyCounter',
+        countdown: true
+      });
+    }
+  };
+
   Message.query({ channel: $scope.channel }, function (messages) {
     $scope.messages = $scope.messages.concat(messages);
+    $timeout(function () {
+      $anchorScroll();
+    });
   });
+
 })
 
 // controller for authoring new or existing posts within an event
-.controller('PostCtrl', function ($scope, $state, $stateParams, $timeout, Event, Message, socket) {
+.controller('PostCtrl', function ($scope, $state, $stateParams, $timeout, Event, Message, socket, parallaxHelper) {
   $scope.channel = $stateParams.channel;
   $scope.messageId = $stateParams.messageId;
   $scope.event = Event.get({ channel: $scope.channel });
@@ -242,6 +272,7 @@ angular.module('liveBlogApp', [
   $scope.pageClass = 'post';
   $scope.editor = angular.element('#m');
   $scope.typing = false;
+  $scope.background = parallaxHelper.createAnimator(-0.3);
   socket.connect($scope.channel);
 
   if($scope.messageId) {
@@ -259,17 +290,6 @@ angular.module('liveBlogApp', [
     });
     $scope.editor.val($scope.editingMessage.text);
   }
-  
-  marked.setOptions({
-    renderer: new marked.Renderer(),
-    gfm: true,
-    tables: true,
-    breaks: false,
-    pedantic: false,
-    sanitize: true,
-    smartLists: true,
-    smartypants: false
-  });
 
   $scope.editor.markdown({
     fullscreen: { enable: false },
@@ -338,6 +358,11 @@ angular.module('liveBlogApp', [
   };
 
   $scope.update = function () {
+    /* 
+    Would like to have a custom state change with this to send the author back to the location
+    of this message with //u/r/l#messageId but ui-router $state.go doesn't support a hash right now. 
+    Watch https://github.com/angular-ui/ui-router/issues/510 
+    */
     $scope.publish();
   };
 
@@ -393,4 +418,4 @@ angular.module('liveBlogApp', [
 });
 
 
-})(window.angular, window.io);
+})(window.angular, window.io, window.jQuery, window.marked);

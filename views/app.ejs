@@ -5,15 +5,18 @@
 		<base href="/app" />
 		<% include partials/stylesheets %>
 		<link rel="stylesheet" href="components/bootstrap-markdown/css/bootstrap-markdown.min.css" />
+		<link rel="stylesheet" href="components/FlipClock/compiled/flipclock.css" />
 	</head>
 	<body>
 		<% include partials/top-bar %>
 	  <div class="main-content">
-	  	<div class="view-content {{pageClass}}" ui-view />
-			<% include partials/footer %>
+	  	<div class="view-content" ui-view />
 		</div>
+		<% include partials/footer %>
+
 		<script src="components/jquery/dist/jquery.js"></script>
 		<script src="components/socket.io-client/socket.io.js"></script>
+		<script src="components/FlipClock/compiled/flipclock.min.js"></script>
 		<script src="components/moment/moment.js"></script>
 		<script src="components/marked/lib/marked.js"></script>
 		<script src="components/bootstrap-markdown/js/bootstrap-markdown.js"></script>
@@ -25,13 +28,9 @@
 		<script src="components/angular-moment/angular-moment.js"></script>
 		<script src="components/angular-strap/dist/angular-strap.js"></script>
 		<script src="components/angular-strap/dist/angular-strap.tpl.js"></script>
+		<script src="components/angular-scroll/angular-scroll.min.js"></script>
+		<script src="components/ng-parallax/angular-parallax.min.js"></script>
+		<script src="js/marked-setup.js"></script>
 		<script src="js/app.js"></script>
-		<script type="text/ng-template" id="message-template.html">
-				<div class="message-sent">
-					<div class="sent-time" am-time-ago="message.sent"></div>
-					<a ui-sref="editPost({channel: event.channel, messageId: message._id})"><button class="edit-message btn btn-xs btn-default" ng-show="message._id"><span class="glyphicon glyphicon-edit"></span> Edit</button></a>
-				</div>
-				<div class="message-text" ng-bind-html="message.html"></div>
-		</script>
 	</body>
 </html>

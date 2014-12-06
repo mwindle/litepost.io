@@ -62,7 +62,7 @@ app.use('/api', api);
 ['/', '/join', '/login'].forEach(function(route) {
 	app.get(route, function(req, res) {
 		var url = route.replace('/', '');
-		if(req.user) { return res.redirect('/app'); }
+		if(req.user && url) { return res.redirect('/app'); }
 		res.render(url, { page: url , user: req.user });
 	});
 });

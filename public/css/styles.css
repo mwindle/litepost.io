@@ -11,8 +11,8 @@ body {
 	font-size: 3em; 
 	line-height: 2em;
 	color: #444;
-	background-color: #EFEFEF; 
-	padding-top: 50px;
+	background-color: #EFEFEF;
+	margin-top: 50px;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -28,6 +28,23 @@ h6 { font-size: 1em; }
 
 a, a:hover {
 	color: #c7254e;
+}
+
+#top-bar { 
+	z-index: 2;
+	color: #FFF; 
+	width: 100%; 
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	padding: 10px;
+	height: 50px;
+}
+#top-bar .logo {
+	margin: 0px; 
+}
+.event-status-bar {
+
 }
 
 .main-content {
@@ -46,7 +63,9 @@ a, a:hover {
 	width: 60%;
 	margin-left: auto;
 	margin-right: auto;
-	margin-top: 5%;
+}
+.hero-banner h1 {
+	margin-top: 0px;
 }
 .hero-banner button {
 	font-size: 1em;
@@ -55,6 +74,15 @@ a, a:hover {
 	padding-right: 0.5em;
 	border-radius: 20px;
 }
+.textured-carbon-bg {
+	background: url('/images/tactile_noise.png') repeat scroll 0% 0% transparent;
+	color: #FFF;
+} 
+.home-page-tagline.textured-carbon-bg {
+	padding-bottom: 5em;
+	border-bottom: 2px solid #c7254e;
+}
+
 .main-footer {
 	text-align: center;
 	border-top: 1px solid #CCC;
@@ -97,20 +125,17 @@ a, a:hover {
 	margin-right: auto;
 }
 
-#top-bar { 
-	background: rgba(0,0,0,0.8); 
-	color: #FFF; 
-	padding: 5px; 
-	width: 100%; 
-	position: absolute; 
-	top: 0px;
-	left: 0px;
-	height: 4em;
-}
-#top-bar button { margin-left: 15px; }
-
 .event-status-bar {
 	border-bottom: 1px solid #CCC;
+	height: 50px;
+}
+.event-status-bar * {
+	display: inline-block;
+}
+.message-count-panel, .viewer-count-panel {
+	height: 75px;
+	width: 75px;
+	border: 1px solid black;
 }
 .typing-status {
 	background: url("/images/imessage-sending-animated-gif.gif") center center no-repeat;
@@ -132,7 +157,7 @@ form button { background: rgb(130, 224, 255); border: none; padding: 10px; }
 #editor {
 	width: 100%;
 	height: 100%;
-	z-index: 11;
+	z-index: 1;
 	position: fixed;
 	top: 4em;
 	left: 0px;
@@ -177,6 +202,23 @@ form button { background: rgb(130, 224, 255); border: none; padding: 10px; }
 
 .main-content { width: 100%; }
 
+.event-countdown-container {
+	width: 60%;
+	margin-left: auto;
+	margin-right: auto;
+}
+#countdown-clock {
+	width: 650px;
+	max-width: 95%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.flip-clock-label {
+	font-size: 2em;
+	font-weight: 700;
+	font-family: 'Oswald';
+}
+
 ol#messages {
 	width: 100%;
 }
@@ -213,7 +255,20 @@ li.message {
 .message-text h1, .message-text h2, .message-text h3 { margin-top: 0px; }
 .message-text li { margin-left: 2em; }
 
+.event-settings #description {
+	resize: none;
+}
 
+li.message .parallax-image-wrapper {
+	max-width: 100%;
+	max-height: 80%;
+	position: static;
+	overflow: hidden;
+}
+li.message .parallax-image-wrapper > img {
+    width: auto;
+    display: block;
+}
 
 @media (min-width: 992px) {
 	body { font-size: 1.5em; }

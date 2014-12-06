@@ -39,7 +39,9 @@ EventApi.prototype.createEvent = function (req, res) {
 		users: [{
 			user: req.user._id,
 			role: 'creator'
-		}]
+		}],
+		hidden: req.body.hidden,
+		description: req.body.description
 	}).save(function (err, event) {
 		if(err) { return res.send(err); }
 		res.json(event); 
@@ -51,6 +53,7 @@ EventApi.prototype.updateEvent = function (req, res) {
 	if(req.body.hasOwnProperty('name')) { updated.name = req.body.name; }
 	if(req.body.hasOwnProperty('start')) { updated.start = req.body.start; }
 	if(req.body.hasOwnProperty('hidden')) { updated.hidden = req.body.hidden; }
+	if(req.body.hasOwnProperty('description')) { updated.description = req.body.description; }
 	Event.findByIdAndUpdate(req.params.id, updated,function (err, event) {
 			if(err) { return res.send(err); }
 			else {

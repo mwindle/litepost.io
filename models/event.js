@@ -11,7 +11,8 @@ var EventSchema = mongoose.Schema({
 	channel: { type: String, unique: true, required: true, trim: true },
 	hidden: { tyoe: Boolean, default: false },
 	users: [EventUserSchema],
-	start: Date
+	start: Date,
+	description: String
 });
 
 module.exports = mongoose.model('Event', EventSchema);

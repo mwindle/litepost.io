@@ -1,4 +1,4 @@
-<div class="app-content">
+<div class="app-content event-settings">
   <header>
     <h2>
       <span class="emphasize">{{event.name}}</span> settings
@@ -8,6 +8,7 @@
   <div class="panel panel-default">
   	<div class="panel-heading">Basics</div>
   	<div class="panel-body">
+
 	  	<div class="form-group">
 				<label for="name">Event name</label>
 	  		<div class="input-group">
@@ -33,7 +34,7 @@
 		      	<input size="10" class="form-control" ng-model="updatedEvent.start" data-autoclose="1" placeholder="Start date" bs-datepicker type="text" />
 			    </div>
 			    <div class="form-group">
-			      <input size="8" class="form-control" ng-model="updatedEvent.start" ng-show="updatedEvent.start" data-autoclose="1" placeholder="Start time" bs-timepicker data-time-format="hh:mm a" data-length="1" data-minute-step="15" data-arrow-behavior="picker" type="text" />
+			      <input size="8" class="form-control" ng-model="updatedEvent.start" ng-show="updatedEvent.start" data-autoclose="1" placeholder="Start time" bs-timepicker data-time-format="hh:mm a" data-length="1" data-minute-step="1" data-arrow-behavior="picker" type="text" />
 			    </div>
 		  		<p>
 		  			Setting a start time on this event will help your viewers know when it will start, showing them a countdown to that start time on the event page. Setting a start time also ensures that any messages you post in this event will not be viewable until it starts. 
@@ -47,6 +48,16 @@
 			    </div>
 			   </div>
 			</div>
+
+	  	<div class="form-group">
+	  		<label for="description">Event description</label>
+	  		<div class="form-group">
+	  			<textarea id="description" class="form-control" ng-model="updatedEvent.description" />
+	  		</div>
+	  		<div class="form-group">
+	  			<button class="btn btn-default pull-right" ng-class="{'btn-default': isSetDescriptionDisabled(), 'btn-success': !isSetDescriptionDisabled()}"  ng-disabled="isSetDescriptionDisabled()" ng-click="setDescription()">Update description</button>
+	  		</div>
+	  	</div>
   	</div>
   </div>
 

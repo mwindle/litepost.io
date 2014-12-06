@@ -6,16 +6,7 @@
 var Message = require('../models/message');
 var auth = require('../auth');
 var marked = require('marked');
-marked.setOptions({
-  renderer: new marked.Renderer(),
-  gfm: true,
-  tables: true,
-  breaks: false,
-  pedantic: false,
-  sanitize: true,
-  smartLists: true,
-  smartypants: false
-});
+require('../public/js/marked-setup');
 
 module.exports = MessageApi;
 
