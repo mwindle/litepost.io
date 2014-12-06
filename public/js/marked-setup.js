@@ -1,7 +1,7 @@
 /*
 Setup marked for both the client and the server to keep the options and overrides in one place
 */
-(function (marked) {
+(function (marked, highlight) {
 	'use strict';
 
 	if(!marked) return;
@@ -27,6 +27,16 @@ Setup marked for both the client and the server to keep the options and override
     return out;
   }
 
+  // Syntax highlighting of code blocks with highlight.js
+  if(highlight) {
+	  var h = function (code) {
+	  	return highlight.highlightAuto(code).value;
+	  };
+	  marked.setOptions({
+	  	highlight: h
+	  });
+	}
+
   marked.setOptions({
     renderer: r,
     gfm: true,
@@ -38,4 +48,6 @@ Setup marked for both the client and the server to keep the options and override
     smartypants: false
   });
 
-})((typeof module !== 'undefined' && module.exports)?require('marked'):(typeof window !== 'undefined' && window.marked)?window.marked:null);
+}).apply(this, (typeof module !== 'undefined' && module.exports)?
+	[require('marked'), require('highlight.js')]:
+	[window.marked, window.hljs]);

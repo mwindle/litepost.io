@@ -298,6 +298,9 @@ angular.module('liveBlogApp', [
       $scope.$apply(function () {
         $scope.edited(e.getContent());
       });
+    },
+    onShow: function (e) {
+      e.$textarea.css('resize', 'vertical');
     }
   });
 
