@@ -6,18 +6,18 @@
 var http = require('http'),
 	mongoose = require('mongoose'),
 	chalk = require('chalk'),
-	config = require('./app/config/config'),
-	models = require('./app/config/models');
+	config = require('./config/config'),
+	models = require('./config/models');
 
 // Initialize the express application
-var app = require('./app/config/express')();
+var app = require('./config/express')();
 var server = http.createServer(app);
 
 // Setup passport config
-require('./app/config/passport')();
+require('./config/passport')();
 
 // Setup Socket.IO config
-require('./app/config/socket')(server);
+require('./config/socket')(server);
 
 // Setup routes
 require('./app/routes/core')(app);

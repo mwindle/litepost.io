@@ -6,7 +6,7 @@
 var marked = require('marked'),
 	markedSetup = require('../../../public/js/marked-setup'),
 	Message = require('mongoose').model('Message'),
-	emitter = require('../../config/emitter');
+	emitter = require('../../../config/emitter');
 
 // Get all messages associated with an event channel
 exports.getMessages = function(req, res) {
