@@ -28,26 +28,6 @@ angular.module('liveBlogApp', [
   return $resource('api/events/:channel/messages/:id', {id:'@_id'});
 })
 
-.filter('unsafe', function ($sce) {
-  return function (value) {
-    return $sce.trustAsHtml(value);
-  };
-})
-
-.directive('compileTemplate', function ($compile, $parse) {
-  return {
-    link: function (scope, element, attr) {
-      var parsed = $parse(attr.ngBindHtml);
-      function getStringValue() { return (parsed(scope) || '').toString(); }
-
-      //Recompile if the template changes
-      scope.$watch(getStringValue, function() {
-        $compile(element, null, -9999)(scope);  //The -9999 makes it skip directives so that we do not recompile ourselves
-      });
-    }
-  };
-})
-
 // Service for socket.io
 .factory('socket', function ($rootScope) {
   var socket, room;
@@ -81,6 +61,50 @@ angular.module('liveBlogApp', [
     disconnect: function () {
       if(!socket) { return false; }
       socket.emit('leave', room);
+    }
+  };
+})
+
+.factory('title', function ($rootScope) { 
+  return {
+    set: function (title) {
+      $rootScope.title = title;
+    },
+    get: function () {
+      return $rootScope.title;
+    }
+  };
+})
+
+.filter('unsafe', function ($sce) {
+  return function (value) {
+    return $sce.trustAsHtml(value);
+  };
+})
+
+.directive('compileTemplate', function ($compile, $parse) {
+  return {
+    link: function (scope, element, attr) {
+      var parsed = $parse(attr.ngBindHtml);
+      function getStringValue() { return (parsed(scope) || '').toString(); }
+
+      //Recompile if the template changes
+      scope.$watch(getStringValue, function() {
+        $compile(element, null, -9999)(scope);  //The -9999 makes it skip directives so that we do not recompile ourselves
+      });
+    }
+  };
+})
+
+.directive('title', function ($rootScope, $timeout, title) {
+  return {
+    restrict: 'E',
+    link: function () {
+      $rootScope.$on('$stateChangeSuccess', function (event, toState) {
+        $timeout(function () {
+          title.set(toState.data.title);
+        });
+      });
     }
   };
 })
@@ -190,7 +214,7 @@ angular.module('liveBlogApp', [
 })
 
 // event controller, shows the list of event messages and keeps them up to date
-.controller('EventCtrl', function ($scope, $stateParams, $anchorScroll, parallaxHelper, $timeout, Event, Message, socket) {
+.controller('EventCtrl', function ($scope, $stateParams, $anchorScroll, parallaxHelper, $timeout, Event, Message, socket, title) {
   $scope.pageClass = 'event';
   $scope.channel = $stateParams.channel;
   $scope.messages = [];
@@ -236,9 +260,22 @@ angular.module('liveBlogApp', [
   });
 
   $scope.event = Event.get({ channel: $scope.channel }, function () {
-    $scope.title = $scope.event.name;
+    $scope.setPageTitle();
     $scope.updateCountdown();
   });
+
+  $scope.setPageTitle = function () {
+    var t = 'LitePost.io';
+    if($scope.event && $scope.event.name) {
+      t = $scope.event.name + ' - ' + t;
+      if($scope.messages) {
+        t = '(' + $scope.messages.length + ') ' + t;
+      }
+    } else {
+      t = 'Event - ' + t;
+    }
+    title.set(t);
+  };
 
   $scope.isEventInPast = function () {
     return !!$scope.event.start && moment($scope.event.start).unix() < moment().unix();
@@ -256,6 +293,7 @@ angular.module('liveBlogApp', [
 
   Message.query({ channel: $scope.channel }, function (messages) {
     $scope.messages = $scope.messages.concat(messages);
+    $scope.setPageTitle();
     $timeout(function () {
       $anchorScroll();
     });
@@ -386,37 +424,43 @@ angular.module('liveBlogApp', [
     .state('main', {
       url: '/events',
       templateUrl: 'partials/myevents.html',
-      controller: 'MyEventsCtrl'
+      controller: 'MyEventsCtrl',
+      data: { title: 'Your Events - LitePost.io' }
     })
 
     .state('create', {
       url: '/create',
       templateUrl: 'partials/newevent.html',
-      controller: 'CreateEventCtrl'
+      controller: 'CreateEventCtrl',
+      data: { title: 'New Event - LitePost.io' }
     })
 
     .state('event', {
       url: '/events/:channel',
       templateUrl: 'partials/event.html',
-      controller: 'EventCtrl'
+      controller: 'EventCtrl',
+      data: { title: 'Event - LitePost.io' }
     })
 
     .state('post', {
       url: '/events/:channel/post',
       templateUrl: 'partials/postmessage.html',
-      controller: 'PostCtrl'
+      controller: 'PostCtrl',
+      data: { title: 'New Message - LitePost.io' }
     })
 
     .state('editPost', {
       url: '/events/:channel/post/:messageId',
       templateUrl: 'partials/postmessage.html',
-      controller: 'PostCtrl'
+      controller: 'PostCtrl',
+      data: { title: 'Edit Message - LitePost.io' }
     })
 
     .state('editEvent', {
       url: '/events/:channel/settings',
       templateUrl: 'partials/eventsettings.html',
-      controller: 'EventSettingsCtrl'
+      controller: 'EventSettingsCtrl',
+      data: { title: 'Event Settings - LitePost.io' }
     });
 });
 

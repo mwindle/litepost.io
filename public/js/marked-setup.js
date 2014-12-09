@@ -4,7 +4,7 @@ Setup marked for both the client and the server to keep the options and override
 (function (marked, highlight) {
 	'use strict';
 
-	if(!marked) return;
+	if(!marked) { return; }
 
 	var r = new marked.Renderer();
 
@@ -16,7 +16,7 @@ Setup marked for both the client and the server to keep the options and override
     var enableParallax = false;
    	if(title) {
    		enableParallax = !!title.match(enableParallaxMatch);
-   		if(enableParallax) { title = title.replace(enableParallaxMatch); }
+   		if(enableParallax) { title = title.replace(enableParallaxMatch, ''); }
    		out += ' title="' + title + '"';
    	}
    	if(enableParallax) {
@@ -25,7 +25,7 @@ Setup marked for both the client and the server to keep the options and override
    		out += ' />';
    	}
     return out;
-  }
+  };
 
   // Syntax highlighting of code blocks with highlight.js
   if(highlight) {

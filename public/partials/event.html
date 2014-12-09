@@ -1,35 +1,44 @@
-<h1 class="text-center event-title" ng-show="!isEventInPast()">
-	<span class="emphasize">{{event.name}}</span>
-</h1>
-<div class="text-center" ng-show="!isEventInPast()">
-	<br />
-	<h3 class="text-muted">will start in...</h3>
-	<br />
-	<div id="countdown-clock" class="text-center" />
-	<br />
-	<h5 class="text-muted">on {{event.start | amDateFormat:'dddd, MMMM Do YYYY [at] h:mm a'}}.</h5>
-	<button class="btn btn-info btn-xlrg">Subscribe and get a reminder</button>
-</div>
-<div class="event-status-bar text-center" ng-show="isEventInPast()">
-	<h4 class="text-center event-title">
-		<span class="emphasize">{{event.name}}</span>
-	</h4>
-	<div class="message-count-panel">
-		<header>Messages</header>
-		<span class="message-count">{{messages.length || 0}}</span>
+
+<div class="pending-event-view" ng-show="!isEventInPast()">
+	<h1 class="text-center event-title">
+		<span class="emphasize" ng-bind="event.name" />
+	</h1>
+	<div class="text-center">
+		<br />
+		<h3 class="text-muted">will start in...</h3>
+		<br />
+		<div id="countdown-clock" class="text-center" />
+		<br />
+		<h5 class="text-muted">on {{event.start | amDateFormat:'dddd, MMMM Do YYYY [at] h:mm a'}}.</h5>
+		<button class="btn btn-info btn-xlrg">Subscribe and get a reminder</button>
 	</div>
-	<div class="viewer-count-panel">
-		<header>Viewers</header>
-		<span class="viewer-count">{{viewers || 0}}
+</div>
+
+<div class="active-event-view" ng-show="isEventInPast()">
+	<div class="event-status-bar">
+		<h3 class="text-center event-title">
+			<span class="emphasize" ng-bind="event.name" />
+		</h3>
+		<div class="typing-status" ng-show="typing">
+			<span ng-show="typing.author" ng-bind="typing.author + ' is '" />
+			<span ng-bind="'typing...'" />
+		</div>
+		<div class="status-panel message-count-panel">
+			<header>Messages</header>
+			<span class="status-number" ng-bind="messages.length || 0" />
+		</div>
+		<div class="status-panel viewer-count-panel">
+			<header>Viewers</header>
+			<span class="status-number" ng-bind="viewers || 0" />
+		</div>
+		<a ui-sref="post({channel: event.channel})">
+			<button class="btn btn-primary"><span class="glyphicon glyphicon-pencil"></span> New Message</button>
+		</a>
+		<a ui-sref="editEvent({channel:event.channel})">
+			<button class="btn btn-default"><span class="glyphicon glyphicon-cog"></span> Event Settings</button>
+		</a>
 	</div>
-	<a ui-sref="post({channel: event.channel})"><button id="toggle-edit" class="btn btn-primary"><span class="glyphicon glyphicon-pencil"></span> New Message</button></a>
-	<a ui-sref="editEvent({channel:event.channel})">
-		<small><button class="btn btn-xs btn-default"><span class="glyphicon glyphicon-cog"></span> Event Settings</button></small>
-	</a>
+	<ol id="messages">
+		<li class="message" ng-repeat="message in messages" ng-include="'partials/message.html'" />
+	</ol>
 </div>
-<div class="typing-status" ng-show="typing">
-	<span><span ng-show="typing.author">{{typing.author}} is </span>typing...</span>
-</div>
-<ol id="messages" ng-show="isEventInPast()">
-	<li class="message" ng-repeat="message in messages" ng-include="'partials/message.html'" />
-</ol>

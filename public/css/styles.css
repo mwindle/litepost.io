@@ -43,9 +43,6 @@ a, a:hover {
 #top-bar .logo {
 	margin: 0px; 
 }
-.event-status-bar {
-
-}
 
 .main-content {
 	min-height: 100%;
@@ -127,16 +124,47 @@ a, a:hover {
 
 .event-status-bar {
 	border-bottom: 1px solid #CCC;
-	height: 50px;
+	width: 100%;
+	height: 60px;
+	background: #FFF;
+	display: none;
+	position: fixed;
+	top: 0px;
+	left: 0px;
 }
-.event-status-bar * {
+.event-status-bar .event-title {
+	margin: 0px;
+	width: 100%;
 	display: inline-block;
+	position: absolute;
+	left: 50%;
+	margin-left: -50%;
 }
-.message-count-panel, .viewer-count-panel {
-	height: 75px;
-	width: 75px;
+.status-panel {
+	min-height: 60px;
+	max-height: 60px;
+	min-width: 75px;
+	max-width: 75px;
+	margin-left: 5px;
 	border: 1px solid black;
+	text-align: center;
+	display: block;
+	position: relative;
+	float: left;
+	top: 0px;
+	text-transform: uppercase;
+	font-size: 0.8em;
+	background: #444;
+	color: #FFF;
+
 }
+.status-panel .message-count-panel {
+	margin-right: 20px;
+}
+.status-panel .status-number {
+	font-size: 1.8em;
+}
+
 .typing-status {
 	background: url("/images/imessage-sending-animated-gif.gif") center center no-repeat;
 	height: 40px;
@@ -221,6 +249,7 @@ form button { background: rgb(130, 224, 255); border: none; padding: 10px; }
 
 ol#messages {
 	width: 100%;
+	margin-top: 200px;
 }
 
 li.message { 
