@@ -43,7 +43,7 @@ Setup marked for both the client and the server to keep the options and override
     tables: true,
     breaks: true,
     pedantic: false,
-    sanitize: false,
+    sanitize: true,
     smartLists: true,
     smartypants: false
   });
