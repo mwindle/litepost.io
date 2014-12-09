@@ -1,13 +1,35 @@
 
-# OSX custom attribute store
+# iOS / Apple
 .DS_Store
+ehthumbs.db
+Icon?
+Thumbs.db
 
 # Sublime Text workspace and project files
+.sublime-project
 *.sublime-project
 *.sublime-workspace
 
 # Eclipse project files
-*.project
+.project
+.settings/
+.*.md.html
+.metadata
+*~.nib
+local.properties
+
+# General
+*.log
+*.csv
+*.dat
+*.out
+*.pid
+*.gz
+*.tmp
+*.bak
+*.swp
+logs/
+build/
 
 # Node.js node_modules, installed later with npm install
 node_modules
@@ -15,5 +37,5 @@ node_modules
 # Bower components
 public/components
 
-# Secrets that have no business in a public repo
-secrets.js
+# Secrets
+app/config/env

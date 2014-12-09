@@ -1,37 +1,28 @@
 'use strict';
 
-/* 
-	REST API controller for events model
-*/
-var Event = require('../models/event');
-var auth = require('../auth');
+/**
+ * Module dependencies.
+ */
+var Event = require('mongoose').model('Event');
 
-module.exports = EventApi;
-
-function EventApi(router) {
-	if(!(this instanceof EventApi)) { return new EventApi(router); }
-	router.get('/events/:id', this.getEvent.bind(this));
-	router.get('/events', this.getEventByChannel.bind(this));
-	router.post('/events', auth.ensureAuthenticated, this.createEvent.bind(this));
-	router.post('/events/:id', auth.ensureAuthenticated, this.updateEvent.bind(this));
-	router.delete('/events/:id', auth.ensureAuthenticated, this.deleteEvent.bind(this));
-}
-
-EventApi.prototype.getEvent = function (req, res) {
+// Get an event with the provided id
+exports.getEvent = function (req, res) {
 	Event.findById(req.params.id, function (err, event) {
 		if(err) { return res.send(err); }
 		res.json(event);
 	});
 };
 
-EventApi.prototype.getEventByChannel = function (req, res) {
+// Get an event with the provided channel
+exports.getEventByChannel = function (req, res) {
 	Event.findOne({ channel: req.query.channel }, function (err, event) {
 		if(err) { res.send(err); }
 		res.json(event);
 	});
 };
 
-EventApi.prototype.createEvent = function (req, res) {
+// Create a new event
+exports.createEvent = function (req, res) {
 	new Event({ 
 		name: req.body.name,
 		channel: req.body.channel, 
@@ -48,7 +39,8 @@ EventApi.prototype.createEvent = function (req, res) {
 	});
 };
 
-EventApi.prototype.updateEvent = function (req, res) {
+// Update an existing event
+exports.updateEvent = function (req, res) {
 	var updated = {};
 	if(req.body.hasOwnProperty('name')) { updated.name = req.body.name; }
 	if(req.body.hasOwnProperty('start')) { updated.start = req.body.start; }
@@ -62,7 +54,8 @@ EventApi.prototype.updateEvent = function (req, res) {
 	});
 };
 
-EventApi.prototype.deleteEvent = function (req, res) {
+// Delete event with the provided id
+exports.deleteEvent = function (req, res) {
 	Event.findByIdAndRemove(req.params.id, function (err, event) {
 		if(err) { return res.send(err); }
 		else { 
