@@ -37,5 +37,8 @@ node_modules
 # Bower components
 public/components
 
+# Build output
+public/dist
+
 # Secrets
 app/config/env

@@ -1,9 +1,14 @@
-'use strict';
+/*
+* Services for the myevents module
+*/
+(function () {
+	'use strict';
 
-angular.module('myevents').factory('Me', function ($resource) {
-  return $resource('api/me');
-})
+	angular.module('myevents').factory('Me', function ($resource) {
+	  return $resource('api/me');
+	})
 
-.factory('MyEvents', function ($resource) {
-  return $resource('api/me/events');
-});
+	.factory('MyEvents', function ($resource) {
+	  return $resource('api/me/events');
+	});
+})();

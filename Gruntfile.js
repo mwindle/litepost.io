@@ -7,7 +7,7 @@ module.exports = function(grunt) {
 		serverJS: ['Gruntfile.js', 'server.js', 'config/**/*.js', 'app/**/*.js'],
 		clientViews: ['public/modules/**/views/**/*.html'],
 		clientJS: ['public/js/*.js', 'public/modules/**/*.js'],
-		clientCSS: ['public/modules/**/*.css'],
+		clientCSS: ['public/css/styles.css', 'public/modules/**/*.css'],
 		mochaTests: ['app/tests/**/*.js']
 	};
 
@@ -50,10 +50,16 @@ module.exports = function(grunt) {
 			}
 		},
 		jshint: {
-			all: {
-				src: watchFiles.clientJS.concat(watchFiles.serverJS),
+			client: {
+				src: watchFiles.clientJS,
 				options: {
-					jshintrc: true
+					jshintrc: '.jshintrc.client'
+				}
+			},
+			server: {
+				src: watchFiles.serverJS,
+				options: {
+					jshintrc: '.jshintrc.server'
 				}
 			}
 		},
@@ -150,11 +156,10 @@ module.exports = function(grunt) {
 
 	// A Task for loading the configuration object
 	grunt.task.registerTask('loadConfig', 'Task that loads the config into a grunt option.', function() {
-		var init = require('./config/init')();
 		var config = require('./config/config');
-
-		grunt.config.set('applicationJavaScriptFiles', config.assets.js);
-		grunt.config.set('applicationCSSFiles', config.assets.css);
+		
+		grunt.config.set('applicationJavaScriptFiles', config.assets.lib.js.concat(config.assets.js));
+		grunt.config.set('applicationCSSFiles', config.assets.lib.css.concat(config.assets.css));
 	});
 
 	// Default task(s).
@@ -167,7 +172,7 @@ module.exports = function(grunt) {
 	grunt.registerTask('secure', ['env:secure', 'lint', 'concurrent:default']);
 
 	// Lint task(s).
-	grunt.registerTask('lint', ['jshint', 'csslint']);
+	grunt.registerTask('lint', ['jshint:client', 'jshint:server', 'csslint']);
 
 	// Build task(s).
 	grunt.registerTask('build', ['lint', 'loadConfig', 'ngAnnotate', 'uglify', 'cssmin']);

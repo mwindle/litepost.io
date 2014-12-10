@@ -35,13 +35,13 @@ a, a:hover {
 	color: #FFF; 
 	width: 100%; 
 	position: absolute;
-	top: 0px;
-	left: 0px;
+	top: 0;
+	left: 0;
 	padding: 10px;
 	height: 50px;
 }
 #top-bar .logo {
-	margin: 0px; 
+	margin: 0; 
 }
 
 .main-content {
@@ -62,7 +62,7 @@ a, a:hover {
 	margin-right: auto;
 }
 .hero-banner h1 {
-	margin-top: 0px;
+	margin-top: 0;
 }
 .hero-banner button {
 	font-size: 1em;
@@ -72,7 +72,7 @@ a, a:hover {
 	border-radius: 20px;
 }
 .textured-carbon-bg {
-	background: url('/images/tactile_noise.png') repeat scroll 0% 0% transparent;
+	background: url('/images/tactile_noise.png') repeat scroll 0 0 transparent;
 	color: #FFF;
 } 
 .home-page-tagline.textured-carbon-bg {
@@ -129,11 +129,11 @@ a, a:hover {
 	background: #FFF;
 	display: none;
 	position: fixed;
-	top: 0px;
-	left: 0px;
+	top: 0;
+	left: 0;
 }
 .event-status-bar .event-title {
-	margin: 0px;
+	margin: 0;
 	width: 100%;
 	display: inline-block;
 	position: absolute;
@@ -151,7 +151,7 @@ a, a:hover {
 	display: block;
 	position: relative;
 	float: left;
-	top: 0px;
+	top: 0;
 	text-transform: uppercase;
 	font-size: 0.8em;
 	background: #444;
@@ -195,7 +195,7 @@ form button { background: rgb(130, 224, 255); border: none; padding: 10px; }
 	z-index: 1;
 	position: absolute;
 	top: 1em;
-	left: 0px;
+	left: 0;
 	background: #EFEFEF;
 }
 #m { 
@@ -216,13 +216,13 @@ form button { background: rgb(130, 224, 255); border: none; padding: 10px; }
 }
 #message-preview { 
 	padding: 30px; 
-	padding-top: 0px;
+	padding-top: 0;
 }
 #action-panel {
 	width: 100%;
 	position: fixed;
-	bottom: 0px;
-	left: 0px;
+	bottom: 0;
+	left: 0;
 	background: #666;
 	padding: 10px;
 	border-top: 1px solid #000;
@@ -281,7 +281,7 @@ li.message {
 	top: -100px;
 	left: 15%;
 }
-.message-text h1, .message-text h2, .message-text h3 { margin-top: 0px; }
+.message-text h1, .message-text h2, .message-text h3 { margin-top: 0; }
 .message-text li { margin-left: 2em; }
 
 .event-settings #description {

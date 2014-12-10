@@ -36,14 +36,13 @@ module.exports = {
       	'public/components/bootstrap/dist/css/bootstrap.min.css',
       	'//fonts.googleapis.com/css?family=Oxygen',
       	'//fonts.googleapis.com/css?family=Oswald:400,300,700',
-      	'public/css/styles.css',
       	'public/components/bootstrap-markdown/css/bootstrap-markdown.min.css',
       	'//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/github.min.css',
       	'public/components/FlipClock/compiled/flipclock.css'
       ],
 	  },
 	  css: [		
-      'public/dist/application.min.css',
+      'public/css/styles.css'
 	  ],
     js: [
       'public/js/marked-setup.js',
