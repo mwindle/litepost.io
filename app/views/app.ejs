@@ -4,9 +4,6 @@
 		<title ng-bind="title">LitePost.io</title>
 		<base href="/app" />
 		<% include partials/stylesheets %>
-		<link rel="stylesheet" href="components/bootstrap-markdown/css/bootstrap-markdown.min.css" />
-		<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/github.min.css">
-		<link rel="stylesheet" href="components/FlipClock/compiled/flipclock.css" />
 	</head>
 	<body>
 		<% include partials/top-bar %>
@@ -15,24 +12,8 @@
 		</div>
 		<% include partials/footer %>
 
-		<script src="components/jquery/dist/jquery.js"></script>
-		<script src="components/socket.io-client/socket.io.js"></script>
-		<script src="components/FlipClock/compiled/flipclock.min.js"></script>
-		<script src="components/moment/moment.js"></script>
-		<script src="components/marked/lib/marked.js"></script>
-		<script src="components/bootstrap-markdown/js/bootstrap-markdown.js"></script>
-		<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
-		<script src="components/angular/angular.js"></script>
-		<script src="components/angular-resource/angular-resource.js"></script>
-		<script src="components/angular-ui-router/release/angular-ui-router.js"></script>
-		<script src="components/angular-cookies/angular-cookies.js"></script>
-		<script src="components/angular-sanitize/angular-sanitize.js"></script>
-		<script src="components/angular-moment/angular-moment.js"></script>
-		<script src="components/angular-strap/dist/angular-strap.js"></script>
-		<script src="components/angular-strap/dist/angular-strap.tpl.js"></script>
-		<script src="components/angular-scroll/angular-scroll.min.js"></script>
-		<script src="components/ng-parallax/angular-parallax.min.js"></script>
-		<script src="js/marked-setup.js"></script>
-		<script src="js/app.js"></script>
+		<% jsFiles.forEach(function (jsFile) { %>
+		<script src="<%= jsFile %>"></script>
+		<% }); %>
 	</body>
 </html>

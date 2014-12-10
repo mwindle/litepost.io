@@ -12,6 +12,7 @@
     "ejs": "^1.0.0",
     "express": "^4.10.1",
     "express-session": "^1.9.2",
+    "glob": "^4.3.1",
     "helmet": "^0.5.3",
     "highlight.js": "^8.4.0",
     "marked": "^0.3.2",

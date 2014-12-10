@@ -120,7 +120,6 @@ angular.module('liveBlogApp', [
   }, function (error) {
     window.location = '/login';
   });
-
 })
 
 .controller('CreateEventCtrl', function ($scope, $state, Me, MyEvents, Event, Message) {

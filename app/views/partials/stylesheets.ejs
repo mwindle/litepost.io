@@ -1,4 +1,3 @@
-<link rel="stylesheet" href="components/bootstrap/dist/css/bootstrap.min.css" />
-<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Oxygen" />
-<link rel="stylesheet" href='//fonts.googleapis.com/css?family=Oswald:400,300,700' />
-<link rel="stylesheet" href="/css/styles.css" />
+<% cssFiles.forEach(function (cssFile) { %>
+<link rel="stylesheet" href="<%= cssFile %>" />
+<% }); %>

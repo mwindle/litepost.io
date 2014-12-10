@@ -1,0 +1,18 @@
+<div id="editor">
+	<div id="editor-panel" class="clearfix text-center">
+		<textarea id="m" class="md-input" rows="5" autofocus > </textarea>
+	</div>
+	<div id="preview-panel">
+		<ol id="message-preview">
+			<li class="message" ng-repeat="message in [editingMessage]" ng-include="'partials/message.html'" />
+		</ol>
+	</div>
+	<div id="action-panel">
+		<a ui-sref="event({channel: channel})"><button id="close-editor" class="btn btn-default"><span class="glyphicon glyphicon-remove"></span> Cancel</button></a>
+		<span class="pull-right" ng-show="isMessageLoaded()">
+			<button id="delete" class="btn btn-danger" ng-click="delete()" ng-show="isUpdatingExisting()"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+			<button id="update" class="btn btn-primary" ng-click="update()" ng-show="isUpdatingExisting()"><span class="glyphicon glyphicon-edit"></span> Update</button>
+			<button id="publish" class="btn btn-primary" ng-click="publish()" ng-show="!isUpdatingExisting()"><span class="glyphicon glyphicon-share"></span> Publish</button>
+		</span>
+	</div>
+</div>

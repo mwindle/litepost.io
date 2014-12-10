@@ -18,6 +18,13 @@ var express = require('express'),
 module.exports = function () {
 	var app = express();
 
+	// Setting application local variables
+	app.locals.title = config.app.title;
+	app.locals.description = config.app.description;
+	app.locals.keywords = config.app.keywords;
+	app.locals.jsFiles = config.getJavaScriptAssets();
+	app.locals.cssFiles = config.getCSSAssets();
+
 	app.set('view engine', 'ejs');
 	app.set('views', path.resolve('./app/views'));
 
