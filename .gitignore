@@ -41,4 +41,4 @@ public/components
 public/dist
 
 # Secrets
-app/config/env
+config/env
