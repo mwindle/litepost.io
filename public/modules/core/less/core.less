@@ -1,0 +1,79 @@
+
+@import "../../../less/variables.less";
+
+.message-sent { 
+	.make-xs-column(10, 0);
+	.make-xs-column-offset(1);
+
+	.make-md-column(2, 0);
+	.make-md-column-offset(0);
+
+	font-size: 0.5em;
+		@media (@md) {
+			font-size: 1em;
+		}
+
+	text-align: left;
+		@media (@md) {
+			text-align: right;
+		}
+
+	padding: 1em;
+	
+	.sent-time {
+		color: @gray-dark;
+	}
+}
+
+.message-text {
+	.make-xs-column(10, 0);
+	.make-xs-column-offset(1);
+
+	.make-md-column(8, 0);
+	.make-md-column-offset(0);
+
+	font-size: @font-size-base;
+
+	h1, h2, h3, h4, h5, h6 {
+		margin-top: 0;
+	}
+
+	ul {
+		padding-left: 1.2em;
+	}
+
+	img {
+		border-radius: @message-img-border-radius;
+		display: block;
+		.img-responsive;
+	}
+
+	.parallax-image-wrapper {
+		width: auto;
+		max-width: 100%;
+		max-height: 70%;
+		display: inline-block;
+		position: static;
+		overflow: hidden;
+		border-radius: @message-img-border-radius;
+
+		/* 
+		* This fixes the overflow:hidden with border-radius in Chrome 
+		* See: http://stackoverflow.com/questions/5736503/how-to-make-css3-rounded-corners-hide-overflow-in-chrome-opera
+		*/
+	  -webkit-mask-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA5JREFUeNpiYGBgAAgwAAAEAAGbA+oJAAAAAElFTkSuQmCC);
+	
+		img {
+			width: auto;
+		}
+	}
+
+	pre {
+		code {
+			span {
+				white-space: nowrap;
+			}
+		}
+	}
+
+}

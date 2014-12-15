@@ -1,57 +1,20 @@
-// Core variables and mixins
-@import "../components/bootstrap/less/variables.less";
-@import "../components/bootstrap/less/mixins.less";
 
-// Overwrite and additional variables
-@import "variables.less";
+// Load all of Bootstrap core
+@import "../components/bootstrap/less/bootstrap.less";
 
-// Reset and dependencies
-@import "../components/bootstrap/less/normalize.less";
-@import "../components/bootstrap/less/print.less";
-@import "../components/bootstrap/less/glyphicons.less";
-
-// Core CSS
-@import "../components/bootstrap/less/scaffolding.less";
-@import "../components/bootstrap/less/type.less";
-@import "../components/bootstrap/less/code.less";
-@import "../components/bootstrap/less/grid.less";
-@import "../components/bootstrap/less/tables.less";
-@import "../components/bootstrap/less/forms.less";
-@import "../components/bootstrap/less/buttons.less";
-
-// Components
-@import "../components/bootstrap/less/component-animations.less";
-@import "../components/bootstrap/less/dropdowns.less";
-@import "../components/bootstrap/less/button-groups.less";
-@import "../components/bootstrap/less/input-groups.less";
-@import "../components/bootstrap/less/navs.less";
-@import "../components/bootstrap/less/navbar.less";
-@import "../components/bootstrap/less/breadcrumbs.less";
-@import "../components/bootstrap/less/pagination.less";
-@import "../components/bootstrap/less/pager.less";
-@import "../components/bootstrap/less/labels.less";
-@import "../components/bootstrap/less/badges.less";
-@import "../components/bootstrap/less/jumbotron.less";
-@import "../components/bootstrap/less/thumbnails.less";
-@import "../components/bootstrap/less/alerts.less";
-@import "../components/bootstrap/less/progress-bars.less";
-@import "../components/bootstrap/less/media.less";
-@import "../components/bootstrap/less/list-group.less";
-@import "../components/bootstrap/less/panels.less";
-@import "../components/bootstrap/less/responsive-embed.less";
-@import "../components/bootstrap/less/wells.less";
-@import "../components/bootstrap/less/close.less";
-
-// Components w/ JavaScript
-@import "../components/bootstrap/less/modals.less";
-@import "../components/bootstrap/less/tooltip.less";
-@import "../components/bootstrap/less/popovers.less";
-@import "../components/bootstrap/less/carousel.less";
-
-// Utility classes
-@import "../components/bootstrap/less/utilities.less";
-@import "../components/bootstrap/less/responsive-utilities.less";
+@import "../components/bootstrap-markdown/less/bootstrap-markdown.less";
+@import "//fonts.googleapis.com/css?family=Oxygen";
+@import "//fonts.googleapis.com/css?family=Oswald:400,300,700";
+@import "//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/github.min.css";
+@import "../components/FlipClock/compiled/flipclock.css";
 
 // Application LESS files
+@import "variables.less";
 @import "mixins.less";
-@import "styles.less"
+@import "styles.less";
+@import "pages/index.less";
+@import "pages/login.less";
+@import "../modules/core/less/core.less";
+@import "../modules/myevents/less/dashboard.less";
+@import "../modules/viewevent/less/viewevent.less";
+@import "../modules/postmessage/less/postmessage.less";

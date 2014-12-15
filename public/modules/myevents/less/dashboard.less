@@ -1,0 +1,45 @@
+
+@import "../../../less/variables.less";
+
+.event-summary-panel {
+
+	.panel-heading {
+		.event-summary-heading {
+			margin: 0;
+		}
+	}
+
+	.panel-body {
+		padding: 0;
+
+		.event-summary-row {
+			padding: 0.25em;
+			min-height: 4em;
+			border-bottom: 1px solid @gray-lighter;
+
+			.event-summary-icon {
+				display: inline-block;
+				width: 2em;
+			}
+
+			.event-summary-name {
+				display: inline-block;
+				width: 70%;
+			}
+
+			.event-summary-stats {
+				display: inline-block;
+				width: 20%;
+			}
+
+		}
+	}
+}
+
+.dashboard-container {
+	width: 800px;
+}
+
+.event-settings #description {
+	resize: none;
+}

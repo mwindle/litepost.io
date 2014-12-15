@@ -1,0 +1,33 @@
+
+@import "../variables.less";
+
+.home-page-tagline {
+	padding-bottom: 5em;
+	border-bottom: 1px solid @brand-primary;
+	box-shadow: inset 1px -25px 25px -25px @body-bg;
+	.text-center;
+	
+	.hero-banner {
+		.center-block();
+		width: 100%;
+			@media (@sm) {	
+				width: 80%;
+			}
+			@media (@md) {
+				width: 60%;
+			}
+
+		h1 {
+			margin-top: 0;
+		}
+
+		button {
+			font-size: 1em;
+			margin-top: 30px;
+			padding-left: 0.5em;
+			padding-right: 0.5em;
+			border-radius: 5px;
+			box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+		}
+	}
+}

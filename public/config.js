@@ -9,8 +9,10 @@ var ApplicationConfiguration = (function() {
 	  'mgcrea.ngStrap',
 	  'duParallax',
 	  'ngResource', 
+	  'ngAnimate',
 	  'ngSanitize', 
-	  'angularMoment'
+	  'angularMoment',
+	  'zumba.angular-waypoints'
 	];
 
 	// Add a new vertical module

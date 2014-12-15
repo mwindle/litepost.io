@@ -1,0 +1,11 @@
+{% set ngAppName = 'liveBlogApp' %}
+{% set page = 'app' %}
+{% extends 'layout.html' %}
+
+{% block content %}
+	<!-- 
+	For some reason, the tag below MUST have an explicit closing tag
+		...> </div> works, .. /> doesn't work. 
+	-->
+	<div class="view-content" ui-view> </div>
+{% endblock %}

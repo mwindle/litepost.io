@@ -9,7 +9,7 @@ module.exports = function(app) {
 
 	// Static home page
 	app.route('/').get(function (req, res) {
-		res.render('', { page: 'home', user: req.user });
+		res.render('');
 	});
 
 	// Join (sign up) routes
@@ -25,7 +25,7 @@ module.exports = function(app) {
 
 	// Routes /app/* to the AngularJS app, the regex lets Angular do its client-side magic
 	app.route(/^\/app(\/.*)?$/).get(function (req, res) {
-		res.render('app', { page: 'app', user: req.user });
+		res.render('app');
 	});
 
 };

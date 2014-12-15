@@ -11,6 +11,7 @@ var express = require('express'),
 	helmet = require('helmet'),
 	compress = require('compression'),
 	passport = require('passport'),
+	cons = require('consolidate'),
 	chalk = require('chalk'),
 	path = require('path'),
 	config = require('./config');
@@ -25,7 +26,14 @@ module.exports = function () {
 	app.locals.jsFiles = config.getJavaScriptAssets();
 	app.locals.cssFiles = config.getCSSAssets();
 
-	app.set('view engine', 'ejs');
+	// Passing the request url to environment locals
+	app.use(function (req, res, next) {
+		res.locals.url = req.protocol + '://' + req.headers.host + req.url;
+		next();
+	});
+
+	app.engine('html', cons.swig);
+	app.set('view engine', 'html');
 	app.set('views', path.resolve('./app/views'));
 
 	app.use(bodyParser.json());
@@ -50,9 +58,9 @@ module.exports = function () {
 	app.use(helmet.ienoopen());
 	app.disable('x-powered-by');
 
-	// Passing the request url to environment locals
-	app.use(function(req, res, next) {
-		res.locals.url = req.protocol + '://' + req.headers.host + req.url;
+	// Pass the currently authenticated user to locals
+	app.use(function (req, res, next) {
+		res.locals.user = req.user;
 		next();
 	});
 

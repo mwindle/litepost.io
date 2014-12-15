@@ -8,7 +8,7 @@ var passport = require('passport'),
 
 // Static request to join page
 exports.join = function (req, res) {
-	res.render('join', { page: 'join', user: req.user });
+	res.render('join');
 };
 
 // Process join form submission
@@ -37,7 +37,7 @@ exports.doJoin = function (req, res) {
 
 // Static request to login page
 exports.login = function (req, res) {
-	res.render('login', { page: 'login'	});
+	res.render('login');
 };
 
 // Delegate processing of login form submission to passport-local

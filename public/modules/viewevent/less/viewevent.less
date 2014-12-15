@@ -1,0 +1,158 @@
+
+@import "../../../less/variables.less";
+
+#countdown-text {
+	width: 100%;
+	max-width: 100%;
+	
+	.text-center;
+
+	/*
+	* Show this text countdown by default for mobile, upgrade to FlipClock.js on medium+ displays. 
+	*/
+	display: block;
+		@media (@md) {
+			display: none;
+		}
+}
+
+#countdown-clock {
+	width: 650px;
+	max-width: 90%;
+	margin-left: auto;
+	margin-right: auto;
+
+	.text-center;
+
+	/*
+	*	FlipClock.js is not responsive. 
+	* 	https://github.com/objectivehtml/FlipClock/issues/161
+	* Only show the fancy countdown on medium+ displays.
+	* 	Fallback to a less specific textual version of the time until event start. 
+	*/
+	display: none;
+		@media (@md) {
+			display: block;
+		}
+
+	.flip-clock-label, .flip-clock-divider {
+		font-size: 1.2em;
+		font-weight: 700;
+		font-family: 'Oswald';
+	}
+}
+
+.event-header-bar {
+	width: 100%;
+	background: #FFF;
+	padding: 1em;
+
+	.event-title {
+		.text-center;
+		margin: 0;
+	}
+
+	.event-creator {
+		.text-center;
+		.text-muted;
+		font-size: @font-size-small;
+	}
+
+	.event-postmessage {
+		.text-center;
+		font-size: @font-size-small;
+	}
+}
+
+.event-status-bar {
+	border-bottom: 1px solid #CCC;
+	width: 100%;
+	background: #FFF;
+	position: relative;
+	transition: all 0.5s ease;
+
+	&.sticky {
+		position: fixed;
+		top: 0;
+		left: 0;
+		z-index: 5;
+
+		.event-status-title {
+			display: inline-block;
+		}
+	}
+
+	.event-status-title {
+		display: none;
+		position: absolute;
+		right: 0;
+		top: 0;
+		padding-right: 1em;
+		transition: all 0.5s ease;
+
+		font-size: (@font-size-small * 0.9);
+			@media (@sm) {
+				font-size: @font-size-large;
+			}
+	}
+
+	.typing-status {
+		display: inline-block;
+		position: absolute;
+		right: 0;
+		bottom: 0;
+		font-size: (@font-size-small * 0.6);
+			@media (@sm) {
+				font-size: @font-size-small;
+			}
+	}
+
+	.status-panel {
+		display: inline-block;
+		font-size: (@font-size-small * 0.5);
+			@media (@sm) {
+				font-size: @font-size-small;
+			}
+		text-transform: uppercase;
+		.text-center;
+		padding: 0 0 0 1em;
+
+		.status-number {
+			font-size: (@font-size-small * 0.9);
+				@media (@sm) {
+					font-size: @font-size-large;
+				}
+			border-bottom: 2px solid @brand-primary;
+			display: block;
+			width: 4em;
+
+			.unread-message-count {
+				vertical-align: super;
+				font-size: (@font-size-small * 0.6);
+					@media (@sm) {
+						font-size: @font-size-small;
+					}
+
+				background: @brand-primary;
+				color: white;
+				padding: 0 0.1em 0 0.1em;
+				border-radius: 10%;
+				position: relative;
+
+			}
+		}
+	}
+}
+
+#messages {
+	padding: 0;
+	margin: 0;
+
+	.message { 
+		list-style: none;
+		width: 100%; 
+		margin: 0;
+		padding: 0;
+		margin-top: 3em;
+	}
+}

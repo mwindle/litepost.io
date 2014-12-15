@@ -16,6 +16,10 @@
     $scope.background = parallaxHelper.createAnimator(-0.3);
     socket.connect($scope.channel);
 
+    $scope.$on('$destroy', function () {
+      socket.disconnect();
+    });
+
     if($scope.messageId) {
       $scope.editingMessage = Message.get({ 
         channel: $scope.channel, 

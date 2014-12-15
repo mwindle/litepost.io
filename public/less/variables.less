@@ -1,0 +1,49 @@
+
+// Import Bootrap for variables and mixins to pass lint, ignored by LESS compiler later
+@import "../components/bootstrap/less/bootstrap.less";
+
+/*
+* Bootstrap overrides
+*/
+// Override Bootstrap's location for the font library 
+@icon-font-path: "/components/bootstrap/fonts/";
+
+
+// Colors
+//@brand-primary: #c7254e;
+@brand-primary: #25BAC2;//#3D97CC;
+@brand-info: lighten(@brand-primary, 30%);
+
+// Scaffolding
+@body-bg: #EFEFEF;
+
+
+// Typography
+@font-family-sans-serif: "Oxygen", "Helvetica Neue", Helvetica, Arial, sans-serif;
+@font-size-base: 16px;
+
+@headings-font-family: "Oswald", @font-family-sans-serif;
+@headings-font-weight: 300;
+
+
+// Components
+@padding-small-vertical: 16px;
+@padding-large-vertical: 30px;
+
+
+
+/*
+* Custom style variables
+*/
+// Convenience strings for media queries
+@sm: ~'min-width: @{screen-sm-min}';
+@md: ~'min-width: @{screen-md-min}';
+@lg: ~'min-width: @{screen-lg-min}';
+
+// Typography
+@font-color-on-bg: #FFF;
+
+// Components
+@main-footer-height: 10em;
+@message-img-border-radius: 5px;
+

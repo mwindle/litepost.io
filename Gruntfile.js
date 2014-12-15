@@ -7,7 +7,8 @@ module.exports = function(grunt) {
 		serverJS: ['Gruntfile.js', 'server.js', 'config/**/*.js', 'app/**/*.js'],
 		clientViews: ['public/modules/**/views/**/*.html'],
 		clientJS: ['public/js/*.js', 'public/modules/**/*.js'],
-		clientCSS: ['public/css/styles.css', 'public/modules/**/*.css'],
+		clientCSS: ['public/dist/application.min.css'],
+		clientLESS: ['public/less/**/*.less', 'public/modules/**/*.less'],
 		mochaTests: ['app/tests/**/*.js']
 	};
 
@@ -42,8 +43,8 @@ module.exports = function(grunt) {
 				}
 			},
 			clientCSS: {
-				files: watchFiles.clientCSS,
-				tasks: ['csslint'],
+				files: watchFiles.clientLESS,
+				tasks: ['lesslint', 'less', 'autoprefixer'],
 				options: {
 					livereload: true
 				}
@@ -63,12 +64,12 @@ module.exports = function(grunt) {
 				}
 			}
 		},
-		csslint: {
+		lesslint: {
+			src: watchFiles.clientLESS,
 			options: {
-				csslintrc: '.csslintrc'
-			},
-			all: {
-				src: watchFiles.clientCSS
+				csslint: {
+					csslintrc: '.csslintrc'
+				}
 			}
 		},
 		uglify: {
@@ -81,11 +82,22 @@ module.exports = function(grunt) {
 				}
 			}
 		},
-		cssmin: {
-			combine: {
-				files: {
-					'public/dist/application.min.css': '<%= applicationCSSFiles %>'
-				}
+		less: {
+	    production: {
+        options: {
+          paths: ['public/less'],
+          cleancss: true,
+          strictMath: true
+        },
+        files: {
+	        'public/dist/application.min.css': 'public/less/application.less'
+        }
+	    }
+		},
+		autoprefixer: {
+			single_file: {
+				src: 'public/dist/application.min.css',
+				dest: 'public/dist/application.min.css'
 			}
 		},
 		nodemon: {
@@ -172,10 +184,10 @@ module.exports = function(grunt) {
 	grunt.registerTask('secure', ['env:secure', 'lint', 'concurrent:default']);
 
 	// Lint task(s).
-	grunt.registerTask('lint', ['jshint:client', 'jshint:server', 'csslint']);
+	grunt.registerTask('lint', ['jshint:client', 'jshint:server', 'lesslint']);
 
 	// Build task(s).
-	grunt.registerTask('build', ['lint', 'loadConfig', 'ngAnnotate', 'uglify', 'cssmin']);
+	grunt.registerTask('build', ['lint', 'loadConfig', 'ngAnnotate', 'uglify', 'less', 'autoprefixer']);
 
 	// Test task.
 	grunt.registerTask('test', ['env:test', 'mochaTest', 'karma:unit']);

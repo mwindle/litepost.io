@@ -9,8 +9,8 @@ module.exports = {
 	port: 3000,
 	db: 'mongodb://localhost',
 	sessionSecret: 'litepost.io',
-  assets: {
-	  lib: {
+    assets: {
+    lib: {
       js: [
         'public/components/jquery/dist/jquery.js',
         'public/components/socket.io-client/socket.io.js',
@@ -30,20 +30,16 @@ module.exports = {
         'public/components/angular-scroll/angular-scroll.js',
         'public/components/ng-parallax/angular-parallax.js',
         'public/components/angular-strap/dist/angular-strap.js',
-        'public/components/angular-strap/dist/angular-strap.tpl.js'
+        'public/components/angular-strap/dist/angular-strap.tpl.js',
+        'public/components/angular-waypoints/dist/angular-waypoints.all.js'
       ],
       css: [
-      	'public/components/bootstrap/dist/css/bootstrap.min.css',
-      	'//fonts.googleapis.com/css?family=Oxygen',
-      	'//fonts.googleapis.com/css?family=Oswald:400,300,700',
-      	'public/components/bootstrap-markdown/css/bootstrap-markdown.min.css',
-      	'//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/github.min.css',
-      	'public/components/FlipClock/compiled/flipclock.css'
+
       ],
-	  },
-	  css: [		
-      'public/css/styles.css'
-	  ],
+    },
+    css: [    
+      'public/dist/application.min.css'
+    ],
     js: [
       'public/js/marked-setup.js',
       'public/config.js',
@@ -51,9 +47,9 @@ module.exports = {
       'public/modules/*/*.js',
       'public/modules/*/*[!tests]*/*.js'
     ],
-	  tests: [
+    tests: [
       'public/components/angular-mocks/angular-mocks.js',
       'public/modules/*/tests/*.js'
-	  ]
+    ]
   }
 };
