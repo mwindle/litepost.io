@@ -4,47 +4,39 @@
 (function () {
   'use strict';
 
-  angular.module('myevents').controller('MyEventsController', function ($scope, Me, MyEvents, Event, Message) {
+  angular.module('myevents')
+
+  /**
+  * Controller to load and expose the users events
+  */
+  .controller('MyEventsController', function ($scope, Me, MyEvents) {
     $scope.user = Me.get(function (data) { 
-      $scope.user.events = MyEvents.query(function(events) {
-        for(var i=0; i<events.length; i++) {
-          events[i].messages = Message.query({channel: events[i].channel});
-          events[i].viewers = Math.round(Math.random()*1000);
-        }
-      });
-    }, function (error) {
-      window.location = '/login';
+      $scope.user.events = MyEvents.query();
     });
   })
 
-  .controller('CreateEventController', function ($scope, $state, Me, MyEvents, Event, Message) {
-    $scope.user = Me.get(function (data) { 
-      $scope.user.events = MyEvents.query(function(events) {
-        for(var i=0; i<events.length; i++) {
-          events[i].messages = Message.query({channel: events[i].channel});
-          events[i].viewers = Math.round(Math.random()*1000);
-        }
-      });
-    }, function (error) {
-      window.location = '/login';
-    });
+  /**
+  * Controller to create a new event
+  */
+  .controller('CreateEventController', function ($scope, $state, Event) {
 
     $scope.createEvent = function () {
-      new Event({
-        channel: $scope.channel,
-        name: $scope.name
-      }).$save(function (event) {
-        $scope.user.events.push(event);
-        $scope.channel = $scope.name = '';
-        $state.go('main');
-      });
+      if($scope.channel && $scope.name) {
+        new Event({
+          channel: $scope.channel,
+          name: $scope.name
+        }).$save(function (event) {
+          $state.go('main');
+        });
+      }
     };
 
   })
 
-  // controller for managing the settings of an event
+  /**
+  * Controller for managing the settings of an event
+  */
   .controller('EventSettingsController', function ($scope, $state, $stateParams, Event) {
-    $scope.pageClass = 'settings';
     $scope.channel = $stateParams.channel;
     $scope.event = Event.get({ channel: $scope.channel }, function () {
       $scope.updatedEvent = angular.copy($scope.event);

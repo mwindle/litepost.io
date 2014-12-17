@@ -9,7 +9,7 @@ module.exports = {
 	port: 3000,
 	db: 'mongodb://localhost',
 	sessionSecret: 'litepost.io',
-    assets: {
+  assets: {
     lib: {
       js: [
         'public/components/jquery/dist/jquery.js',
