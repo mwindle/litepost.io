@@ -5,7 +5,7 @@
   'use strict';
 
   angular.module('postmessage').controller('PostController', 
-    function ($scope, $state, $stateParams, $timeout, Event, Message, socket, parallaxHelper) {
+    function ($scope, $state, $stateParams, $timeout, Event, Message, EventSocket, parallaxHelper) {
     $scope.channel = $stateParams.channel;
     $scope.messageId = $stateParams.messageId;
     $scope.event = Event.get({ channel: $scope.channel });
@@ -14,10 +14,10 @@
     $scope.editor = angular.element('#m');
     $scope.typing = false;
     $scope.background = parallaxHelper.createAnimator(-0.3);
-    socket.connect($scope.channel);
+    EventSocket.connect($scope.channel);
 
     $scope.$on('$destroy', function () {
-      socket.disconnect();
+      EventSocket.disconnect();
     });
 
     if($scope.messageId) {
@@ -87,12 +87,12 @@
     };
 
     $scope.startTyping = function () {
-      socket.emit('typing');
+      EventSocket.emit('typing');
       $scope.typing = true;
     };
 
     $scope.stopTyping = function () {
-      socket.emit('stop-typing');
+      EventSocket.emit('stop-typing');
       $scope.typing = false;
     };
 

@@ -6,6 +6,7 @@ var ApplicationConfiguration = (function() {
 	var applicationModuleName = 'liveBlogApp';
 	var applicationModuleVendorDependencies = [
 	  'ui.router', 
+	  'btford.socket-io',
 	  'mgcrea.ngStrap',
 	  'duParallax',
 	  'ngResource', 

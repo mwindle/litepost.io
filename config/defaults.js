@@ -21,6 +21,7 @@ module.exports = {
         '//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js',
         'public/components/angular/angular.js',
         'public/components/angular-resource/angular-resource.js', 
+        'public/components/angular-socket-io/socket.js', 
         'public/components/angular-cookies/angular-cookies.js', 
         'public/components/angular-animate/angular-animate.js', 
         'public/components/angular-touch/angular-touch.js', 
@@ -49,6 +50,7 @@ module.exports = {
     ],
     tests: [
       'public/components/angular-mocks/angular-mocks.js',
+      'public/components/angular-socket-io/mock/socket-io.js',
       'public/modules/*/tests/*.js'
     ]
   }
