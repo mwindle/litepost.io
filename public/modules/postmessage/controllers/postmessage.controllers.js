@@ -115,7 +115,7 @@
     };
 
     $scope.delete = function () {
-      if($scope.editingMessage) {
+      if($scope.isUpdatingExisting() && $scope.isMessageLoaded()) {
         $scope.editingMessage.$delete({ channel: $scope.channel }).then(function (message) {
           $scope.editingMessage = null;
           $scope.disableEditing();
