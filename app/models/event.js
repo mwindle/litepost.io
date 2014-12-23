@@ -2,8 +2,15 @@
 var mongoose = require('mongoose');
 
 var EventUserSchema = mongoose.Schema({
-	user: { type: mongoose.Schema.ObjectId, ref: 'User' },
-	role: { type: String, enum: ['creator', 'admin', 'author'] }
+	user: { 
+		type: mongoose.Schema.ObjectId, 
+		ref: 'User' 
+	},
+	role: { 
+		type: String, 
+		required: true,
+		enum: ['creator', 'admin', 'author'] 
+	}
 });
 
 var EventSchema = mongoose.Schema({
@@ -25,7 +32,10 @@ var EventSchema = mongoose.Schema({
 		// Allow alphanumeric, _ (underscore), and - (dash) characters. Must be 3-32 characters long (inclusive).
 		match: /^[a-z0-9_\-]{3,32}$/i
 	},
-	hidden: { tyoe: Boolean, default: false },
+	hidden: { 
+		type: Boolean, 
+		default: false 
+	},
 	users: [EventUserSchema],
 	start: Date,
 	description: {
