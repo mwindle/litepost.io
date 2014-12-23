@@ -10,7 +10,7 @@
 module.exports = function (app) {
 
 	// REST API for events resource
-	app.route('/api/events:id').get(events.getEvent);
+	app.route('/api/events/:id').get(events.getEvent);
 	app.route('/api/events').get(events.getEventByChannel);
 	app.route('/api/events').post(events.createEvent);
 	app.route('/api/events/:id').post(events.updateEvent);
