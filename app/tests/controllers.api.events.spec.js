@@ -12,17 +12,6 @@ var Event = mongoose.model('Event');
 
 describe('/api/events', function () {
 	var req, res, mocks;
-	
-	beforeEach(function () {
-		this.addMatchers({
-			toBeCustom: function (expected) {
-				console.log(arguments);
-				console.log(this);
-				var actual = this.actual;
-				return actual === expected;
-			}
-		});
-	});
 
 	// Setup data-only equals comparison for objects
 	beforeEach(function() {
