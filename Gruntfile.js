@@ -8,8 +8,7 @@ module.exports = function(grunt) {
 		clientViews: ['public/modules/**/views/**/*.html'],
 		clientJS: ['public/js/*.js', 'public/modules/**/*.js'],
 		clientCSS: ['public/dist/application.min.css'],
-		clientLESS: ['public/less/**/*.less', 'public/modules/**/*.less'],
-		mochaTests: ['app/tests/**/*.js']
+		clientLESS: ['public/less/**/*.less', 'public/modules/**/*.less']
 	};
 
 	// Project Configuration
@@ -146,18 +145,21 @@ module.exports = function(grunt) {
 				NODE_ENV: 'secure'
 			}
 		},
-		mochaTest: {
-			src: watchFiles.mochaTests,
-			options: {
-				reporter: 'spec',
-				require: 'server.js'
-			}
-		},
 		karma: {
 			unit: {
 				configFile: 'karma.conf.js'
 			}
-		}
+		},
+	  jasmine_node: {
+	    options: {
+	      forceExit: true,
+	      match: '.',
+	      matchall: true,
+	      extensions: 'js',
+	      specNameMatcher: 'spec'
+	    },
+	    all: ['app/tests/']
+	  }
 	});
 
 	// Load NPM tasks
@@ -190,5 +192,5 @@ module.exports = function(grunt) {
 	grunt.registerTask('build', ['lint', 'loadConfig', 'ngAnnotate', 'uglify', 'less', 'autoprefixer']);
 
 	// Test task.
-	grunt.registerTask('test', ['env:test', 'mochaTest', 'karma:unit']);
+	grunt.registerTask('test', ['env:test', 'jasmine_node', 'karma:unit']);
 };
