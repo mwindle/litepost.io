@@ -76,14 +76,14 @@ mocks.setup = function () {
 		channel: 'new-channel',
 		hidden: true,
 		start: new Date(),
-		description: 'Updated'
+		description: 'Updated \n description with \n newlines.'
 	});
 
 	beforeEach(function (done) {
 		mocks.message = new Message({
 			channel: mocks.event.channel,
-			text: 'This is a test message',
-			html: '<p>This is a test message</p>',
+			text: 'This is a test message\nwith a newline.',
+			html: '<p>This is a test message</p>\n<p>with a newline.</p>',
 			sent: new Date()
 		}).save(function (err, message) {
 			mocks.message = message;

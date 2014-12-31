@@ -175,14 +175,14 @@ describe('/api/messages', function () {
 		beforeEach(function () {
 			req.method = 'POST';
 			req.body = {
-      	text: 'An updated message'
+      	text: 'An \nupdated \nmessage'
       };
       req.params.id = mocks.message._id.toString();
 		});
 
 		it('should update a message when provided id and text are valid', function (done) {
 			res.json = function (message) {
-				expect(message.text).toEqual('An updated message');
+				expect(message.text).toEqual(req.body.text);
 				done();
 			};
 			messages.updateMessage(req, res);

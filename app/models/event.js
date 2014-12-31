@@ -20,7 +20,7 @@ var EventSchema = mongoose.Schema({
 		trim: true,
 
 		// Allow all characters. Must be 3-128 characters long (inclusive). 
-		match: /^.{3,128}$/
+		match: /^[\s\S]{3,128}$/
 	},
 	channel: { 
 		type: String, 
@@ -43,7 +43,7 @@ var EventSchema = mongoose.Schema({
 		trim: true,
 
 		// Allow all characters. Must be less than or equal to 1024 characters long.
-		match: /^.{0,1024}$/
+		match: /^[\s\S]{0,1024}$/
 	}
 });
 

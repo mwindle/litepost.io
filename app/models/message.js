@@ -10,7 +10,7 @@ var MessageSchema = new mongoose.Schema({
 		required: true,
 
 		// Allow all characters. Must be 1-1024 characters long (inclusive). 
-		match: /^.{1,1024}$/
+		match: /^[\s\S]{1,1024}$/
 	},
 	html: {
 		type: String,
