@@ -9,7 +9,7 @@ module.exports = function(app) {
 
 	// Static home page
 	app.route('/').get(function (req, res) {
-		res.render('');
+		res.render('index');
 	});
 
 	// Join (sign up) routes
