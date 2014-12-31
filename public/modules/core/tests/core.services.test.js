@@ -9,6 +9,31 @@
 		// Load the main application module from the global app config
 		beforeEach(module(ApplicationConfiguration.applicationModuleName));
 
+		describe('pageClass service', function () {
+			var $rootScope, pageClass;
+
+			// Setup injected services
+			beforeEach(inject(function ($injector) {
+				$rootScope = $injector.get('$rootScope');
+				pageClass = $injector.get('pageClass');
+			}));
+
+			// Setup $rootScope.pageClass with default value
+			beforeEach(function () {
+				$rootScope.pageClass = 'default';
+			});
+
+			it('get method should get pageClass from $rootScope', function () {
+				expect(pageClass.get()).toEqual($rootScope.pageClass);
+			});
+
+			it('set method should set pageClass on $rootScope', function () {
+				pageClass.set('testing');
+				expect($rootScope.pageClass).toEqual('testing');
+			});
+
+		});
+
 		describe('title service', function () {
 			var $rootScope, title;
 

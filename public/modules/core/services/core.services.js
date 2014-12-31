@@ -22,6 +22,20 @@
   })
 
   /**
+  * Service to expose access to pageClass property on $rootScope
+  */
+  .factory('pageClass', function ($rootScope) {
+    return {
+      set: function (pageClass) {
+        $rootScope.pageClass = pageClass;
+      },
+      get: function () {
+        return $rootScope.pageClass;
+      }
+    };
+  })
+
+  /**
   * Service to expose access to title propery on $rootScope
   */
   .factory('title', function ($rootScope) { 
