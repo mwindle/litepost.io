@@ -1,108 +1,14 @@
 'use strict';
 
-require('../models/user');
-require('../models/event');
-var mongoose = require('mongoose'),
-	mockgoose = require('mockgoose'),
-	httpMocks = require('node-mocks-http'),
+var httpMocks = require('node-mocks-http'),
+	matchers = require('./matchers'),
+	mocks = require('./mocks'),
 	events = require('../controllers/api/events');
-mockgoose(mongoose);
-var User = mongoose.model('User');
-var Event = mongoose.model('Event');
 
 describe('/api/events', function () {
-	var req, res, mocks;
+	var req, res;
 
-	// Setup data-only equals comparison for objects
-	beforeEach(function() {
-		this.addMatchers({
-
-			/**
-			* Compares the data of two objects/properties for equality. 
-			* Checks for equality of all boolean, number, and string properties and 
-			* sub-object properties of the provided actual and expected. 
-			*/
-			toEqualData: function(expected) {
-
-        return (function compare(actual, expected) {
-        	// If expected is undefined (not provided to function), return true if
-        	// actual is also undefined, false otherwise. 
-        	if(expected === undefined) {
-        		return actual === undefined;
-        	}
-
-        	// Test if actual is null first since typeof null === 'object' and we don't
-					// want to fall into that case here. 
-					if(actual === null) {
-						return expected === null;
-					}
-
-					switch(typeof actual) {
-						case 'object':
-							// Get the actual and expected properties of the object
-							var keys = Object.getOwnPropertyNames(actual);
-							var expectedKeys = Object.getOwnPropertyNames(expected);
-
-							// Make sure they have the same number of properties
-							if(keys.length !== expectedKeys.length) {
-								return false;
-							}
-
-							// Iterate over actual keys and recursively compare with expected
-							for(var i=0; i<keys.length; i++) {
-								if(!compare(actual[keys[i]], expected[keys[i]])) {
-									return false;
-								}
-							}
-							break;
-						case 'boolean':
-						case 'number':
-						case 'string':
-							if(actual !== expected) {
-								return false;
-							}
-							break;
-						default:
-							// Ignore Functions, Symbols, and anything else
-							break;
-					}
-					return true;
-        })(this.actual, expected);			
-			}
-		});
-	});
-
-	beforeEach(function (done) {
-		mockgoose.reset();
-		done();
-	});
-
-	beforeEach(function (done) {
-		mocks = {};
-		new User({
-			email: 'test@valid.com',
-			password: 'testing'
-		}).save(function (err, user) {
-			mocks.user = user;
-			done();
-		});
-	});
-
-	beforeEach(function (done) {
-		mocks.event = new Event({
-			name: 'Test Event',
-			channel: 'test-event',
-			users: [{
-				user: mocks.user,
-				role: 'creator'
-			}],
-			start: new Date(),
-			description: 'Test description'
-		}).save(function (err, event) {
-			mocks.event = event;
-			done();
-		});
-	});
+	mocks.setup();
 
 	beforeEach(function () {
 		req = httpMocks.createRequest({
@@ -120,7 +26,7 @@ describe('/api/events', function () {
 
 	describe('getEvent method', function () {
 
-		it('should respond with the an event', function (done) {
+		it('should respond with an event', function (done) {
 			res.json = function (event) {
 				expect(event.toObject()).toEqualData(mocks.event.toObject());
 				done();
@@ -129,32 +35,32 @@ describe('/api/events', function () {
 		});
 
 		it('should respond with 404 when the event doesn\'t exist', function (done) {
-			res.json = function (json) {
+			res.json = function (err) {
 				expect(res.statusCode).toEqual(404);
 				done();
 			};
 			// Set the id in the params to be a valid, non-existent id
-			req.params.id = '000000000000000000000000';
+			req.params.id = mocks.nonExistentId;
 			events.getEvent(req, res);
 		});
 
 		it('should respond with 404 when an invalid id is provided', function (done) {
-			res.json = function (json) {
+			res.json = function (err) {
 				expect(res.statusCode).toEqual(404);
 				done();
 			};
 			// Set the id in the params to be invalid
-			req.params.id = 'invalid';
+			req.params.id = mocks.invalidId;
 			events.getEvent(req, res);
 		});
 
 		it('should not be vulnerable to mongo injection', function (done) {
-			res.json = function (json) {
+			res.json = function (err) {
 				expect(res.statusCode).toEqual(404);
 				done();
 			};
 			// Set the id in the params with a mongo injection value
-			req.params.id = { '$gt': '' };
+			req.params.id = mocks.mongoInjectionValue;
 			events.getEvent(req, res);
 		});
 
@@ -162,7 +68,7 @@ describe('/api/events', function () {
 
 	describe('getEventByChannel method', function () {
 
-		it('should respond with the an event', function (done) {
+		it('should respond with an event', function (done) {
 			res.json = function (event) {
 				expect(event.toObject()).toEqualData(mocks.event.toObject());
 				done();
@@ -170,13 +76,13 @@ describe('/api/events', function () {
 			events.getEventByChannel(req, res);
 		});
 
-		it('should respond with 404 when the event doesn\'t exist', function (done) {
+		it('should respond with 404 when an event doesn\'t exist', function (done) {
 			res.json = function (json) {
 				expect(res.statusCode).toEqual(404);
 				done();
 			};
 			// Set the channel in the query to a non-existent one
-			req.query.channel = 'does-not-exist';
+			req.query.channel = mocks.nonExistentChannel;
 			events.getEventByChannel(req, res);
 		});
 
@@ -185,7 +91,7 @@ describe('/api/events', function () {
 				expect(res.statusCode).toEqual(400);
 				done();
 			};
-			// Set the id in the params to be invalid
+			// Set the id in the params to be empty
 			req.query.channel = '';
 			events.getEventByChannel(req, res);
 		});
@@ -196,7 +102,7 @@ describe('/api/events', function () {
 				done();
 			};
 			// Set the channel in the query with a mongo injection value
-			req.query.channel = { '$gt': '' };
+			req.query.channel = mocks.mongoInjectionValue;
 			events.getEventByChannel(req, res);
 		});
 
@@ -247,7 +153,7 @@ describe('/api/events', function () {
 				expect(res.statusCode).toEqual(400);
 				done();
 			};
-			req.body.name = 'aa';
+			req.body.name = mocks.tooShortEventName;
 			events.createEvent(req, res);
 		});
 
@@ -256,10 +162,7 @@ describe('/api/events', function () {
 				expect(res.statusCode).toEqual(400);
 				done();
 			};
-			req.body.name = '';
-			for(var i=0; i<129; i++) {
-				req.body.name += 'a';
-			}
+			req.body.name = mocks.tooLongEventName;
 			events.createEvent(req, res);
 		});
 
@@ -277,7 +180,7 @@ describe('/api/events', function () {
 				expect(res.statusCode).toEqual(400);
 				done();
 			};
-			req.body.channel = '+++invalid+++';
+			req.body.channel = mocks.invalidChannel;
 			events.createEvent(req, res);
 		});
 
@@ -286,7 +189,7 @@ describe('/api/events', function () {
 				expect(res.statusCode).toEqual(400);
 				done();
 			};
-			req.body.channel = 'aa';
+			req.body.channel = mocks.tooShortEventChannel;
 			events.createEvent(req, res);
 		});
 
@@ -295,10 +198,7 @@ describe('/api/events', function () {
 				expect(res.statusCode).toEqual(400);
 				done();
 			};
-			req.body.channel = '';
-			for(var i=0; i<33; i++) {
-				req.body.channel += 'a';
-			}
+			req.body.channel = mocks.tooLongEventChannel;
 			events.createEvent(req, res);
 		});
 
@@ -307,35 +207,25 @@ describe('/api/events', function () {
 				expect(res.statusCode).toEqual(400);
 				done();
 			};
-			req.body.description = '';
-			for(var i=0; i<1025; i++) {
-				req.body.description += 'a';
-			}
+			req.body.description = mocks.tooLongEventDescription;
 			events.createEvent(req, res);
 		});
 
 	});
 
 	describe('updateEvent method', function () {
-		var updatedEvent = new Event({
-			name: 'Updated Event Name',
-			channel: 'new-channel',
-			hidden: true,
-			start: new Date(),
-			description: 'Updated'
-		});
 
 		beforeEach(function () {
 			req.url += '/' + mocks.event._id;
 			req.method = 'POST';
 			req.body = {
-				name: updatedEvent.name
+				name: mocks.updatedEvent.name
 			};
 		});
 
 		it('should update an event when new name provided', function (done) {
 			res.json = function (event) {
-				expect(event.name).toEqual(updatedEvent.name);
+				expect(event.name).toEqual(mocks.updatedEvent.name);
 				done();
 			};
 			events.updateEvent(req, res);
@@ -343,25 +233,24 @@ describe('/api/events', function () {
 
 		it('should update an event when new name and channel provided', function (done) {
 			res.json = function (event) {
-				expect(event.name).toEqual(updatedEvent.name);
-				expect(event.channel).toEqual(updatedEvent.channel);
+				expect(event.name).toEqual(mocks.updatedEvent.name);
+				expect(event.channel).toEqual(mocks.updatedEvent.channel);
 				done();
 			};
-			req.body.channel = updatedEvent.channel;
+			req.body.channel = mocks.updatedEvent.channel;
 			events.updateEvent(req, res);
 		});
 
-		it('should update an event when all new properties are provided', 
-		function (done) {
+		it('should update an event when all new properties are provided', function (done) {
 			res.json = function (event) {
-				expect(event.name).toEqual(updatedEvent.name);
-				expect(event.channel).toEqual(updatedEvent.channel);
-				expect(!!event.hidden).toEqual(!!updatedEvent.hidden);
-				expect(event.start).toEqual(updatedEvent.start);
-				expect(event.description).toEqual(updatedEvent.description);
+				expect(event.name).toEqual(mocks.updatedEvent.name);
+				expect(event.channel).toEqual(mocks.updatedEvent.channel);
+				expect(event.hidden).toEqual(mocks.updatedEvent.hidden);
+				expect(event.start).toEqual(mocks.updatedEvent.start);
+				expect(event.description).toEqual(mocks.updatedEvent.description);
 				done();
 			};
-			req.body = updatedEvent.toObject();
+			req.body = mocks.updatedEvent.toObject();
 			events.updateEvent(req, res);
 		});
 
@@ -371,18 +260,17 @@ describe('/api/events', function () {
 				expect(res.statusCode).toEqual(400);
 				done();
 			};
-			req.body.channel = '++invalid++';
+			req.body.channel = mocks.invalidChannel;
 			events.updateEvent(req, res);
 		});
 
 		it('should fail to update with 404 status when a non-existent event id is provided', 
 		function (done) {
 			res.json = function (err) {
-				console.log(err);
 				expect(res.statusCode).toEqual(404);
 				done();
 			};
-			req.params.id = '000000000000000000000000';
+			req.params.id = mocks.nonExistentId;
 			events.updateEvent(req, res);
 		});
 
@@ -403,7 +291,16 @@ describe('/api/events', function () {
 				expect(res.statusCode).toEqual(404);
 				done();
 			};
-			req.params.id = '000000000000000000000000';
+			req.params.id = mocks.nonExistentId;
+			events.deleteEvent(req, res);
+		});
+
+		it('should fail to delete with a 404 if an invalid event id is provided', function (done) {
+			res.json = function (event) {
+				expect(res.statusCode).toEqual(404);
+				done();
+			};
+			req.params.id = mocks.invalidId;
 			events.deleteEvent(req, res);
 		});
 

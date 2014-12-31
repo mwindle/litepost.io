@@ -52,18 +52,18 @@ exports.getEventByChannel = function (req, res) {
 
 // Create a new event
 exports.createEvent = function (req, res) {
-	// Stop immediately if required parameters are not provided
-	if(!req.body.name || !req.body.channel) {
-		res.statusCode = 400;
-		return res.json({ error: 'Invalid request, missing name or channel.' });
-	}
-
 	// Sanitize inputs against mongo injection
 	req.body.name = sanitize(req.body.name);
 	req.body.channel = sanitize(req.body.channel);
 	req.body.start = sanitize(req.body.start);
 	req.body.hidden = sanitize(req.body.hidden);
 	req.body.description = sanitize(req.body.description);
+
+	// Stop immediately if required parameters are not provided
+	if(!req.body.name || !req.body.channel) {
+		res.statusCode = 400;
+		return res.json({ error: 'Invalid request, missing name or channel.' });
+	}
 
 	// Create a new event and save it
 	new Event({ 
