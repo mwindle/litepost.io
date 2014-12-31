@@ -35,6 +35,11 @@ module.exports = function () {
 	app.engine('html', cons.swig);
 	app.set('view engine', 'html');
 	app.set('views', path.resolve('./app/views'));
+	/**
+	* Workaround for consolidate issue #134. 
+	* See https://github.com/tj/consolidate.js/commit/e84860d55b2cb938c9a5525f83feba7f86dfeba7#commitcomment-6427166
+	*/
+	app.locals.cache = 'memory';
 
 	app.use(bodyParser.json());
 	app.use(bodyParser.urlencoded({ extended: true }));

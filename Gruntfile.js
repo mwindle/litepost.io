@@ -41,7 +41,7 @@ module.exports = function(grunt) {
 					livereload: true
 				}
 			},
-			clientCSS: {
+			clientLESS: {
 				files: watchFiles.clientLESS,
 				tasks: ['lesslint', 'less', 'autoprefixer'],
 				options: {
@@ -141,6 +141,9 @@ module.exports = function(grunt) {
 			test: {
 				NODE_ENV: 'test'
 			},
+			production: {
+				NODE_ENV: 'production'
+			},
 			secure: {
 				NODE_ENV: 'secure'
 			}
@@ -148,6 +151,12 @@ module.exports = function(grunt) {
 		karma: {
 			unit: {
 				configFile: 'karma.conf.js'
+			},
+			production: {
+				configFile: 'karma.conf.js',
+				browsers: ['PhantomJS', 'Chrome', 'Firefox', 'Safari', 'Opera'],
+				autoWatch: false,
+				singleRun: true
 			}
 		},
 	  jasmine_node: {
@@ -189,8 +198,11 @@ module.exports = function(grunt) {
 	grunt.registerTask('lint', ['jshint:client', 'jshint:server', 'lesslint']);
 
 	// Build task(s).
-	grunt.registerTask('build', ['lint', 'loadConfig', 'ngAnnotate', 'uglify', 'less', 'autoprefixer']);
+	grunt.registerTask('build', ['lint', 'loadConfig', 'ngAnnotate', 'uglify', 'less', 'autoprefixer', 'test:build']);
 
 	// Test task.
 	grunt.registerTask('test', ['env:test', 'jasmine_node', 'karma:unit']);
+
+	// Test build
+	grunt.registerTask('test:build', ['env:production', 'jasmine_node', 'karma:production']);
 };
