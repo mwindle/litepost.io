@@ -5,22 +5,23 @@
   'use strict';
 
   angular.module('postmessage').controller('PostController', 
-    function ($scope, $state, $stateParams, $timeout, Event, Message, EventSocket, parallaxHelper) {
+    function ($scope, $state, $stateParams, $timeout, Event, Message, EventSocket, parallaxHelper, title, pageClass) {
     $scope.channel = $stateParams.channel;
     $scope.messageId = $stateParams.messageId;
     $scope.event = Event.get({ channel: $scope.channel });
-    $scope.title = 'New Message';
-    $scope.pageClass = 'post';
+    pageClass.set('postmessage');
     $scope.editor = angular.element('#m');
     $scope.typing = false;
     $scope.background = parallaxHelper.createAnimator(-0.3);
     EventSocket.connect($scope.channel);
 
     $scope.$on('$destroy', function () {
+      pageClass.set('');
       EventSocket.disconnect();
     });
 
     if($scope.messageId) {
+      title.set('Edit Message');
       $scope.editingMessage = Message.get({ 
         channel: $scope.channel, 
         id: $scope.messageId 
@@ -28,6 +29,7 @@
         $scope.editor.val($scope.editingMessage.text);
       });
     } else {
+      title.set('New Message');
       $scope.editingMessage = new Message({ 
         channel: $scope.channel,
         text: '',
