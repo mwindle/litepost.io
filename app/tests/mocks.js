@@ -16,7 +16,7 @@ module.exports = mocks;
 
 function getStringOfLength(length) {
 	var str = '';
-	for(var i=0; i<length+1; i++) {
+	for(var i=0; i<length; i++) {
 		str += 'a';
 	}
 	return str;
@@ -31,14 +31,14 @@ mocks.setup = function () {
 	mocks.invalidChannel = '++invalid++';
 
 	mocks.tooShortEventName = 'aa';
-	mocks.tooLongEventName = getStringOfLength(129);
+	mocks.tooLongEventName = getStringOfLength(51);
 
 	mocks.tooShortEventChannel = 'aa';
-	mocks.tooLongEventChannel = getStringOfLength(33);
+	mocks.tooLongEventChannel = getStringOfLength(31);
 
-	mocks.tooLongEventDescription = getStringOfLength(1025);
+	mocks.tooLongEventDescription = getStringOfLength(201);
 
-	mocks.tooLongMessageText = getStringOfLength(1025);
+	mocks.tooLongMessageText = getStringOfLength(1001);
 
 	beforeEach(function (done) {
 		mockgoose.reset();

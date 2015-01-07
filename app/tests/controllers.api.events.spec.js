@@ -148,7 +148,7 @@ describe('/api/events', function () {
 			events.createEvent(req, res);
 		});
 
-		it('should fail to create an event when name is too short (<3 char)', function (done) {
+		it('should fail to create an event when name is too short', function (done) {
 			res.json = function (err) {
 				expect(res.statusCode).toEqual(400);
 				done();
@@ -157,7 +157,7 @@ describe('/api/events', function () {
 			events.createEvent(req, res);
 		});
 
-		it('should fail to create an event when name is too long (>128 char)', function (done) {
+		it('should fail to create an event when name is too long', function (done) {
 			res.json = function (err) {
 				expect(res.statusCode).toEqual(400);
 				done();
@@ -184,7 +184,7 @@ describe('/api/events', function () {
 			events.createEvent(req, res);
 		});
 
-		it('should fail to create an event when channel is too short (<3 char)', function (done) {
+		it('should fail to create an event when channel is too short', function (done) {
 			res.json = function (err) {
 				expect(res.statusCode).toEqual(400);
 				done();
@@ -193,7 +193,7 @@ describe('/api/events', function () {
 			events.createEvent(req, res);
 		});
 
-		it('should fail to create an event when channel is too long (>32 char)', function (done) {
+		it('should fail to create an event when channel is too long', function (done) {
 			res.json = function (err) {
 				expect(res.statusCode).toEqual(400);
 				done();
@@ -202,7 +202,7 @@ describe('/api/events', function () {
 			events.createEvent(req, res);
 		});
 
-		it('should fail to create an event when description is too long (>1024 char)', function (done) {
+		it('should fail to create an event when description is too long', function (done) {
 			res.json = function (err) {
 				expect(res.statusCode).toEqual(400);
 				done();

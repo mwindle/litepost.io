@@ -235,7 +235,7 @@ describe('/api/messages', function () {
 			messages.updateMessage(req, res);
 		});
 
-		it('should fail to update with 400 status when text is too long (>1024 char)', function (done) {
+		it('should fail to update with 400 status when text is too long', function (done) {
 			res.json = function (message) {
 				expect(res.statusCode).toEqual(400);
 				done();

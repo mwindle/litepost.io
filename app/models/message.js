@@ -15,8 +15,8 @@ var MessageSchema = new mongoose.Schema({
 		type: String,
 		required: true,
 
-		// Allow all characters. Must be 1-1024 characters long (inclusive). 
-		match: /^[\s\S]{1,1024}$/
+		// Allow all characters. Must be 1-1000 characters long (inclusive). 
+		match: /^[\s\S]{1,1000}$/
 	},
 	html: {
 		type: String,

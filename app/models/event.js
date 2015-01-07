@@ -19,8 +19,8 @@ var EventSchema = mongoose.Schema({
 		required: true, 
 		trim: true,
 
-		// Allow all characters. Must be 3-128 characters long (inclusive). 
-		match: /^[\s\S]{3,128}$/
+		// Allow all characters. Must be 3-50 characters long (inclusive). 
+		match: /^[\s\S]{3,50}$/
 	},
 	channel: { 
 		type: String, 
@@ -29,8 +29,8 @@ var EventSchema = mongoose.Schema({
 		trim: true,
 		lowercase: true,
 
-		// Allow alphanumeric, _ (underscore), and - (dash) characters. Must be 3-32 characters long (inclusive).
-		match: /^[a-z0-9_\-]{3,32}$/i
+		// Allow alphanumeric, _ (underscore), and - (dash) characters. Must be 3-30 characters long (inclusive).
+		match: /^[a-z0-9_\-]{3,30}$/i
 	},
 	hidden: { 
 		type: Boolean, 
@@ -42,8 +42,8 @@ var EventSchema = mongoose.Schema({
 		type: String,
 		trim: true,
 
-		// Allow all characters. Must be less than or equal to 1024 characters long.
-		match: /^[\s\S]{0,1024}$/
+		// Allow all characters. Must be less than or equal to 200 characters long.
+		match: /^[\s\S]{0,200}$/
 	}
 });
 
