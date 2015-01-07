@@ -5,6 +5,13 @@ var mongoose = require('mongoose'),
 	ENCRYPTION_ROUNDS = 10;
 
 var UserSchema = new mongoose.Schema({
+	username: {
+		type: String,
+		required: true,
+		index: {
+			unique: true
+		}
+	},
 	email: { 
 		type: String,
 		required: true,

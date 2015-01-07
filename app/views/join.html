@@ -15,6 +15,10 @@
 	  <div class="alert alert-warning" role="alert">Oops! Something went wrong on the server and we couldn't process your request. Please try again in a few moments. </div>
 	  {% endif %}
 		<div class="form-group">
+			<label for="username">Username</label>
+			<input type="username" class="form-control" id="username" name="username" placeholder="Pick a username" />
+		</div>
+		<div class="form-group">
 			<label for="email">Email</label>
 			<input type="email" class="form-control" id="email" name="email" placeholder="Email" value="{{email}}" autofocus />
 			{% if errors.duplicate %}
@@ -25,10 +29,6 @@
 		<div class="form-group">
 			<label for="password">Password</label>
 			<input type="password" class="form-control" id="password" name="password" placeholder="Password" />
-		</div>
-		<div class="form-group">
-			<label for="confirm-password">Confirm password</label>
-			<input type="password" class="form-control" id="confirm-password" name="confirmPassword" placeholder="Confirm" />
 		</div>
 		<button type="submit" class="btn btn-primary login-btn">Create account</button>
 		<div class="form-advice">Already have an account? <a href="/login">Sign in</a>.</div>

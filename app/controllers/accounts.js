@@ -14,6 +14,7 @@ exports.join = function (req, res) {
 // Process join form submission
 exports.doJoin = function (req, res) {
 	new User( {
+		username: req.body.username,
 		email: req.body.email,
 		password: req.body.password
 	}).save(function (err, user) {

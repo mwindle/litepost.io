@@ -49,6 +49,7 @@ mocks.setup = function () {
 
 	beforeEach(function (done) {
 		new User({
+			username: 'testvalid',
 			email: 'test@valid.com',
 			password: 'testing'
 		}).save(function (err, user) {
