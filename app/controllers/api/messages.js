@@ -76,6 +76,7 @@ exports.createMessage = function(req, res) {
 		return res.json({ error: 'Event not found, invalid id provided.' });
 	}
 	req.body.text = sanitize(req.body.text);
+	req.body.published = sanitize(req.body.published);
 
 	// Stop immediately if required parameters are not provided
 	if(!req.body.event || !req.body.text) {
@@ -97,7 +98,8 @@ exports.createMessage = function(req, res) {
 				author: req.user,
 				text: req.body.text, 
 				html: marked(req.body.text), 
-				sent: new Date() 
+				sent: new Date(),
+				published: req.body.published
 			}).save(function (err, message) {
 				if(err) { 
 					if(err.name === 'ValidationError') {
@@ -125,27 +127,31 @@ exports.updateMessage = function(req, res) {
 		return res.json({ error: 'Message not found, invalid id provided.' });
 	}
 
-	// Sanitize and check updated text
-	req.body.text = sanitize(req.body.text);
-	if(!req.body.text) {
+	var updated = {};
+	// Get updated properties individually from req.body and sanitize them
+	if(req.body.hasOwnProperty('text')) { updated.text = sanitize(req.body.text); }
+	if(req.body.hasOwnProperty('published')) { updated.published = sanitize(req.body.published); }
+
+	if(!updated.text) {
 		res.statusCode = 400;
 		return res.json({ error: 'Missing required text parameter.' });
 	}
 
 	// Run mongoose validation on the text property directly
-	Message.schema.path('text').doValidate(req.body.text, function (err) {
+	Message.schema.path('text').doValidate(updated.text, function (err) {
 		// Validation failed, respond with a 400
 		if(err) {
 			res.statusCode = 400;
 			return res.json({ error: err.message });
 		}
 	});
+
+	// Derived attributes
+	updated.html = marked(updated.text);
+	updated.updated = new Date();
 	
 	// Atomically find and update the message
-	Message.findByIdAndUpdate(req.params.id, { 
-			text: req.body.text, 
-			html: marked(req.body.text)
-		}, function (err, message) {
+	Message.findByIdAndUpdate(req.params.id, updated, function (err, message) {
 		if(err) { 
 			if(err.name === 'ValidationError') {
 				res.statusCode = 400;

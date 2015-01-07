@@ -58,6 +58,8 @@ exports.createEvent = function (req, res) {
 	req.body.start = sanitize(req.body.start);
 	req.body.hidden = sanitize(req.body.hidden);
 	req.body.description = sanitize(req.body.description);
+	req.body.location = sanitize(req.body.location);
+	req.body.coverPhoto = sanitize(req.body.coverPhoto);
 
 	// Stop immediately if required parameters are not provided
 	if(!req.body.name || !req.body.channel) {
@@ -75,7 +77,9 @@ exports.createEvent = function (req, res) {
 			role: 'creator'
 		}],
 		hidden: req.body.hidden,
-		description: req.body.description
+		description: req.body.description,
+		location: req.body.location,
+		coverPhoto: req.body.coverPhoto
 	}).save(function (err, event) {
 		if(err) { 
 			if(err.name === 'ValidationError') {
@@ -106,6 +110,8 @@ exports.updateEvent = function (req, res) {
 	if(req.body.hasOwnProperty('start')) { updated.start = sanitize(req.body.start); }
 	if(req.body.hasOwnProperty('hidden')) { updated.hidden = sanitize(req.body.hidden); }
 	if(req.body.hasOwnProperty('description')) { updated.description = sanitize(req.body.description); }
+	if(req.body.hasOwnProperty('location')) { updated.location = sanitize(req.body.location); }
+	if(req.body.hasOwnProperty('coverPhoto')) { updated.coverPhoto = sanitize(req.body.coverPhoto); }
 
 	/**
 	* Manually validate the updated properties since the findByIdAndUpdate method interacts with the

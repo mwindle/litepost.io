@@ -38,6 +38,8 @@ mocks.setup = function () {
 
 	mocks.tooLongEventDescription = getStringOfLength(201);
 
+	mocks.tooLongEventLocation = getStringOfLength(31);
+
 	mocks.tooLongMessageText = getStringOfLength(1001);
 
 	beforeEach(function (done) {
@@ -76,7 +78,9 @@ mocks.setup = function () {
 		channel: 'new-channel',
 		hidden: true,
 		start: new Date(),
-		description: 'Updated \n description with \n newlines.'
+		description: 'Updated \n description with \n newlines.',
+		location: 'Seattle, WA',
+		coverPhoto: 'https://someurl.com/image.png'
 	});
 
 	beforeEach(function (done) {
@@ -85,7 +89,9 @@ mocks.setup = function () {
 			author: mocks.user,
 			text: 'This is a test message\nwith a newline.',
 			html: '<p>This is a test message</p>\n<p>with a newline.</p>',
-			sent: new Date()
+			sent: new Date(),
+			updated: null,
+			published: false
 		}).save(function (err, message) {
 			mocks.message = message;
 			done();

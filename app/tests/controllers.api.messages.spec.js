@@ -128,6 +128,17 @@ describe('/api/messages', function () {
 			messages.createMessage(req, res);
 		});
 
+		it('should create a message when all attributes are provided', function (done) {
+			res.json = function (message) {
+				expect(message.event.toString()).toEqual(req.body.event);
+				expect(message.text).toEqual(req.body.text);
+				expect(message.published).toEqual(req.body.published);
+				done();
+			};
+			req.body.published = true;
+			messages.createMessage(req, res);
+		});
+
 		it('should fail to create a message when text is empty', function (done) {
 			res.json = function (err) {
 				expect(res.statusCode).toEqual(400);
@@ -179,14 +190,17 @@ describe('/api/messages', function () {
 		beforeEach(function () {
 			req.method = 'POST';
 			req.body = {
-      	text: 'An \nupdated \nmessage'
+      	text: 'An \nupdated \nmessage',
+      	published: true
       };
       req.params.id = mocks.message._id.toString();
+      req.user = mocks.user;
 		});
 
-		it('should update a message when provided id and text are valid', function (done) {
+		it('should update a message when provided id, text, and published are valid', function (done) {
 			res.json = function (message) {
 				expect(message.text).toEqual(req.body.text);
+				expect(message.published).toEqual(req.body.published);
 				done();
 			};
 			messages.updateMessage(req, res);

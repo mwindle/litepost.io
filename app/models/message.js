@@ -26,6 +26,13 @@ var MessageSchema = new mongoose.Schema({
 		type: Date,
 		required: true,
 		default: Date.now
+	},
+	updated: {
+		type: Date
+	},
+	published: {
+		type: Boolean,
+		default: false
 	}
 });
 

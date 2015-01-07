@@ -130,12 +130,18 @@ describe('/api/events', function () {
 
 		it('should create an event when all its properties are provided', function (done) {
 			res.json = function (event) {
-				expect(event._id).toBeTruthy();
+				expect(event.start).toEqual(req.body.start);
+				expect(event.hidden).toEqual(req.body.hidden);
+				expect(event.description).toEqual(req.body.description);
+				expect(event.location).toEqual(req.body.location);
+				expect(event.coverPhoto).toEqual(req.body.coverPhoto);
 				done();
 			};
 			req.body.start = new Date();
 			req.body.hidden = true;
 			req.body.description = 'This is a great event description';
+			req.body.location = 'Vancouver, BC';
+			req.body.coverPhoto = 'https://www.fake-domain.com/some/path/to/an/image.png';
 			events.createEvent(req, res);
 		});
 
@@ -211,6 +217,15 @@ describe('/api/events', function () {
 			events.createEvent(req, res);
 		});
 
+		it('should fail to create an event when location is too long', function (done) {
+			res.json = function (err) {
+				expect(res.statusCode).toEqual(400);
+				done();
+			};
+			req.body.location = mocks.tooLongEventLocation;
+			events.createEvent(req, res);
+		});
+
 	});
 
 	describe('updateEvent method', function () {
@@ -248,6 +263,8 @@ describe('/api/events', function () {
 				expect(event.hidden).toEqual(mocks.updatedEvent.hidden);
 				expect(event.start).toEqual(mocks.updatedEvent.start);
 				expect(event.description).toEqual(mocks.updatedEvent.description);
+				expect(event.location).toEqual(mocks.updatedEvent.location);
+				expect(event.coverPhoto).toEqual(mocks.updatedEvent.coverPhoto);
 				done();
 			};
 			req.body = mocks.updatedEvent.toObject();

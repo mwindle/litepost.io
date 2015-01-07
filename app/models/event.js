@@ -44,6 +44,17 @@ var EventSchema = mongoose.Schema({
 
 		// Allow all characters. Must be less than or equal to 200 characters long.
 		match: /^[\s\S]{0,200}$/
+	},
+	location: {
+		type: String,
+		trim: true,
+
+		// Allow all characters. Must be less than or equal to 30 characters long. 
+		match: /^[\s\S]{0,30}$/
+	},
+	coverPhoto: {
+		type: String,
+		trim: true
 	}
 });
 
