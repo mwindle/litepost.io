@@ -51,7 +51,7 @@ mocks.setup = function () {
 		new User({
 			username: 'testvalid',
 			email: 'test@valid.com',
-			password: 'testing'
+			password: 'T3sting'
 		}).save(function (err, user) {
 			mocks.user = user;
 			done();
