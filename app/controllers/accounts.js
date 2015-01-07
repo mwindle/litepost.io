@@ -15,7 +15,7 @@ exports.join = function (req, res) {
 exports.doJoin = function (req, res) {
 	new User( {
 		email: req.body.email,
-		password: User.generateHash(req.body.password)
+		password: req.body.password
 	}).save(function (err, user) {
 		if(err && err.code === 11000) {
 			return res.render('join', {

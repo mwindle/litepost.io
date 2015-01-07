@@ -3,7 +3,7 @@
   "description": "A live blogging application",
   "version": "0.0.1",
   "dependencies": {
-    "bcrypt-nodejs": "0.0.3",
+    "bcrypt": "^0.8.0",
     "body-parser": "^1.9.2",
     "chalk": "^0.5.1",
     "compression": "^1.2.1",

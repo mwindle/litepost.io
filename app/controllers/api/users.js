@@ -12,11 +12,13 @@ exports.getMe = function (req, res) {
 		res.statusCode = 401;
 		return res.json({ error: 'Not authenticated.' });
 	}
-
-	// Stringify then parse the req.user object to get a deep clone of it
-	var user = JSON.parse(JSON.stringify(req.user));
-	// Remove the password from the cloned user object
-	delete user.password;
+	var user = req.user;
+	if(user.password) {
+		// Stringify then parse the req.user object to get a deep clone of it
+		user = JSON.parse(JSON.stringify(req.user));
+		// Remove the password from the cloned user object
+		delete user.password;
+	}
 	return res.json(user);
 };
 
