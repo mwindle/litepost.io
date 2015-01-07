@@ -1,8 +1,9 @@
 var mongoose = require('mongoose');
 
 var MessageSchema = new mongoose.Schema({
-	channel: {
-		type: String,
+	event: { 
+		type: mongoose.Schema.ObjectId, 
+		ref: 'Event',
 		required: true
 	},
 	text: {

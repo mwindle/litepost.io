@@ -8,7 +8,6 @@
     function ($scope, $state, $stateParams, $timeout, Event, Message, EventSocket, parallaxHelper, title, pageClass) {
     $scope.channel = $stateParams.channel;
     $scope.messageId = $stateParams.messageId;
-    $scope.event = Event.get({ channel: $scope.channel });
     pageClass.set('postmessage');
     $scope.editor = angular.element('#m');
     $scope.typing = false;
@@ -20,23 +19,25 @@
       EventSocket.disconnect();
     });
 
-    if($scope.messageId) {
-      title.set('Edit Message');
-      $scope.editingMessage = Message.get({ 
-        channel: $scope.channel, 
-        id: $scope.messageId 
-      }, function () {
+    $scope.event = Event.get({ channel: $scope.channel }, function (event) {
+      if($scope.messageId) {
+        title.set('Edit Message');
+        $scope.editingMessage = Message.get({ 
+          channel: $scope.channel, 
+          id: $scope.messageId 
+        }, function () {
+          $scope.editor.val($scope.editingMessage.text);
+        });
+      } else {
+        title.set('New Message');
+        $scope.editingMessage = new Message({ 
+          event: event._id,
+          text: '',
+          html: ''
+        });
         $scope.editor.val($scope.editingMessage.text);
-      });
-    } else {
-      title.set('New Message');
-      $scope.editingMessage = new Message({ 
-        channel: $scope.channel,
-        text: '',
-        html: ''
-      });
-      $scope.editor.val($scope.editingMessage.text);
-    }
+      }
+    });
 
     $scope.editor.markdown({
       fullscreen: { enable: false },
@@ -52,7 +53,7 @@
     });
 
     $scope.isMessageLoaded = function () {
-      return !$scope.isUpdatingExisting() || $scope.editingMessage.$resolved;
+      return $scope.event.$resolved && (!$scope.isUpdatingExisting() || $scope.editingMessage.$resolved);
     };
 
     $scope.isUpdatingExisting = function () {

@@ -28,7 +28,7 @@ exports.getMessages = function(req, res) {
 			res.statusCode = 404;
 			return res.json({ error: 'Event not found.' });
 		} else {
-			Message.find({ channel: req.params.channel }).sort('-sent').exec(function(err, messages) {
+			Message.find({ event: event }).sort('-sent').exec(function(err, messages) {
 				if(err) { 
 					res.statusCode = 500;
 					return res.json({ error: err.message }); 
@@ -65,26 +65,30 @@ exports.getMessage = function(req, res) {
 // Create a new message
 exports.createMessage = function(req, res) {
 	// Sanitize inputs against mongo injection
-	req.body.channel = sanitize(req.body.channel);
+	req.body.event = sanitize(req.body.event);
+	if(!mongoose.Types.ObjectId.isValid(req.body.event)) {
+		res.statusCode = 404;
+		return res.json({ error: 'Event not found, invalid id provided.' });
+	}
 	req.body.text = sanitize(req.body.text);
 
 	// Stop immediately if required parameters are not provided
-	if(!req.body.channel || !req.body.text) {
+	if(!req.body.event || !req.body.text) {
 		res.statusCode = 400;
-		return res.json({ error: 'Invalid request, missing channel or text' });
+		return res.json({ error: 'Invalid request, missing event or text' });
 	}
 
 	// Fetch event by channel first to ensure it exists
-	Event.findOne({ channel: req.body.channel }, function (err, event) {
+	Event.findById(req.body.event, function (err, event) {
 		if(err) { 
 			res.statusCode = 500;
 			return res.json({ error: err.message });
 		} else if (!event) {
 			res.statusCode = 400;
-			return res.json({ error: 'Invalid event channel provided.' });
+			return res.json({ error: 'Invalid event id provided.' });
 		} else {
 			new Message({ 
-				channel: req.body.channel, 
+				event: req.body.event, 
 				text: req.body.text, 
 				html: marked(req.body.text), 
 				sent: new Date() 

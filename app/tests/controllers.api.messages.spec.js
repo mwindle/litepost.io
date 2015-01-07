@@ -111,12 +111,12 @@ describe('/api/messages', function () {
 		beforeEach(function () {
 			req.method = 'POST';
 			req.body = {
-      	channel: mocks.event.channel,
+      	event: mocks.event._id.toString(),
       	text: 'A new message'
       };
 		});
 
-		it('should create a message when valid channel and text are provided', function (done) {
+		it('should create a message when valid event and text are provided', function (done) {
 			res.json = function (message) {
 				expect(message._id).toBeTruthy();
 				done();
@@ -133,16 +133,16 @@ describe('/api/messages', function () {
 			messages.createMessage(req, res);
 		});
 
-		it('should fail to create a message when a non-existent channel is provided', function (done) {
+		it('should fail to create a message when a non-existent event is provided', function (done) {
 			res.json = function (err) {
 				expect(res.statusCode).toEqual(400);
 				done();
 			};
-			req.body.channel = mocks.nonExistentChannel;
+			req.body.event = mocks.nonExistentId;
 			messages.createMessage(req, res);
 		});
 
-		it('should fail to create a message when its text is too long (>1024 char)', function (done) {
+		it('should fail to create a message when its text is too long', function (done) {
 			res.json = function (err) {
 				expect(res.statusCode).toEqual(400);
 				done();

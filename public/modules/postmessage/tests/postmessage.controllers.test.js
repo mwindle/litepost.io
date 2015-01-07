@@ -91,7 +91,7 @@
 			// Mock a new Message object
 			mocks.message = {
 				_id: 'new-id',
-				channel: mocks.event.channel,
+				event: mocks.event._id,
 				text: 'New Message!',
 				html: '<p>New Message!</p>',
 				sent: new Date()
@@ -245,8 +245,9 @@
 		});
 
 		it('should save a new message to the server when publish is called', function () {
-			$httpBackend.expectPOST(mocks.messagePostREquest);
 			var controller = createController();
+			$httpBackend.flush();
+			$httpBackend.expectPOST(mocks.messagePostREquest);
 			$scope.editingMessage.text = 'Whatever';
 			$scope.editingMessage.html = 'Whatever';
 			$scope.publish();
