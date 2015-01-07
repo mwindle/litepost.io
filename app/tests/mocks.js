@@ -82,6 +82,7 @@ mocks.setup = function () {
 	beforeEach(function (done) {
 		mocks.message = new Message({
 			event: mocks.event,
+			author: mocks.user,
 			text: 'This is a test message\nwith a newline.',
 			html: '<p>This is a test message</p>\n<p>with a newline.</p>',
 			sent: new Date()

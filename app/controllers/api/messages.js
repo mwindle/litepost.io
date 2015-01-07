@@ -64,6 +64,11 @@ exports.getMessage = function(req, res) {
 
 // Create a new message
 exports.createMessage = function(req, res) {
+	if(!req.user) {
+		res.statusCode = 401;
+		return res.json({ error: 'Not authenticated.' });
+	}
+
 	// Sanitize inputs against mongo injection
 	req.body.event = sanitize(req.body.event);
 	if(!mongoose.Types.ObjectId.isValid(req.body.event)) {
@@ -88,7 +93,8 @@ exports.createMessage = function(req, res) {
 			return res.json({ error: 'Invalid event id provided.' });
 		} else {
 			new Message({ 
-				event: req.body.event, 
+				event: req.body.event,
+				author: req.user,
 				text: req.body.text, 
 				html: marked(req.body.text), 
 				sent: new Date() 

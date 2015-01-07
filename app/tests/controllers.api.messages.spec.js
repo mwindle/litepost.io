@@ -115,6 +115,10 @@ describe('/api/messages', function () {
       	text: 'A new message'
       };
 		});
+		
+		beforeEach(function () {
+			req.user = mocks.user;
+		});
 
 		it('should create a message when valid event and text are provided', function (done) {
 			res.json = function (message) {

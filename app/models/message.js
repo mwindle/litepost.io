@@ -6,6 +6,11 @@ var MessageSchema = new mongoose.Schema({
 		ref: 'Event',
 		required: true
 	},
+	author: {
+		type: mongoose.Schema.ObjectId,
+		ref: 'User',
+		required: true
+	},
 	text: {
 		type: String,
 		required: true,
