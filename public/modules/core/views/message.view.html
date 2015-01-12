@@ -1,9 +1,13 @@
-<div class="container">
-	<div class="wrapper">
-		<div class="message-sent">
-			<div class="sent-time" am-time-ago="message.sent" />
-			<a ui-sref="editPost({channel: event.channel, messageId: message._id})"><button class="edit-message btn btn-xs btn-default" ng-show="message._id"><span class="glyphicon glyphicon-edit"></span> Edit</button></a>
-		</div>
-		<div class="message-text" ng-bind-html="message.html | unsafe" compile-template id="{{message._id}}"></div>
-	</div>
-</div>
+<section class="message-text" ng-bind-html="message.html | unsafe" compile-template id="{{message._id}}" />
+<footer class="message-footer">
+	<span class="message-author">
+		<a ui-sref="app.profile({username: username})"><img class="message-author-img" ng-src="//www.gravatar.com/avatar/{{message.author.emailHash}}?s=30&d=mm" /></a>
+		<a ui-sref="app.profile({username: username})">
+			<span ng-bind="message.author.name || '@'+message.author.username" />
+		</a>
+	</span>
+	<span class="message-footer-divider"> | </span>
+	<time class="message-sent-time" am-time-ago="message.sent" />
+	<span class="message-footer-divider"> | </span>
+	<a class="message-edit-link" ui-sref="app.event.editPost({username: username, slug: slug, messageId: message._id})">Edit</a>
+</footer>

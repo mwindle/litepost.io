@@ -1,17 +1,7 @@
+'use strict';
 
-var mongoose = require('mongoose');
-
-var EventUserSchema = mongoose.Schema({
-	user: { 
-		type: mongoose.Schema.ObjectId, 
-		ref: 'User' 
-	},
-	role: { 
-		type: String, 
-		required: true,
-		enum: ['creator', 'admin', 'author'] 
-	}
-});
+var mongoose = require('mongoose'),
+	restful = require('node-restful');
 
 var EventSchema = mongoose.Schema({
 	name: { 
@@ -22,9 +12,8 @@ var EventSchema = mongoose.Schema({
 		// Allow all characters. Must be 3-50 characters long (inclusive). 
 		match: /^[\s\S]{3,50}$/
 	},
-	channel: { 
+	slug: { 
 		type: String, 
-		unique: true, 
 		required: true, 
 		trim: true,
 		lowercase: true,
@@ -32,11 +21,20 @@ var EventSchema = mongoose.Schema({
 		// Allow alphanumeric, _ (underscore), and - (dash) characters. Must be 3-30 characters long (inclusive).
 		match: /^[a-z0-9_\-]{3,30}$/i
 	},
+	owner: {
+		type: mongoose.Schema.ObjectId,
+		ref: 'User',
+		required: true,
+		index: true
+	},
+	username: {
+		type: String,
+		required: true
+	},
 	hidden: { 
 		type: Boolean, 
 		default: false 
 	},
-	users: [EventUserSchema],
 	start: Date,
 	description: {
 		type: String,
@@ -58,4 +56,16 @@ var EventSchema = mongoose.Schema({
 	}
 });
 
-module.exports = mongoose.model('Event', EventSchema);
+// Quick retreival (most common way of getting an event), plus it ensures uniqueness of the tuple
+EventSchema.index({ username: 1, slug: 1}, { unique: true });
+
+EventSchema.virtual('socket').get(function () {
+	return this._id;
+});
+EventSchema.set('toObject', { virtuals: true });
+EventSchema.set('toJSON', { virtuals: true });
+EventSchema.statics.findOneBySocket = function (socket, cb) {
+	return this.findOne({ _id: socket }, cb);
+};
+
+module.exports = restful.model('Event', EventSchema);

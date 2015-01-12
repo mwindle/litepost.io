@@ -7,10 +7,11 @@
 
   angular.module('viewevent').controller('EventController', 
   	function ($scope, $stateParams, $location, $anchorScroll, 
-      parallaxHelper, $timeout, Event, Message, EventSocket, title) {
+      parallaxHelper, $timeout, User, Event, Message, EventSocket, title) {
     
-    // Grab the event channel from the current state
-    $scope.channel = $stateParams.channel;
+    // Grab the username and event slug from the current state
+    $scope.username = $stateParams.username;
+    $scope.slug = $stateParams.slug;
     
     // Start with an empty array for this event's messages
     $scope.messages = [];
@@ -19,62 +20,86 @@
     $scope.background = parallaxHelper.createAnimator(-0.15);
     $anchorScroll.yOffset = 120;
 
-    // Connect to the socket associated with this event
-    EventSocket.connect($scope.channel);
+    // Load the owner of this event
+    $scope.user = User.get({ username: $scope.username });
 
-    // Disconnect from the event's socket when this $scope is destroyed
-    $scope.$on('$destroy', function () {
-      EventSocket.disconnect();
-    });
+    // Load the event with the provided username and slug
+    $scope.event = Event.get({ 
+      username: $scope.username, 
+      slug: $scope.slug
+    }, function (event) {
+      $scope.setupSocket();
+      $scope.messages = Message.query({ event: event._id, populate: 'author' });
 
-    // Listen to typing events that indicate an author is typing a message for this event
-    EventSocket.on('typing', function () {
-      $scope.typing = true;
-    });
-
-    // Listen to stop-typing events
-    EventSocket.on('stop-typing', function () { 
-      $scope.typing = false;
-    });
-
-    // Prepend new messages to the local messages array
-    EventSocket.on('new-message', function (message) {
-      $scope.messages.unshift(new Message(message));
-    });
-
-    // Update local message when an update comes from the socket
-    EventSocket.on('update-message', function (message) {
-      for(var i=0; i<$scope.messages.length; i++) {
-        if($scope.messages[i]._id === message._id) {
-          $scope.messages[i] = new Message(message);
-          return;
-        }
-      }
-    });
-
-    // Delete local message when a delete comes from the socket
-    EventSocket.on('delete-message', function (message) {
-      for(var i=0; i<$scope.messages.length; i++) {
-        if($scope.messages[i]._id === message._id) {
-          $scope.messages.splice(i, 1);
-          return;
-        }
-      }
-    });
-
-    // Listen to metadata updates on the event socket
-    EventSocket.on('event-meta-update', function (meta) {
-      $scope.viewers = meta.viewers;
-    });
-
-    // Load the event with the provided channel
-    $scope.event = Event.get({ channel: $scope.channel }, function () {
       // Update the page title to customize it based on the event
       $scope.setPageTitle();
 
-      // Start a countdown if this event is in the future
-      $scope.updateCountdown();
+      /** 
+      * Scroll to the hashed message if it's set.
+      * The use of $timeout is a hack. There isn't a good way to detect when the DOM is completely
+      * constructed AND rendered with CSS applied (ie fully loaded). That is necessary to determine
+      * the actual scroll position. The use of $timeout will ensure the scrolling takes place the 
+      * specified amount of milliseconds after the DOM is constructed, meaning that's how much time
+      * it's allowing for the rendering. This may not work on slower systems. One could argue for the 
+      * complete removal of this hash-linking capability because of this inconsistent behavior. 
+      */
+      if($location.hash()) {
+        $timeout(function () {
+          $anchorScroll();
+        }, 500);
+      }
     });
+
+    $scope.setupSocket = function () {
+
+      // Disconnect from the event's socket when this $scope is destroyed
+      $scope.$on('$destroy', function () {
+        EventSocket.disconnect();
+      });
+
+      // Connect to the socket associated with this event
+      EventSocket.connect($scope.event.socket);
+
+      // Listen to typing events that indicate an author is typing a message for this event
+      EventSocket.on('typing', function () {
+        $scope.typing = true;
+      });
+
+      // Listen to stop-typing events
+      EventSocket.on('stop-typing', function () { 
+        $scope.typing = false;
+      });
+
+      // Prepend new messages to the local messages array
+      EventSocket.on('new-message', function (message) {
+        $scope.messages.unshift(new Message(message));
+      });
+
+      // Update local message when an update comes from the socket
+      EventSocket.on('update-message', function (message) {
+        for(var i=0; i<$scope.messages.length; i++) {
+          if($scope.messages[i]._id === message._id) {
+            $scope.messages[i] = new Message(message);
+            return;
+          }
+        }
+      });
+
+      // Delete local message when a delete comes from the socket
+      EventSocket.on('delete-message', function (message) {
+        for(var i=0; i<$scope.messages.length; i++) {
+          if($scope.messages[i]._id === message._id) {
+            $scope.messages.splice(i, 1);
+            return;
+          }
+        }
+      });
+
+      // Listen to metadata updates on the event socket
+      EventSocket.on('event-meta-update', function (meta) {
+        $scope.viewers = meta.viewers;
+      });
+    };
 
     /**
     * Sets/updates the title of the page depending on the state of this controller
@@ -113,29 +138,85 @@
       }
     };
 
-    // Fetch all the messages for this event
-    Message.query({ channel: $scope.channel }, function (messages) {
-      // Append server-sorted (sent desc) messages to local $scope array
-      $scope.messages = $scope.messages.concat(messages);
+  })
 
-      // Update the page title to reflect any updates to unread count
-      $scope.setPageTitle();
 
-      /** 
-      * Scroll to the hashed message if it's set.
-      * The use of $timeout is a hack. There isn't a good way to detect when the DOM is completely
-      * constructed AND rendered with CSS applied (ie fully loaded). That is necessary to determine
-      * the actual scroll position. The use of $timeout will ensure the scrolling takes place the 
-      * specified amount of milliseconds after the DOM is constructed, meaning that's how much time
-      * it's allowing for the rendering. This may not work on slower systems. One could argue for the 
-      * complete removal of this hash-linking capability because of this inconsistent behavior. 
-      */
-      if($location.hash()) {
-        $timeout(function () {
-          $anchorScroll();
-        }, 500);
-      }
+  /**
+  * Controller for managing the settings of an event
+  */
+  .controller('EventSettingsController', function ($scope, $location, $state, $stateParams, Event) {
+    $scope.username = $stateParams.username;
+    $scope.slug = $stateParams.slug;
+    $scope.baseEventUrl = $location.host() + '/' + $scope.username + '/';
+    $scope.event = Event.get({ username: $scope.username, slug: $scope.slug }, function () {
+      $scope.updatedEvent = angular.copy($scope.event);
     });
 
+    $scope.save = function () {
+      $scope.updatedEvent.$save(function (event) {
+        // If the event slug has changed, we need to re-route
+        if($scope.event.slug !== event.slug) {
+          return $state.go('app.editEvent', { username: $scope.username, slug: event.slug });
+        }
+        $scope.event = angular.copy(event);
+      });
+    };
+
+    $scope.isRenameDisabled = function () {
+      return !$scope.updatedEvent || !$scope.updatedEvent.name || $scope.updatedEvent.name===$scope.event.name;
+    };
+
+    $scope.rename = function () {
+      $scope.event.name = $scope.updatedEvent.name;
+      $scope.event.$save();
+    };
+
+    $scope.isSetStartDisabled = function () {
+      return !$scope.updatedEvent || !$scope.updatedEvent.start || $scope.updatedEvent.start===$scope.event.start;
+    };
+
+    $scope.isRemoveStartDisabled = function () {
+      return !$scope.event || !$scope.event.start;
+    };
+
+    $scope.setStart = function () {
+      $scope.event.start = $scope.updatedEvent.start;
+      $scope.event.$save(function (event) {
+        $scope.updatedEvent.start = $scope.event.start;
+      });
+    };
+
+    $scope.removeStart = function () {
+      $scope.event.start = $scope.updatedEvent.start = null;
+      $scope.event.$save();
+    };
+
+    $scope.isSetDescriptionDisabled = function () {
+      return !$scope.updatedEvent || $scope.updatedEvent.description===$scope.event.description;
+    };
+
+    $scope.setDescription = function () {
+      $scope.event.description = $scope.updatedEvent.description;
+      $scope.event.$save();
+    };
+
+    $scope.isEventInPast = function () {
+      return $scope.event.start && moment($scope.event.start).unix() < moment().unix();
+    };
+
+    $scope.setHidden = function () {
+      $scope.event.hidden = $scope.updatedEvent.hidden;
+      $scope.event.$save();
+    };
+
+    $scope.delete = function () {
+      if($scope.deleteConfirmationName !== $scope.event.name) { 
+        return; 
+      }
+      $scope.event.$delete(function (event) {
+        $state.go('app.profile', { username: $scope.username });
+      });
+    };
   });
+
 })();

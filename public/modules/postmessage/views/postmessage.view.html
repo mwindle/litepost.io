@@ -1,18 +1,38 @@
-<div id="editor">
-	<div id="editor-panel" class="clearfix text-center">
-		<textarea id="m" class="md-input" rows="5" autofocus > </textarea>
-	</div>
-	<div id="preview-panel">
-		<ol id="message-preview">
-			<li class="message" ng-repeat="message in [editingMessage]" ng-include="'modules/core/views/message.view.html'" />
-		</ol>
-	</div>
-	<div id="action-panel">
-		<a ui-sref="event({channel: channel})"><button id="close-editor" class="btn btn-default"><span class="glyphicon glyphicon-remove"></span> Cancel</button></a>
+<section class="editor">
+
+	<header class="editor-header">
+		<section class="editor-edit-header" ng-init="tab='markdown'" ng-class="{active: tab==='markdown'}" ng-click="tab='markdown'">Markdown</section>
+		<section class="editor-preview-header" ng-class="{active: tab==='preview'}" ng-click="tab='preview'" >Preview</section>
+	</header>
+
+	<section class="editor-panel-container">
+		<section class="editor-tab editor-edit-panel" ng-class="{active: tab==='markdown'}" >
+			<textarea class="editor-textarea" ng-model="editingMessage.text" ng-trim="false" ng-change="textChanged()" placeholder="Enter your post in Markdown format here..." autofocus > </textarea>
+		</section>
+
+		<section class="editor-tab editor-preview-panel"ng-class="{active: tab==='preview'}" >
+			<article class="message" ng-repeat="message in [editingMessage]" ng-include="'modules/core/views/message.view.html'" />
+		</section>
+	</section>
+
+	<footer class="editor-action-panel">
+		<a ui-sref="app.event({username: username, slug: slug})">
+			<button type="button" class="btn btn-default btn-sm">
+				<span class="glyphicon glyphicon-remove"></span> Cancel
+			</button>
+		</a>
 		<span class="pull-right" ng-show="isMessageLoaded()">
-			<button id="delete" class="btn btn-danger" ng-click="delete()" ng-show="isUpdatingExisting()"><span class="glyphicon glyphicon-trash"></span> Delete</button>
-			<button id="update" class="btn btn-primary" ng-click="update()" ng-show="isUpdatingExisting()"><span class="glyphicon glyphicon-edit"></span> Update</button>
-			<button id="publish" class="btn btn-primary" ng-click="publish()" ng-show="!isUpdatingExisting()"><span class="glyphicon glyphicon-share"></span> Publish</button>
+			<button id="delete" type="button" class="btn btn-danger btn-sm" ng-click="delete()" ng-show="isUpdatingExisting()">
+				<span class="glyphicon glyphicon-trash"></span> Delete
+			</button>
+			<button id="update" class="btn btn-primary btn-sm" ng-click="update()" ng-show="isUpdatingExisting()">
+				<span class="glyphicon glyphicon-edit"></span> Update
+			</button>
+			<button id="publish" class="btn btn-primary btn-sm" ng-click="publish()" ng-show="!isUpdatingExisting()">
+				<span class="glyphicon glyphicon-share"></span> Publish
+			</button>
 		</span>
-	</div>
-</div>
+	</footer>
+
+</section>
+

@@ -8,17 +8,51 @@
   angular.module('core')
 
   /**
+  * Extend $resource to ensure update uses PUT
+  * Thanks to http://kirkbushell.me/angular-js-using-ng-resource-in-a-more-restful-manner/
+  */
+  .factory('resource', function ($resource) {
+    return function (url, params, methods) {
+      var defaults = {
+        update: { method: 'put', isArray: false },
+        create: { method: 'post' }
+      };
+
+      methods = angular.extend(defaults, methods);
+
+      var resource = $resource(url, params, methods);
+
+      resource.prototype.$save = function () {
+        if (!this._id) {
+          return this.$create.apply(this, arguments);
+        }
+        else {
+          return this.$update.apply(this, arguments);
+        }
+      };
+      return resource;
+    };
+  })
+
+  /**
+  * User $resource from server REST API. 
+  */
+  .factory('User', function (resource) {
+    return resource('api/users/:id', {id:'@_id'});
+  })
+
+  /**
   * Event $resource from server REST API. 
   */
-  .factory('Event', function ($resource) {
-    return $resource('api/events/:id', {id:'@_id'});
+  .factory('Event', function (resource) {
+    return resource('api/events/:id', {id:'@_id'});
   })
 
   /**
   * Message $resource from server REST API. 
   */
-  .factory('Message', function ($resource) {
-    return $resource('api/events/:channel/messages/:id', {id:'@_id'});
+  .factory('Message', function (resource) {
+    return resource('api/messages/:id', {id:'@_id'});
   })
 
   /**

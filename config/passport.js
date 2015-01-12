@@ -34,8 +34,8 @@ module.exports = function() {
 			} else if(!user) { 
 				done(null, false, { message: 'Invalid email.' }); 
 			} else {
-				user.authenticate(password, function (err, authenticated) {
-					if(!authenticated) {
+				user.comparePassword(password, function (err, matched) {
+					if(!matched) {
 						done(null, false, { message: 'Authentication failed.' });
 					} else {
 						done(null, user);

@@ -14,10 +14,8 @@ module.exports = {
       js: [
         'public/components/jquery/dist/jquery.js',
         'public/components/socket.io-client/socket.io.js',
-        'public/components/FlipClock/compiled/flipclock.min.js',
         'public/components/moment/moment.js',
         'public/components/marked/lib/marked.js',
-        'public/components/bootstrap-markdown/js/bootstrap-markdown.js',
         '//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js',
         'public/components/angular/angular.js',
         'public/components/angular-resource/angular-resource.js', 

@@ -1,8 +1,11 @@
-var mongoose = require('mongoose');
+'use strict';
+
+var mongoose = require('mongoose'),
+	restful = require('node-restful');
 
 var MessageSchema = new mongoose.Schema({
-	event: { 
-		type: mongoose.Schema.ObjectId, 
+	event: {
+		type: mongoose.Schema.ObjectId,
 		ref: 'Event',
 		required: true
 	},
@@ -36,4 +39,10 @@ var MessageSchema = new mongoose.Schema({
 	}
 });
 
-module.exports = mongoose.model('Message', MessageSchema);
+MessageSchema.virtual('eventSocket').get(function () {
+	return this.event;
+});
+MessageSchema.set('toObject', { virtuals: true });
+MessageSchema.set('toJSON', { virtuals: true });
+
+module.exports = restful.model('Message', MessageSchema);

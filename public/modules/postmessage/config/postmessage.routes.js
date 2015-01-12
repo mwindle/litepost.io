@@ -8,15 +8,15 @@
   angular.module('postmessage').config(function ($stateProvider) {
     $stateProvider
 
-      .state('post', {
-        url: '/events/:channel/post',
+      .state('app.event.post', {
+        url: '/:username/:slug/post',
         templateUrl: 'modules/postmessage/views/postmessage.view.html',
         controller: 'PostController',
         data: { title: 'New Message - LitePost.io' }
       })
 
-      .state('editPost', {
-        url: '/events/:channel/post/:messageId',
+      .state('app.event.editPost', {
+        url: '/:username/:slug/post/:messageId',
         templateUrl: 'modules/postmessage/views/postmessage.view.html',
         controller: 'PostController',
         data: { title: 'Edit Message - LitePost.io' }

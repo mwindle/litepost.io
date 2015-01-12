@@ -1,4 +1,4 @@
-
+<!--
 <div class="pending-event-view" ng-show="!isEventInPast()">
 	<h1 class="text-center event-title">
 		<span class="emphasize" ng-bind="event.name" />
@@ -14,41 +14,63 @@
 		<button class="btn btn-info btn-xlrg">Subscribe and get a reminder</button>
 	</div>
 </div>
-
-<div class="active-event-view" ng-show="isEventInPast()">
-	<header class="event-header-bar">
+-->
+<div ui-view></div>
+<div class="active-event-view">
+	<header class="event-header textured-carbon-bg">
 		<h3 class="event-title">
-			<!-- <span class="event-settings">
-				<a ui-sref="editEvent({channel:event.channel})"><span class="glyphicon glyphicon-cog"></span></a>
-			</span> -->
-			<span class="emphasize" ng-bind="event.name" />
+			<a ui-sref="app.editEvent({username: username, slug: slug})">
+				<span class="emphasize" ng-bind="event.name" />
+			</a>
 		</h3>
-		<div class="event-creator">by <span ng-bind="event.creator" /> Marc Windle</div>
-		<div class="event-postmessage">
-			<a ui-sref="post({channel: event.channel})">
-				<button class="btn btn-primary"><span class="glyphicon glyphicon-pencil"></span> New Message</button>
+		<div class="event-description" ng-bind="event.description" />
+		<div class="set-cover-button-wrapper">
+			<a ui-sref="app.editEventWithHash({username: username, slug: slug, 'hash': 'coverPhoto'})">
+				<button class="set-cover-button">
+					<span ng-if="event.coverPhoto">Update cover photo</span>
+					<span ng-if="!event.coverPhoto">Set cover photo</span>
+				</button>
 			</a>
 		</div>
+		<div class="event-owner">
+			<a ui-sref="app.profile({username: username})">
+				<img class="event-owner-img" ng-src="//www.gravatar.com/avatar/{{user.emailHash}}?s=100&d=mm" />
+			</a>
+			<div class="event-owner-name">
+				by 
+				<a ui-sref="app.profile({username: username})">
+					<span ng-bind="user.name || '@'+user.username" />
+				</a>
+			</div>
+		</div>
 	</header>
-	<div zum-waypoint="waypoints" down="flags.on" up="flags.off"> </div>
-	<div class="event-status-bar" ng-class="{ 'sticky': waypoints.flags.on }">
+	<div class="event-status-bar">
 		<div class="status-panel message-count-panel">
 			<header>Posts</header>
-			<span class="status-number">{{messages.length || 0}}<span class="unread-message-count">14</span></span>
+			<span class="status-number" ng-bind="messages.length || 0" />
 		</div>
 		<div class="status-panel viewer-count-panel">
 			<header>Viewers</header>
-			<span class="status-number" ng-bind="viewers || 0" />
+			<span class="status-number" ng-bind="viewers || 1" />
 		</div>
-		<div class="event-status-title">
-			<span ng-bind="event.name" />
+		<div class="event-start pull-right" ng-if="event.start">
+			<span class="glyphicon glyphicon-time" /> Starts <span am-time-ago="event.start" />
+		</div>
+		<div class="event-location pull-right" ng-if="event.location">
+			<span class="glyphicon glyphicon-map-marker" /> <span ng-bind="event.location" />
 		</div>
 		<div class="typing-status" ng-show="typing">
 			<span ng-show="typing.author" ng-bind="typing.author + ' is '" />
 			<span ng-bind="'typing...'" />
 		</div>
 	</div>
-	<ol id="messages">
-		<li class="message" ng-repeat="message in messages" ng-include="'modules/core/views/message.view.html'" />
-	</ol>
+
+	<main class="messages">
+		<div class="event-postmessage">
+			<a ui-sref="app.event.post({username: username, slug: slug})">
+				<button class="btn btn-success btn-lg event-postmessage-button">+</button>
+			</a>
+		</div>
+		<article class="message" ng-repeat="message in messages | orderBy:'sent':true" ng-include="'modules/core/views/message.view.html'" />
+	</main>
 </div>

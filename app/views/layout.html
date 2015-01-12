@@ -27,8 +27,8 @@
 		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
 </head>
-<body>
-	<div class="container-fluid"{% if ngAppName %} ng-class="pageClass ? pageClass : ''"{% endif %}>
+<body{% if ngAppName %} ng-class="pageClass ? pageClass : ''"{% endif %}>
+	<div class="container-fluid">
 			
 		<div class="wrapper main-header-wrapper">
 			<header class="main-header clearfix text-center textured-carbon-bg">

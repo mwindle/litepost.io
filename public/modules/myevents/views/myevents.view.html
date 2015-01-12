@@ -3,19 +3,19 @@
   <div class="event-summary-panel panel panel-default">
     <div class="panel-heading"><h5 class="event-summary-heading">Recent events</h5></div>
     <div class="panel-body">
-      <div class="event-summary-row" ng-repeat="event in user.events">
+      <div class="event-summary-row" ng-repeat="event in events">
         <span class="event-summary-icon" />
         <span class="event-summary-name">
-          <a ui-sref="event({channel: event.channel})">{{event.name}}</a>
+          <a ui-sref="app.event({username: username, slug: event.slug})">{{event.name}}</a>
           <br />
           <span class="event-summary-description">
-             @{{event.channel}}
+             /{{event.slug}}
           </span>
           <br />
         <span am-time-ago="event.start" />
         </span>
         <span class="event-summary-stats">
-          <span class="event-summary-follower-count">{{event.followers}}</span>
+          <span class="event-summary-follower-count"></span>
         </span>
       </div>
     </div>

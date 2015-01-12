@@ -1,41 +1,28 @@
 
 @import "../../../less/variables.less";
 
-.message-sent { 
-	.make-xs-column(10, 0);
-	.make-xs-column-offset(1);
-
-	.make-md-column(2, 0);
-	.make-md-column-offset(0);
-
-	font-size: 0.5em;
+.messages {
+	width: 80%;
 		@media (@md) {
-			font-size: 1em;
+			width: 50%;
 		}
+	margin-left: auto;
+	margin-right: auto;
+}
 
-	text-align: left;
-		@media (@md) {
-			text-align: right;
-		}
-
-	padding: 1em;
-	
-	.sent-time {
-		color: @gray-dark;
-	}
+.message {
+	padding-top: @padding-large-vertical;
+	margin-bottom: @padding-large-vertical;
+	position: relative;
+	border-bottom: 1px solid #EEE;
 }
 
 .message-text {
-	.make-xs-column(10, 0);
-	.make-xs-column-offset(1);
-
-	.make-md-column(8, 0);
-	.make-md-column-offset(0);
 
 	font-size: @font-size-base;
 
 	h1, h2, h3, h4, h5, h6 {
-		margin-top: 0;
+		margin-top: @padding-large-vertical;
 	}
 
 	ul {
@@ -76,4 +63,47 @@
 		}
 	}
 
+}
+
+.message-footer {
+	padding-top: @padding-small-vertical;
+	padding-bottom: @padding-large-vertical;
+	color: @gray-light;
+	font-weight: 300;
+
+	font-size: @font-size-small;
+		@media (@md) {
+			font-size: @font-size-base;
+		}
+
+	a, a:hover {
+		color: inherit;
+		font-weight: inherit;
+		font-size: inherit;
+	}
+
+}
+
+.message-footer::after {
+	content: "";
+	display: block;
+	position: absolute;
+	height: @font-size-small;
+	width: @font-size-small;
+	bottom: (-1 * (@font-size-small / 2));
+	left: 50%;
+	margin-left: (-1 * (@font-size-small / 2));
+
+	border: 1px solid @gray-lighter;
+	border-radius: 100%;
+	box-shadow: @body-bg 0 0 0 (@font-size-small / 2);
+	background: @body-bg;
+}
+
+.message-author-img {
+	border-radius: 100%;
+}
+
+.edit-message-link {
+	text-transform: uppercase;
 }

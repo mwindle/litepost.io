@@ -1,7 +1,9 @@
 'use strict';
 
 var mongoose = require('mongoose'),
+	restful = require('node-restful'),
 	bcrypt = require('bcrypt'),
+	crypto = require('crypto'),
 	validator = require('validator'),
 	ENCRYPTION_ROUNDS = 10;
 
@@ -22,9 +24,8 @@ var UserSchema = new mongoose.Schema({
 		required: true,
 		trim: true,
 		lowercase: true,
-		index: {
-			unique: true
-		},
+		unique: true,
+		index: true,
 		validate: [
 			{
 				validator: validator.isAlphanumeric,
@@ -43,15 +44,17 @@ var UserSchema = new mongoose.Schema({
 		required: true,
 		trim: true,
 		lowercase: true,
-		index: {
-			unique: true
-		},
+		unique: true,
+		index: true,
 		validate: [
 			{
 				validator: validator.isEmail,
 				msg: '{VALUE} is not a valid email.'
 			}
 		]
+	},
+	emailHash: {
+		type: String
 	},
 	password: {
 		type: String,
@@ -64,7 +67,7 @@ var UserSchema = new mongoose.Schema({
 			}
 		]
 	},
-	fullName: {
+	name: {
 		type: String,
 		trim: true,
 		validate: [
@@ -86,28 +89,52 @@ var UserSchema = new mongoose.Schema({
 UserSchema.pre('save', function (next) {
   var user = this;
 
-  if (!user.isModified('password')) {
+  if(!user.isModified('password')) {
   	return next();
   }
 
-  bcrypt.genSalt(ENCRYPTION_ROUNDS, function (err, salt) {
-    if (err) {
-    	return next(err);
-    }
-
-    // Hash the password with generated salt
-    bcrypt.hash(user.password, salt, function (err, hash) {
-      if (err) {
-      	return next(err);
-      }
-
-      user.password = hash;
-      next();
-    });
+  UserSchema.statics.hashPassword(user.password, function (err, hash) {
+  	if(err) {
+  		return next(err);
+  	}
+		user.password = hash;
+		next();
   });
 });
 
-UserSchema.methods.authenticate = function (password, cb) {
+// Mongoose middleware to md5 hash email
+UserSchema.pre('save', function (next) {
+	var user = this;
+
+	if(!user.isModified('email')) {
+		return next();
+	}
+
+	UserSchema.statics.hashEmail(user.email, function (err, hash) {
+		if(err) {
+			return next(err);
+		}
+		user.emailHash = hash;
+		next();
+	});
+});
+
+UserSchema.statics.hashEmail = function (email, cb) {
+	cb(null, crypto.createHash('md5').update(email).digest('hex'));
+};
+
+UserSchema.statics.hashPassword = function (password, cb) {
+  bcrypt.genSalt(ENCRYPTION_ROUNDS, function (err, salt) {
+    if (err) {
+    	return cb(err);
+    }
+
+    // Hash the password with generated salt
+    bcrypt.hash(password, salt, cb);
+  });
+};
+
+UserSchema.methods.comparePassword = function (password, cb) {
 	bcrypt.compare(password, this.password, function (err, authenticated) {
 		if(err) {
 			return cb(err);
@@ -116,4 +143,4 @@ UserSchema.methods.authenticate = function (password, cb) {
 	});
 };
 
-module.exports = mongoose.model('User', UserSchema);
+module.exports = restful.model('User', UserSchema);

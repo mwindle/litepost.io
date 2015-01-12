@@ -2,6 +2,10 @@
 // Import Bootrap for variables and mixins to pass lint, ignored by LESS compiler later
 @import "../components/bootstrap/less/bootstrap.less";
 
+@font-weight-bold: 700;
+@font-weight-normal: 400;
+@font-weight-light: 300;
+
 /*
 * Bootstrap overrides
 */
@@ -15,19 +19,21 @@
 @brand-info: lighten(@brand-primary, 30%);
 
 // Scaffolding
-@body-bg: #EFEFEF;
+@body-bg: #FFF;
 
 
 // Typography
 @font-family-sans-serif: "Oxygen", "Helvetica Neue", Helvetica, Arial, sans-serif;
 @font-size-base: 16px;
+@font-size-small: 12px;
+@fond-size-large: 24px;
 
 @headings-font-family: "Oswald", @font-family-sans-serif;
-@headings-font-weight: 300;
+@headings-font-weight: @font-weight-bold;
 
 
 // Components
-@padding-small-vertical: 16px;
+/*@padding-small-vertical: 16px;*/
 @padding-large-vertical: 30px;
 
 
@@ -46,4 +52,5 @@
 // Components
 @main-footer-height: 10em;
 @message-img-border-radius: 5px;
+@gray-lightest: lighten(@gray-base, 96%);
 

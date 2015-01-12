@@ -6,58 +6,43 @@
 
   angular.module('postmessage').controller('PostController', 
     function ($scope, $state, $stateParams, $timeout, Event, Message, EventSocket, parallaxHelper, title, pageClass) {
-    $scope.channel = $stateParams.channel;
+    $scope.username = $stateParams.username;
+    $scope.slug = $stateParams.slug;
     $scope.messageId = $stateParams.messageId;
     pageClass.set('postmessage');
-    $scope.editor = angular.element('#m');
     $scope.typing = false;
     $scope.background = parallaxHelper.createAnimator(-0.3);
-    EventSocket.connect($scope.channel);
 
     $scope.$on('$destroy', function () {
       pageClass.set('');
       EventSocket.disconnect();
     });
 
-    $scope.event = Event.get({ channel: $scope.channel }, function (event) {
-      if($scope.messageId) {
-        title.set('Edit Message');
-        $scope.editingMessage = Message.get({ 
-          channel: $scope.channel, 
-          id: $scope.messageId 
-        }, function () {
-          $scope.editor.val($scope.editingMessage.text);
-        });
-      } else {
-        title.set('New Message');
-        $scope.editingMessage = new Message({ 
-          event: event._id,
-          text: '',
-          html: ''
-        });
-        $scope.editor.val($scope.editingMessage.text);
-      }
-    });
-
-    $scope.editor.markdown({
-      fullscreen: { enable: false },
-      hiddenButtons: ['Preview'],
-      onChange: function (e) {
-        $scope.$apply(function () {
-          $scope.edited(e.getContent());
-        });
-      },
-      onShow: function (e) {
-        e.$textarea.css('resize', 'vertical');
-      }
+    if($scope.messageId) {
+      title.set('Edit Message');
+      $scope.editingMessage = Message.get({ id: $scope.messageId, populate: 'author' });
+    } else {
+      title.set('New Message');
+      $scope.editingMessage = new Message({ 
+        text: '',
+        html: ''
+        //TODO: , author: me
+      });
+    }
+    $scope.$watch('event._id', function () {
+      $scope.editingMessage.event = $scope.event._id;
     });
 
     $scope.isMessageLoaded = function () {
-      return $scope.event.$resolved && (!$scope.isUpdatingExisting() || $scope.editingMessage.$resolved);
+      return $scope.event && $scope.event.$resolved && (!$scope.isUpdatingExisting() || $scope.editingMessage.$resolved);
     };
 
     $scope.isUpdatingExisting = function () {
       return !!$scope.messageId;
+    };
+
+    $scope.textChanged = function () {
+      $scope.edited($scope.editingMessage.text || '');
     };
 
     $scope.edited = function (content) {
@@ -80,9 +65,9 @@
     };
 
     $scope.disableEditing = function () {
-      $scope.editor.val('');
+      $scope.editingMessage = null;
       $scope.stopTyping();
-      $state.go('event', $stateParams);
+      $state.go('app.event', $stateParams);
     };
 
     $scope.isTyping = function () {
@@ -101,7 +86,7 @@
 
     $scope.publish = function () {
       if($scope.editingMessage && $scope.editingMessage.text) {
-        $scope.editingMessage.$save({ channel: $scope.channel }).then(function (message) {
+        $scope.editingMessage.$save(function (message) {
           $scope.editingMessage = null;
           $scope.disableEditing();
         });
@@ -109,17 +94,12 @@
     };
 
     $scope.update = function () {
-      /* 
-      Would like to have a custom state change with this to send the author back to the location
-      of this message with //u/r/l#messageId but ui-router $state.go doesn't support a hash right now. 
-      Watch https://github.com/angular-ui/ui-router/issues/510 
-      */
       $scope.publish();
     };
 
     $scope.delete = function () {
       if($scope.isUpdatingExisting() && $scope.isMessageLoaded()) {
-        $scope.editingMessage.$delete({ channel: $scope.channel }).then(function (message) {
+        $scope.editingMessage.$delete().then(function (message) {
           $scope.editingMessage = null;
           $scope.disableEditing();
         });
