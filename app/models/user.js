@@ -77,9 +77,55 @@ var UserSchema = new mongoose.Schema({
 			},
 			{
 				validator: function (str) {
-					return validator.isLength(str, 0, 50);
+					return validator.isLength(str, 0, 30);
 				},
 				msg: '{VALUE} length is not in [0,30]'
+			}
+		]
+	},
+	website: {
+		type: String,
+		trim: true,
+		validate: [
+			{
+				validator: function (str) {
+					return validator.isLength(str, 0, 200);
+				},
+				msg: '{VALUE} length is not in [0,200]'
+			},
+			{
+				validator: function (str) {
+					return validator.isURL(str, {
+						protocols: ['http', 'https'],
+						require_protocol: true,
+						allow_underscores: true
+					});
+				},
+				msg: '{VALUE} is not a valid URL'
+			}
+		]
+	},
+	location: {
+		type: String,
+		trim: true,
+		validate: [
+			{
+				validator: function (str) {
+					return validator.isLength(str, 0, 30);
+				},
+				msg: '{VALUE} length is not in [0,30]'
+			}
+		]
+	},
+	bio: {
+		type: String,
+		trim: true,
+		validate: [
+			{
+				validator: function (str) {
+					return validator.isLength(str, 0, 200);
+				},
+				msg: '{VALUE} length is not in [0,200]'
 			}
 		]
 	}

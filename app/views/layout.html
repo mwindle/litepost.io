@@ -1,8 +1,9 @@
+{% set ngAppName = 'liveBlogApp' %}
 <!DOCTYPE html>
 <html lang="en"{% if ngAppName %} ng-app="{{ngAppName}}"{% endif %}>
 
 <head>
-	<title{% if ngAppName %} ng-bind="title"{% endif %}>{{title}}</title>
+	<title{% if page === 'app' %} ng-bind="title"{% endif %}>{{title}}</title>
 
 	<!-- General META -->
 	<meta charset="utf-8">
@@ -35,16 +36,21 @@
 				<div class="pull-left">
 					<a class="logo" href="/">LitePost<span class="emphasize">.io</span></a>
 				</div>
-				<div class="pull-right">
-					{% if page === 'join' or page === '' %}Learn more{% endif %}
-					{% if user %}
-					<a href="/app">Dashboard</a>
-					<a href="/logout">Sign out</a>
-					{% elseif page !== 'login' %}
-					<a href="/login">Sign in</a>
-					{% else %}
-					<a href="/join">Join</a>
-					{% endif %}
+				<div class="identity-status pull-right" ng-controller="IdentityStatusController">
+					{% raw %}
+					<div class="dropdown">
+						<a ng-if="me.username" href="/app#/{{me.username}}">
+							<img class="avatar identity-status-avatar" ng-if="me.emailHash" ng-src="//www.gravatar.com/avatar/{{me.emailHash}}?s=30&d=mm" />
+							<span ng-bind="me.name || '@'+me.username"></span>
+						</a>
+
+						<span ng-if="!me.username">
+							<a href="/join">Join</a>
+							<span> | </span>
+							<a href="/login">Sign in</a>
+						</span>
+					</div>
+					{% endraw %}
 			  </div>
 			</header>
 		</div>

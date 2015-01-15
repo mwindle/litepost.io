@@ -1,0 +1,43 @@
+<form role="form" class="responsive-content">
+  <header>
+    <h2>
+      <span class="emphasize" ng-bind="me.username"></span> settings
+    </h2>
+  </header>
+
+  <div class="panel panel-default">
+  	<header class="panel-heading">Profile</header>
+  	<div class="panel-body">
+
+		  <div class="form-group">
+		    <label for="name">Name</label>
+		    <input type="text" class="form-control" id="name" name="name" placeholder="Full name" ng-model="updatedMe.name" autofocus />
+		  </div>
+		  <div class="form-group">
+		    <label for="location">Location</label>
+		    <input type="text" class="form-control" id="location" name="location" placeholder="Location" ng-model="updatedMe.location" />
+		  </div>
+		  <div class="form-group">
+		    <label for="website">Website</label>
+		    <input type="url" class="form-control" id="website" name="website" placeholder="Website" ng-model="updatedMe.website" />
+		  </div>
+		  <div class="form-group">
+		    <label for="bio">Bio</label>
+		    <textarea class="form-control" id="bio" name="bio" placeholder="Thoughts, hopes, dreams..." ng-model="updatedMe.bio" />
+		  </div>
+		  <div class="form-group">
+		  	<button class="btn btn-success" ng-click="save()">Save profile settings</button>
+		  </div>
+		</div>
+	</div>
+
+  <div class="panel panel-danger">
+  	<div class="panel-heading">Danger Zone</div>
+  	<div class="panel-body">
+	  	<div class="form-group">
+				<label for="delete">Delete your account</label>
+				TODO
+			</div>
+  	</div>
+	</div>
+</form>

@@ -10,6 +10,7 @@ var ApplicationConfiguration = (function() {
 	  'mgcrea.ngStrap',
 	  'duParallax',
 	  'ngResource', 
+	  'LocalStorageModule',
 	  'ngAnimate',
 	  'ngSanitize', 
 	  'angularMoment',

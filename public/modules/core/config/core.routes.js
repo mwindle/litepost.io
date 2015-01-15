@@ -4,13 +4,29 @@
 (function () {
 'use strict';
 
-	// Setting up route
-	angular.module('core').config(function ($stateProvider, $urlRouterProvider, $urlMatcherFactoryProvider) {
-	   $stateProvider.state('app', {
-      url: '',
-      template: '<ui-view />',
-      controller: 'CoreController'
-    });
+	
+	angular.module('core')
+
+	// Ensure all http requests include Authorization header if a token is set
+	.config(function ($httpProvider) {
+		$httpProvider.interceptors.push('AuthTokenInterceptor');
+	})
+
+	.config(function ($stateProvider, $urlRouterProvider, $urlMatcherFactoryProvider) {
+	   $stateProvider
+
+		   .state('app', {
+	      url: '',
+	      template: '<ui-view />',
+	      controller: 'CoreController'
+	    })
+
+		   .state('app.login', {
+		   		url: '/login',
+		   		templateUrl: 'modules/core/views/login.view.html',
+		   		controller: 'LoginController',
+		   		data: { title: 'Login - LitePost.io' }
+		   });
 
 	  $urlRouterProvider.otherwise('/events');
 	  $urlMatcherFactoryProvider.strictMode(false);

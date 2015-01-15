@@ -8,6 +8,7 @@
     function ($scope, $state, $stateParams, $timeout, Event, Message, EventSocket, parallaxHelper, title, pageClass) {
     $scope.username = $stateParams.username;
     $scope.slug = $stateParams.slug;
+    $scope.maxPostLength = 1000;
     $scope.messageId = $stateParams.messageId;
     pageClass.set('postmessage');
     $scope.typing = false;
@@ -87,8 +88,9 @@
     $scope.publish = function () {
       if($scope.editingMessage && $scope.editingMessage.text) {
         $scope.editingMessage.$save(function (message) {
-          $scope.editingMessage = null;
           $scope.disableEditing();
+        }, function (err) {
+          console.log(err);
         });
       }
     };

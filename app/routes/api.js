@@ -4,10 +4,12 @@
  * Module dependencies.
  */
  var mongoose = require('mongoose'),
+ 	jwt = require('jsonwebtoken'),
  	User = mongoose.model('User'),
  	Event = mongoose.model('Event'),
  	Message = mongoose.model('Message'),
  	//pruner = require('../controllers/api/pruner'),
+ 	config = require('../../config/config'),
 	emitter = require('../../config/emitter'),
  	marked = require('marked'),
 	markedSetup = require('../../public/js/marked-setup');
@@ -15,6 +17,58 @@
 module.exports = function (app) {
 
 	//app.route('/api/*').all(auth.ensure);
+
+	//TODO: middleware to mongo-sanitize req.query, req.params, req.body
+
+	app.route('/api/me').get(function (req, res, next) {
+		if(!req.user) {
+			return next(new Error('Not authenticated (should be 401'));
+		}
+		User.findById(req.user._id, function (err, user) {
+			if(err) {
+				next(err);
+			} else if (!user) {
+				next(new Error('User not found (should be 404'));
+			} else {
+				res.json(user); //TODO: Pruner
+			}
+		});
+	});
+
+	app.route('/api/401').get(function (req, res) {
+		res.statusCode = 401;
+		res.json({error: 'Bad news' });
+	});
+
+	app.route('/api/login').post(function (req, res, next) {
+		if(req.body && req.body.username && req.body.password) {
+			User.findOne({ username: req.body.username }, function (err, user) {
+				if(err) { 
+					next(err); 
+				} else if(!user) { 
+					next(new Error('Invalid email.')); 
+				} else {
+					user.comparePassword(req.body.password, function (err, matched) {
+						if(!matched) {
+							next(new Error('Authentication failed.'));
+						} else {
+							var token = jwt.sign(
+							{
+								_id: user._id,
+								username: user.username
+							}, config.jwtSecret, 
+							{
+								expiresInMinutes: config.jwtLifetimeInMin
+							});
+							res.json({ token: token });
+						}
+					});
+				}
+			});
+		} else {
+			next(new Error('Missing username or password in request body'));
+		}
+	});
 
 	User.methods(['get', 'post', 'put', 'delete']);
 	//User.after('get', pruner.handler('user'));
@@ -41,7 +95,7 @@ module.exports = function (app) {
 	Event.methods(['get', 'post', 'put', 'delete']);
 	//Event.after('get', pruner.handler('event'));
 	Event.after('get', function (req, res, next) {
-		if(req.query.username && Array.isArray(res.locals.bundle) && res.locals.bundle.length === 1) {
+		if(req.query.username && req.query.slug && Array.isArray(res.locals.bundle) && res.locals.bundle.length === 1) {
 			res.locals.bundle = res.locals.bundle[0];
 		}
 		next();

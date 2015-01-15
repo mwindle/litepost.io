@@ -15,11 +15,19 @@
         data: { title: 'New Event - LitePost.io' }
       })
 
+      .state('app.editProfile', {
+        url: '/settings',
+        templateUrl: 'modules/myevents/views/settings.view.html',
+        controller: 'ProfileSettingsController',
+        data: { title: 'Edit Profile - LitePost.io' }
+      })
+
       .state('app.profile', {
         url: '/:username',
         templateUrl: 'modules/myevents/views/myevents.view.html',
         controller: 'MyEventsController',
         data: { title: 'Your Events - LitePost.io' }
       });
+      
   });
 })();

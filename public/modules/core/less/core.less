@@ -1,6 +1,22 @@
 
 @import "../../../less/variables.less";
 
+.identity-status {
+	margin-right: @font-size-base;
+	font-size: @font-size-small;
+	font-weight: @font-weight-light;
+	text-transform: uppercase;
+	color: @font-color-on-bg;
+
+	a {
+		color: inherit;
+		&:hover {
+			color: darken(@font-color-on-bg, 10%);
+		}
+		text-decoration: none;
+	}
+}
+
 .messages {
 	width: 80%;
 		@media (@md) {
@@ -8,6 +24,7 @@
 		}
 	margin-left: auto;
 	margin-right: auto;
+	position: relative;
 }
 
 .message {
@@ -15,6 +32,7 @@
 	margin-bottom: @padding-large-vertical;
 	position: relative;
 	border-bottom: 1px solid #EEE;
+	word-wrap: break-word;
 }
 
 .message-text {

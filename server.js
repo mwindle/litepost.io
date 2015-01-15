@@ -13,8 +13,8 @@ var http = require('http'),
 var app = require('./config/express')();
 var server = http.createServer(app);
 
-// Setup passport config
-require('./config/passport')();
+// Setup JWT config
+require('./config/jwt')(app);
 
 // Setup Socket.IO config
 require('./config/socket')(server);

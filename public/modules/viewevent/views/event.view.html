@@ -32,9 +32,9 @@
 				</button>
 			</a>
 		</div>
-		<div class="event-owner">
+		<div class="event-owner" ng-show="user.$resolved">
 			<a ui-sref="app.profile({username: username})">
-				<img class="event-owner-img" ng-src="//www.gravatar.com/avatar/{{user.emailHash}}?s=100&d=mm" />
+				<img class="event-owner-img" ng-show="user.emailHash" ng-src="//www.gravatar.com/avatar/{{user.emailHash}}?s=100&d=mm" />
 			</a>
 			<div class="event-owner-name">
 				by 

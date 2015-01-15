@@ -45,17 +45,6 @@ module.exports = function () {
 	app.use(bodyParser.urlencoded({ extended: true }));
 	app.use(cookieParser());
 	
-	app.use(session({
-	  secret: config.sessionSecret,
-	  store: new MongoStore({
-	    url : config.db
-	  }),
-	  resave: false,
-	  saveUninitialized: false
-	}));
-	app.use(passport.initialize());
-	app.use(passport.session());
-	
 	// Use helmet to secure Express headers
 	app.use(helmet.xframe());
 	app.use(helmet.xssFilter());

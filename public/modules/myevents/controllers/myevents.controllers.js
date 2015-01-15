@@ -16,6 +16,21 @@
   })
 
   /**
+  * Controller to load and expose the users events
+  */
+  .controller('ProfileSettingsController', function ($scope, $stateParams, Me, User) {
+    $scope.me = Me.get(function (me) {
+      $scope.updatedMe = new User(me);
+    });
+
+    $scope.save = function () {
+      $scope.updatedMe.$save(function (me) {
+        $scope.me = new Me(me);
+      });
+    };
+  })
+
+  /**
   * Controller to create a new event
   */
   .controller('CreateEventController', function ($scope, $state, Event) {
@@ -25,7 +40,7 @@
         new Event({
           name: $scope.name
         }).$save(function (event) {
-          $state.go('main');
+          $state.go('app');
         });
       }
     };

@@ -9,6 +9,8 @@ module.exports = {
 	port: 3000,
 	db: 'mongodb://localhost',
 	sessionSecret: 'litepost.io',
+  jwtSecret: 'litepost.io',
+  jwtLifetimeInMin: 60 * 24 * 7, // Tokens last for a week
   assets: {
     lib: {
       js: [
@@ -20,7 +22,7 @@ module.exports = {
         'public/components/angular/angular.js',
         'public/components/angular-resource/angular-resource.js', 
         'public/components/angular-socket-io/socket.js', 
-        'public/components/angular-cookies/angular-cookies.js', 
+        'public/components/angular-local-storage/dist/angular-local-storage.js', 
         'public/components/angular-animate/angular-animate.js', 
         'public/components/angular-touch/angular-touch.js', 
         'public/components/angular-sanitize/angular-sanitize.js', 

@@ -29,6 +29,7 @@ Setup marked for both the client and the server to keep the options and override
 
   // Syntax highlighting of code blocks with highlight.js
   if(highlight) {
+    highlight.configure({ useBR: true });
 	  var h = function (code) {
 	  	return highlight.highlightAuto(code).value;
 	  };

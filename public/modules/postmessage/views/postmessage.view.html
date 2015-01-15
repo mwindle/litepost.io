@@ -1,18 +1,32 @@
 <section class="editor">
 
 	<header class="editor-header">
-		<section class="editor-edit-header" ng-init="tab='markdown'" ng-class="{active: tab==='markdown'}" ng-click="tab='markdown'">Markdown</section>
-		<section class="editor-preview-header" ng-class="{active: tab==='preview'}" ng-click="tab='preview'" >Preview</section>
+		<section class="editor-edit-header" ng-init="tab='markdown'" ng-class="{active: tab==='markdown'}" ng-click="tab='markdown'">
+			Markdown
+		</section>
+		<section class="editor-preview-header" ng-class="{active: tab==='preview'}" ng-click="tab='preview'" >
+			Preview
+		</section>
 	</header>
 
 	<section class="editor-panel-container">
+
 		<section class="editor-tab editor-edit-panel" ng-class="{active: tab==='markdown'}" >
-			<textarea class="editor-textarea" ng-model="editingMessage.text" ng-trim="false" ng-change="textChanged()" placeholder="Enter your post in Markdown format here..." autofocus > </textarea>
+			<header class="editor-header-meta">
+				<span ng-bind="maxPostLength - editingMessage.text.length" /> left
+			</header>
+			<textarea class="editor-textarea scrollable" ng-model="editingMessage.text" ng-trim="false" ng-change="textChanged()" placeholder="Enter your post in Markdown format here..." autofocus > </textarea>
 		</section>
 
 		<section class="editor-tab editor-preview-panel"ng-class="{active: tab==='preview'}" >
-			<article class="message" ng-repeat="message in [editingMessage]" ng-include="'modules/core/views/message.view.html'" />
+			<header class="editor-header-meta">
+				<span ng-bind="editingMessage.html | stripTags | wordCount" /> words
+			</header>
+			<div class="scrollable">
+				<article class="message" ng-repeat="message in [editingMessage]" ng-include="'modules/core/views/message.view.html'" />
+			</div>
 		</section>
+		
 	</section>
 
 	<footer class="editor-action-panel">
