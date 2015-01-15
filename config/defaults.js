@@ -6,7 +6,7 @@ module.exports = {
 		description: 'Publish instantly to a live audience',
 		keywords: 'live blog microblog socket.io mongodb express angularjs node mean'
 	},
-	port: 3000,
+	PORT: 3000,
 	db: 'mongodb://localhost',
 	sessionSecret: 'litepost.io',
   jwtSecret: 'litepost.io',

@@ -5,11 +5,19 @@
  */
 var _ = require('lodash'),
 	glob = require('glob'),
-	environment = (process.env.NODE_ENV || 'development');
+	environment = (process.env.NODE_ENV || 'development'),
+	overrides = {};
+
+// Production environment has no file-based config, overrides must come from process.env
+if(environment !== 'production') {
+	overrides = require('./env/' + environment);
+} else {
+	overrides = process.env;
+}
 
 module.exports = _.extend(
 	require('./defaults'),
-	require('./env/' + environment),
+	overrides,
 	{ env: environment }
 );
 

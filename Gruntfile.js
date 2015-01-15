@@ -198,11 +198,14 @@ module.exports = function(grunt) {
 	grunt.registerTask('lint', ['jshint:client', 'jshint:server', 'lesslint']);
 
 	// Build task(s).
-	grunt.registerTask('build', ['lint', 'loadConfig', 'ngAnnotate', 'uglify', 'less', 'autoprefixer', 'test:build']);
+	grunt.registerTask('build', ['lint', 'loadConfig', 'ngAnnotate', 'uglify', 'less', 'autoprefixer']);
 
 	// Test task.
 	grunt.registerTask('test', ['env:test', 'jasmine_node', 'karma:unit']);
 
 	// Test build
 	grunt.registerTask('test:build', ['env:production', 'jasmine_node', 'karma:production']);
+
+	// Run in production
+	grunt.registerTask('heroku:production', ['lint', 'loadConfig', 'ngAnnotate', 'uglify', 'less', 'autoprefixer']);
 };

@@ -32,8 +32,8 @@ var db = mongoose.connect(config.db, { server: { auto_reconnect: true } }, funct
 		console.log(chalk.green('Connected to MongoDB'));
 
 		// Start the app
-		server.listen(config.port, function() {
-			console.log(chalk.green('Express listening on port ' + config.port));
+		server.listen(config.PORT, function() {
+			console.log(chalk.green('Express listening on port ' + config.PORT));
 		});
 	}
 });
