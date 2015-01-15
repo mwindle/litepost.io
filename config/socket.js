@@ -5,7 +5,9 @@
  */
 var io = require('socket.io'),
 	emitter = require('./emitter'),
-	Event = require('mongoose').model('Event');
+	Event = require('mongoose').model('Event'),
+	roomPrefix = 'event:',
+	roomPrefixTest = new RegExp('^' + roomPrefix + '.*$');
 
 module.exports = function (server) {
 	// Listen to socket connections on the provided server
@@ -13,17 +15,17 @@ module.exports = function (server) {
 
 	// Send newly created messages to all connected clients
 	emitter.onNewMessage(function(data) {
-		io.to(data.room).emit('new-message', data.message);
+		io.to(roomPrefix + data.room).emit('new-message', data.message);
 	});
 
 	// Send updated messages to all connected clients
 	emitter.onUpdateMessage(function(data) {
-		io.to(data.room).emit('update-message', data.message);
+		io.to(roomPrefix + data.room).emit('update-message', data.message);
 	});
 
 	// Send deleted messages to all connected clients
 	emitter.onDeleteMessage(function(data) {
-		io.to(data.room).emit('delete-message', data.message);
+		io.to(roomPrefix + data.room).emit('delete-message', data.message);
 	});
 
 	// Handle individual client connections
@@ -32,28 +34,22 @@ module.exports = function (server) {
 
 		// Join client to event-specific room
 		socket.on('join', function(rm) {
-			if(!io.nsps['/'].adapter.rooms[rm]) {
+			if(!io.nsps['/'].adapter.rooms[roomPrefix + rm]) {
 				Event.findOneBySocket(rm, function (err, event) {
 					if(event) {
-						socket.join(room = rm);
-				
-						// Send client the latest metadata for the event when they join its room
-						socket.emit('event-meta-update', getEventMeta(room));
+						socket.join(room = roomPrefix + rm);
 					} else {
 						socket.disconnect();
 					}
 				});
 			} else {
-				socket.join(room = rm);
-				
-				// Send client the latest metadata for the event when they join its room
-				socket.emit('event-meta-update', getEventMeta(room));
+				socket.join(room = roomPrefix + rm);
 			}
 		});
 
 		// Remove client from event room
 		socket.on('leave', function(rm) {
-			socket.leave(rm);
+			socket.leave(room);
 			room = null;
 		});
 
@@ -66,14 +62,6 @@ module.exports = function (server) {
 		socket.on('stop-typing', function() {
 			if(room) { io.to(room).emit('stop-typing'); }
 		});
-
-		// Setup periodic refresh of event metadata to all clients
-		(function refreshEventMeta () {
-			setTimeout(function () {
-				io.to(room).emit('event-meta-update', getEventMeta(room));
-				refreshEventMeta();
-			}, 5000);
-		})();
 
 	});
 
@@ -92,4 +80,19 @@ module.exports = function (server) {
 			return 1;
 		}
 	}
+
+	// Setup periodic refresh of event metadata to all rooms and clients
+	(function refreshEventMeta () {
+		setTimeout(function () {
+			Object.getOwnPropertyNames(io.nsps['/'].adapter.rooms).forEach(function (room) {
+				// Only our custom-prefixed rooms count, socket.io considers each client in its own room
+				if(!roomPrefixTest.test(room)) {
+					return;
+				}
+				io.to(room).emit('event-meta-update', getEventMeta(room));
+			});
+			refreshEventMeta();
+		}, 5000);
+	})();
+
 };

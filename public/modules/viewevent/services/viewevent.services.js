@@ -63,8 +63,9 @@
       */
       disconnect: function () {
         if(!service.socket) { return false; }
-        service.socket.removeListener('connect', service.connectHandler);
+        service.socket.removeAllListeners();
         service.socket.emit('leave', service.room);
+        service.socket.disconnect();
         service.socket = service.room = null; 
       },
 
