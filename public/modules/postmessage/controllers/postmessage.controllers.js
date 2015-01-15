@@ -10,13 +10,11 @@
     $scope.slug = $stateParams.slug;
     $scope.maxPostLength = 1000;
     $scope.messageId = $stateParams.messageId;
-    pageClass.set('postmessage');
     $scope.typing = false;
     $scope.background = parallaxHelper.createAnimator(-0.3);
-
+    pageClass.set('postmessage');
     $scope.$on('$destroy', function () {
       pageClass.set('');
-      EventSocket.disconnect();
     });
 
     if($scope.messageId) {
