@@ -82,6 +82,6 @@
 			</a>
 		</div>
 		<article class="message" ng-repeat="message in messages | orderBy:'sent':true" ng-include="'modules/core/views/message.view.html'" />
-		
+		<dir-disqus disqus-shortname="litepostio" disqus-identifier="{{ event._id }}" disqus-url="{{ disqusUrl }}" ready-to-bind="{{ event.$resolved }}"></dir-disqus>
 	</main>
 </div>

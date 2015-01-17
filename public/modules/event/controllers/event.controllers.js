@@ -17,6 +17,8 @@
     $scope.messages = [];
     $scope.unread = [];
 
+    $scope.disqusUrl = 'https://litepost.io/app/' + $scope.username + '/' + $scope.slug;
+
     // Setup parallax scrolling animation
     $scope.background = parallaxHelper.createAnimator(-0.15);
     $anchorScroll.yOffset = 120;
