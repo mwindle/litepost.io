@@ -42,6 +42,38 @@
 	}
 }
 
+.unread-status-bar {
+	background: #DFF0D8; 
+	color: #3C763D; 
+	border: 1px solid #3C763D; 
+	width: 100%; 
+	padding: 10px; 
+	position: fixed; 
+	top: 0; 
+	left: 0; 
+	right: 0; 
+	z-index: 199; 
+	border-top: 0; 
+	border-left: 0; 
+	border-right: 0; 
+	text-align: center;
+
+	&.ng-hide-add.ng-hide-add-active, &.ng-hide-remove.ng-hide-remove-active {
+	  transition: all linear 0.3s;
+	}
+
+	&.ng-hide {
+	  line-height: 0;
+	  opacity: 0;
+	  padding: 0 10px;
+	}
+
+	a, a:hover {
+		color: @gray-dark;
+		cursor: pointer;
+	}
+}
+
 .event-header {
 	position: relative;
 	width: 100%;

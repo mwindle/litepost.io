@@ -11,8 +11,7 @@
 	    .state('app.event', {
 	      url: '/:username/:slug',
 	      templateUrl: 'modules/viewevent/views/event.view.html',
-	      controller: 'EventController',
-	      data: { title: 'Event - LitePost.io' }
+	      controller: 'EventController'
 	    })
 
       /** Can remove the extra route below once # is supported in ui.router

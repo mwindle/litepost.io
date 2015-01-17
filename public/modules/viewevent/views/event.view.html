@@ -15,7 +15,15 @@
 	</div>
 </div>
 -->
+
 <div ui-view></div>
+<header ng-show="unread.length" class="unread-status-bar" style="">
+	<div>
+		<span ng-bind="unread.length"></span> new 
+		<span ng-pluralize count="unread.length" when="{'1': 'message.', 'other': 'messages.'}" ></span>
+		<a style="color: black; cursor: pointer;" ng-click="scrollToUnread()"> View now</a>
+	</div>
+</header>
 <div class="active-event-view">
 	<header class="event-header textured-carbon-bg">
 		<h3 class="event-title">
@@ -44,7 +52,7 @@
 			</div>
 		</div>
 	</header>
-	<div class="event-status-bar">
+	<div class="event-status-bar" in-view="showUnread($inview)">
 		<div class="status-panel message-count-panel">
 			<header>Posts</header>
 			<span class="status-number" ng-bind="messages.length || 0" />
@@ -60,11 +68,11 @@
 			<span class="glyphicon glyphicon-map-marker" /> <span ng-bind="event.location" />
 		</div>
 		<div class="typing-status" ng-show="typing">
-			<span ng-show="typing.author" ng-bind="typing.author + ' is '" />
-			<span ng-bind="'typing...'" />
+			<span ng-show="typing.author" ng-bind="(typing.author.name || '@'+typing.author.username) + ' is '" />
+			<span ng-bind="'typing a message...'" />
 		</div>
 	</div>
-
+	
 	<main class="messages">
 		<div class="event-postmessage">
 			<a ui-sref="app.event.post({username: username, slug: slug})">

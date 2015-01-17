@@ -18,7 +18,11 @@
         $rootScope.token = token;
 
         // Persist to local storage, which has cookie fallback built in
-        localStorageService.set('token', token);
+        if(token) {
+          localStorageService.set('token', token);
+        } else {
+          localStorageService.remove('token');
+        }
       },
 
       get: function (token) {
@@ -115,6 +119,7 @@
   * Resource for obtaining the currently authenticated user
   */
   .factory('Me', function (resource) {
+    //var cache = $cacheFactory('me');
     return resource('api/me');
   })
 
@@ -157,9 +162,11 @@
       restrict: 'E',
       link: function () {
         $rootScope.$on('$stateChangeSuccess', function (event, toState) {
-          $timeout(function () {
-            title.set(toState.data.title);
-          });
+          if(toState.data && toState.data.title) {
+            $timeout(function () {
+              title.set(toState.data.title);
+            });
+          }
         });
       }
     };

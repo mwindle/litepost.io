@@ -33,13 +33,15 @@
       * @param room {String}
       * 
       */
-      connect: function (room) {
+      connect: function (room, token) {
         // Refuse to connect if no room is provided
         if(!room) { return false; }
         service.room = room;
         
         // Connect to the socket directly with Socket.IO
-        var socket = io.connect();
+        var socket = io.connect('', {
+          query: token ? 'token='+token : null
+        });
 
         // No point continuing if we couldn't connect
         if(!socket) { return false; }

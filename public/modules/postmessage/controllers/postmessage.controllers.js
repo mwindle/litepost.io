@@ -12,6 +12,7 @@
     $scope.messageId = $stateParams.messageId;
     $scope.typing = false;
     $scope.background = parallaxHelper.createAnimator(-0.3);
+
     pageClass.set('postmessage');
     $scope.$on('$destroy', function () {
       pageClass.set('');
@@ -25,7 +26,6 @@
       $scope.editingMessage = new Message({ 
         text: '',
         html: ''
-        //TODO: , author: me
       });
     }
     $scope.$watch('event._id', function () {
@@ -48,7 +48,7 @@
       // Update the editingMessage object with the changes made in the editor
       $scope.editingMessage.text = content;
       $scope.editingMessage.html = marked(content);
-      $scope.editingMessage.sent = new Date();
+      $scope.editingMessage.updated = new Date();
       // Send a socket message to indicate typing has started
       if(!$scope.isTyping()) {
         $scope.startTyping();
@@ -56,11 +56,11 @@
       // Send a socket message to indicate typing has stopped if another key isn't pressed in the allotted time
       (function (lastEditingTime) {
         $timeout(function () {
-          if($scope.editingMessage && lastEditingTime===$scope.editingMessage.sent) {
+          if($scope.editingMessage && lastEditingTime===$scope.editingMessage.updated) {
             $scope.stopTyping();
           }
-        }, 5000);
-      })($scope.editingMessage.sent);
+        }, 10000);
+      })($scope.editingMessage.updated);
     };
 
     $scope.disableEditing = function () {

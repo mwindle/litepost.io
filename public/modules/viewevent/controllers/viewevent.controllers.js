@@ -7,7 +7,7 @@
 
   angular.module('viewevent').controller('EventController', 
   	function ($scope, $stateParams, $location, $anchorScroll, 
-      parallaxHelper, $timeout, User, Event, Message, EventSocket, title) {
+      parallaxHelper, $timeout, Token, User, Event, Message, EventSocket, title, $document) {
     
     // Grab the username and event slug from the current state
     $scope.username = $stateParams.username;
@@ -15,6 +15,7 @@
     
     // Start with an empty array for this event's messages
     $scope.messages = [];
+    $scope.unread = [];
 
     // Setup parallax scrolling animation
     $scope.background = parallaxHelper.createAnimator(-0.15);
@@ -30,25 +31,8 @@
     }, function (event) {
       $scope.setupSocket();
       $scope.messages = Message.query({ event: event._id, populate: 'author' });
-
-      // Update the page title to customize it based on the event
-      $scope.setPageTitle();
-
-      /** 
-      * Scroll to the hashed message if it's set.
-      * The use of $timeout is a hack. There isn't a good way to detect when the DOM is completely
-      * constructed AND rendered with CSS applied (ie fully loaded). That is necessary to determine
-      * the actual scroll position. The use of $timeout will ensure the scrolling takes place the 
-      * specified amount of milliseconds after the DOM is constructed, meaning that's how much time
-      * it's allowing for the rendering. This may not work on slower systems. One could argue for the 
-      * complete removal of this hash-linking capability because of this inconsistent behavior. 
-      */
-      if($location.hash()) {
-        $timeout(function () {
-          $anchorScroll();
-        }, 500);
-      }
     });
+
 
     $scope.setupSocket = function () {
 
@@ -58,11 +42,11 @@
       });
 
       // Connect to the socket associated with this event
-      EventSocket.connect($scope.event.socket);
+      EventSocket.connect($scope.event.socket, Token.get());
 
       // Listen to typing events that indicate an author is typing a message for this event
-      EventSocket.on('typing', function () {
-        $scope.typing = true;
+      EventSocket.on('typing', function (data) {
+        $scope.typing = data || true;
       });
 
       // Listen to stop-typing events
@@ -72,27 +56,41 @@
 
       // Prepend new messages to the local messages array
       EventSocket.on('new-message', function (message) {
-        $scope.messages.unshift(new Message(message));
+        $scope.unread.push(message);
+        $scope.showUnread();
       });
 
-      // Update local message when an update comes from the socket
-      EventSocket.on('update-message', function (message) {
-        for(var i=0; i<$scope.messages.length; i++) {
-          if($scope.messages[i]._id === message._id) {
-            $scope.messages[i] = new Message(message);
-            return;
+      function indexOfMessage(array, message) {
+        for(var i=0; i<array.length; i++) {
+          if(array[i]._id === message._id) {
+            return i;
           }
+        }
+        return -1;      
+      }
+
+      // Update local message when an update comes from the socket
+      EventSocket.on('update-message', function (message) {        
+        var i = indexOfMessage($scope.unread, message);
+        if(i >= 0) {
+          $scope.unread[i] = new Message(message);
+        }
+        i = indexOfMessage($scope.messages, message);
+        if(i >= 0) {
+          $scope.messages[i] = new Message(message);
         }
       });
 
       // Delete local message when a delete comes from the socket
       EventSocket.on('delete-message', function (message) {
-        for(var i=0; i<$scope.messages.length; i++) {
-          if($scope.messages[i]._id === message._id) {
-            $scope.messages.splice(i, 1);
-            return;
-          }
+        var i = indexOfMessage($scope.unread, message);
+        if(i >= 0) {
+          $scope.unread.splice(i, 1);
         }
+        i = indexOfMessage($scope.messages, message);
+        if(i >= 0) {
+          $scope.messages.splice(i, 1);
+        }        
       });
 
       // Listen to metadata updates on the event socket
@@ -101,21 +99,44 @@
       });
     };
 
+    $scope.showUnread = function (show) {
+      $scope.show = arguments.length ? show : $scope.show;
+      if($scope.show) {
+        $scope.unread.forEach(function (message) {
+          $scope.messages.unshift(message);
+        });
+        $scope.unread = [];
+      }
+    };
+
+    $scope.scrollToUnread = function () {
+      $document.scrollTopAnimated(200);
+    };
+
     /**
     * Sets/updates the title of the page depending on the state of this controller
     */
     $scope.setPageTitle = function () {
+      if(!title) {
+        return;
+      }
       var t = 'LitePost.io';
       if($scope.event && $scope.event.name) {
-        t = $scope.event.name + ' - ' + t;
-        if($scope.messages) {
-          t = '(' + $scope.messages.length + ') ' + t;
+        t = $scope.event.name;
+        if($scope.user) {
+          t += ' by ' + $scope.user.name || '@'+$scope.user.username;
+        }
+        if($scope.unread.length) {
+          t = '(' + $scope.unread.length + ') ' + t;
         }
       } else {
         t = 'Event - ' + t;
       }
       title.set(t);
     };
+    $scope.$watch('event.$resolved', $scope.setPageTitle);
+    $scope.$watch('user.$resolved', $scope.setPageTitle);
+    $scope.$watch('unread.length', $scope.setPageTitle);
 
     $scope.isEventInPast = function () {
       return !!$scope.event.start && moment($scope.event.start).unix() < moment().unix();

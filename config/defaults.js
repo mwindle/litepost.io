@@ -32,7 +32,8 @@ module.exports = {
         'public/components/ng-parallax/angular-parallax.js',
         'public/components/angular-strap/dist/angular-strap.js',
         'public/components/angular-strap/dist/angular-strap.tpl.js',
-        'public/components/angular-waypoints/dist/angular-waypoints.all.js'
+        'public/components/angular-inview/angular-inview.js',
+        'public/components/angular-scroll/angular-scroll.js'
       ],
       css: [
 

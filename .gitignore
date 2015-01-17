@@ -42,3 +42,7 @@ public/dist
 
 # Secrets
 config/env
+
+# Heroku Environment
+.env
+

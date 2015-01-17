@@ -9,23 +9,32 @@
   /**
   * Controller to load and expose the users events
   */
-  .controller('MyEventsController', function ($scope, $stateParams, User, Event) {
+  .controller('MyEventsController', function ($scope, $state, $stateParams, User, Event, Token) {
     $scope.username = $stateParams.username;
     $scope.user = User.get({ username: $scope.username });
     $scope.events = Event.query({ username: $scope.username });
+
+    $scope.logout = function () {
+      Token.set();
+      $scope.updateMe();
+      $state.go('app.login');
+    };
   })
 
   /**
-  * Controller to load and expose the users events
+  * Controller to edit current user's profile
   */
   .controller('ProfileSettingsController', function ($scope, $stateParams, Me, User) {
-    $scope.me = Me.get(function (me) {
-      $scope.updatedMe = new User(me);
+    
+    $scope.$watch('me.$resolved', function () {
+      if($scope.me.$resolved) {
+        $scope.updatedMe = new User(angular.copy($scope.me));
+      }
     });
 
     $scope.save = function () {
       $scope.updatedMe.$save(function (me) {
-        $scope.me = new Me(me);
+        $scope.updateMe(me);
       });
     };
   })

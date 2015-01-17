@@ -14,7 +14,8 @@ var ApplicationConfiguration = (function() {
 	  'ngAnimate',
 	  'ngSanitize', 
 	  'angularMoment',
-	  'zumba.angular-waypoints'
+	  'angular-inview',
+	  'duScroll'
 	];
 
 	// Add a new vertical module

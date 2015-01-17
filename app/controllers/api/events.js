@@ -3,170 +3,63 @@
 /**
  * Module dependencies.
  */
-var sanitize = require('mongo-sanitize'),
-	mongoose = require('mongoose'),
-	Event = mongoose.model('Event');
+var Event = require('mongoose').model('Event'),
+	r = require('./rest').model(Event),
+	errors = require('../../errors/errors');
 
-// Get an event with the provided id
-exports.getEvent = function (req, res) {
-	// Sanitize and validity check the required id parameter
-	req.params.id = sanitize(req.params.id);
-	if(!mongoose.Types.ObjectId.isValid(req.params.id)) {
-		res.statusCode = 404;
-		return res.json({ error: 'Event not found, invalid id provided.' });
+var prune = function (req, res, next) {
+	next();
+};
+
+var clean = function (req, res, next) {
+	// Set event owner details with the current user
+	req.body.owner = req.user._id;
+	req.body.username = req.user.username;
+
+	// If slug isn't provided, generate it from the name
+	if(!req.body.slug && req.body.name) {
+		req.body.slug = req.body.name
+			.substring(0, 25)
+			.toLowerCase()
+			.replace(/[^a-z0-9\-]/g, '-');
 	}
 
-	Event.findById(req.params.id, function (err, event) {
-		if(err) { 
-			res.statusCode = 500;
-			return res.json({ error: err.message }); 
-		} else if (!event) {
-			res.statusCode = 404;
-			return res.json({ error: 'Event not found.' });
-		} else {
-			return res.json(event);
+	// Make sure the slug is unique, or massage it to be unique
+	Event.find({
+		owner: req.user._id,
+		slug: new RegExp('^' + req.body.slug + '(-[0-9]*)?$')
+	}, function (err, events) {
+		// Don't hard fail on error here, just might have a hard validation error if the username+slug isn't unique
+		if(events && events.length) {
+			req.body.slug += '-' + events.length;
 		}
+		next();
 	});
 };
 
-// Get an event with the provided channel
-exports.getEventByChannel = function (req, res) {
-	// Sanitize and validity check the required channel parameter
-	req.query.channel = sanitize(req.query.channel);
-	if(!req.query.channel) {
-		res.statusCode = 400;
-		return res.json({ error: 'Invalid request, no channel provided.' });
-	}
-	Event.findOne({ channel: req.query.channel }, function (err, event) {
-		if(err) { 
-			res.statusCode = 500;
-			return res.json({ error: err.message });
-		} else if (!event) {
-			res.statusCode = 404;
-			return res.json({ error: 'Event not found.' });
-		} else {
-			return res.json(event);
-		}
-	});
+var trimImmutable = function (req, res, next) {
+	delete req.body._id;
+	delete req.body.owner;
+	delete req.body.username;
+	delete req.body.socket;
+	next();
 };
 
-// Create a new event
-exports.createEvent = function (req, res) {
-	// Sanitize inputs against mongo injection
-	req.body.name = sanitize(req.body.name);
-	req.body.channel = sanitize(req.body.channel);
-	req.body.start = sanitize(req.body.start);
-	req.body.hidden = sanitize(req.body.hidden);
-	req.body.description = sanitize(req.body.description);
-	req.body.location = sanitize(req.body.location);
-	req.body.coverPhoto = sanitize(req.body.coverPhoto);
-
-	// Stop immediately if required parameters are not provided
-	if(!req.body.name || !req.body.channel) {
-		res.statusCode = 400;
-		return res.json({ error: 'Invalid request, missing name or channel.' });
+var makeOneWithUsernameAndSlug = function (req, res, next) {
+	if(req.query.username && req.query.slug) {
+		return r.single(req, res, r.ensureResult.bind(null, req, res, next));
 	}
-
-	// Create a new event and save it
-	new Event({ 
-		name: req.body.name,
-		channel: req.body.channel, 
-		start: req.body.start,
-		users: [{
-			user: req.user._id,
-			role: 'creator'
-		}],
-		hidden: req.body.hidden,
-		description: req.body.description,
-		location: req.body.location,
-		coverPhoto: req.body.coverPhoto
-	}).save(function (err, event) {
-		if(err) { 
-			if(err.name === 'ValidationError') {
-				res.statusCode = 400;
-			} else {
-				res.statusCode = 500;
-			}
-			return res.json({ error: err.message }); 
-		} else {
-			return res.json(event); 
-		}
-	});
+	next();
 };
 
-// Update an existing event
-exports.updateEvent = function (req, res) {
-	// Sanitize and validity check the required id parameter
-	req.params.id = sanitize(req.params.id);
-	if(!mongoose.Types.ObjectId.isValid(req.params.id)) {
-		res.statusCode = 404;
-		return res.json({ error: 'Event not found, invalid id provided.' });
-	}
+module.exports = function (app) {
 
-	var updated = {};
-	// Get updated properties individually from req.body and sanitize them
-	if(req.body.hasOwnProperty('name')) { updated.name = sanitize(req.body.name); }
-	if(req.body.hasOwnProperty('channel')) { updated.channel = sanitize(req.body.channel); }
-	if(req.body.hasOwnProperty('start')) { updated.start = sanitize(req.body.start); }
-	if(req.body.hasOwnProperty('hidden')) { updated.hidden = sanitize(req.body.hidden); }
-	if(req.body.hasOwnProperty('description')) { updated.description = sanitize(req.body.description); }
-	if(req.body.hasOwnProperty('location')) { updated.location = sanitize(req.body.location); }
-	if(req.body.hasOwnProperty('coverPhoto')) { updated.coverPhoto = sanitize(req.body.coverPhoto); }
+	app.get('/api/events/:id', r.get);
+	app.get('/api/events', r.get, makeOneWithUsernameAndSlug);
+	app.post('/api/events', clean, r.post);
+	app.put('/api/events/:id', /*r.auth, */trimImmutable, r.validate, r.put);
+	app.delete('/api/events/:id', /*r.auth, */r.del);
 
-	/**
-	* Manually validate the updated properties since the findByIdAndUpdate method interacts with the
-	* Mongo database directly and does not run any of the Mongoose hooks, including validate.
-	* See: https://github.com/LearnBoost/mongoose/issues/964
-	*/
-	Object.getOwnPropertyNames(updated).forEach(function (property) {
-		// Run mongoose validation on the property directly
-		Event.schema.path(property).doValidate(updated[property], function (err) {
-			// Validation failed, respond with a 400
-			if(err) {
-				res.statusCode = 400;
-				return res.json({ error: err.message });
-			}
-		});
-	});
-
-	// Atomically find and update the event
-	Event.findByIdAndUpdate(req.params.id, updated, function (err, event) {
-		if(err) { 
-			if(err.name === 'ValidationError') {
-				res.statusCode = 400;
-			} else {
-				res.statusCode = 500;
-			}
-			return res.json({ error: err.message });
-		} else if (!event) {
-			// No event returned means it didn't exist
-			res.statusCode = 404;
-			return res.json({ error: 'Event not found' });
-		} else {
-			return res.json(event); 
-		}
-	});
+	app.all('/api/events*', prune, r.flush);
 };
 
-// Delete event with the provided id
-exports.deleteEvent = function (req, res) {
-	// Sanitize and validity check the required id parameter
-	req.params.id = sanitize(req.params.id);
-	if(!mongoose.Types.ObjectId.isValid(req.params.id)) {
-		res.statusCode = 404;
-		return res.json({ error: 'Event not found, invalid id provided.' });
-	}
-
-	Event.findByIdAndRemove(req.params.id, function (err, event) {
-		if(err) { 
-			res.statusCode = 500;
-			return res.json({ error: err.message }); 
-		} else if(!event) {
-			// No event returned means it didn't exist
-			res.statusCode = 404;
-			return res.json({ error: 'Event not found.' });
-		}	else { 
-			return res.json(event); 
-		}
-	});
-};
