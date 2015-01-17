@@ -12,7 +12,7 @@
 		$httpProvider.interceptors.push('AuthTokenInterceptor');
 	})
 
-	.config(function ($stateProvider, $urlRouterProvider, $urlMatcherFactoryProvider) {
+	.config(function ($locationProvider, $stateProvider, $urlRouterProvider, $urlMatcherFactoryProvider) {
 	   $stateProvider
 
 		   .state('app', {
@@ -30,6 +30,7 @@
 
 	  $urlRouterProvider.otherwise('/events');
 	  $urlMatcherFactoryProvider.strictMode(false);
+	  $locationProvider.html5Mode(true).hashPrefix('!');
 	});
 
 })();

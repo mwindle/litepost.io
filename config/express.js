@@ -67,6 +67,7 @@ module.exports = function () {
 	}));
 
 	// Setting the app router and static folder
+	app.use('/app', express.static(path.resolve('./public')));
 	app.use(express.static(path.resolve('./public')));
 
 	return app;

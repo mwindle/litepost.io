@@ -98,21 +98,21 @@
   * User $resource from server REST API. 
   */
   .factory('User', function (resource) {
-    return resource('api/users/:id', {id:'@_id'});
+    return resource('/api/users/:id', {id:'@_id'});
   })
 
   /**
   * Event $resource from server REST API. 
   */
   .factory('Event', function (resource) {
-    return resource('api/events/:id', {id:'@_id'});
+    return resource('/api/events/:id', {id:'@_id'});
   })
 
   /**
   * Message $resource from server REST API. 
   */
   .factory('Message', function (resource) {
-    return resource('api/messages/:id', {id:'@_id'});
+    return resource('/api/messages/:id', {id:'@_id'});
   })
 
   /**
@@ -120,7 +120,7 @@
   */
   .factory('Me', function (resource) {
     //var cache = $cacheFactory('me');
-    return resource('api/me');
+    return resource('/api/me');
   })
 
   /**
