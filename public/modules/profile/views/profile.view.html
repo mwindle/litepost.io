@@ -1,23 +1,35 @@
-<div class="dashboard-container responsive-content">
+<a style="position: absolute; top: 20px; right: 20px; " ng-click="logout()">
+  <button class="btn btn-default btn-sm">Sign out</button>
+</a>
 
+<div class="dashboard-container responsive-content">
   <header class="profile-summary" ng-show="user.$resolved">
-    <img class="avatar profile-avatar" ng-show="user.emailHash" ng-src="//www.gravatar.com/avatar/{{user.emailHash}}?s=200&d=mm" />
+    <img class="avatar profile-avatar" ng-show="user.emailHash" ng-src="//www.gravatar.com/avatar/{{user.emailHash}}?s=100&d=mm" />
     <section class="profile-attributes">
-      <article class="profile-name" ng-show="user.name" ng-bind="user.name"></article>
-      <article class="profile-username" ng-bind="'@' + user.username"></article>
-      <article class="profile-location" ng-show="user.location" ng-bind="user.location"></article>
-      <article class="profile-email" ng-show="user.email">
-        <a href="mailto://{{user.email}}" ng-bind="user.email"></a>
-      </article>
-      <article class="profile-website" ng-show="user.website">
-        <a href="{{user.website}}" target="_blank" ng-bind="user.website"></a>
-      </article>
-      <a ui-sref="app.editProfile()">
-        <button class="btn btn-default btn-sm">Edit profile</button>
-      </a>
-      <a ng-click="logout()">
-        <button class="btn btn-default btn-sm">Sign out</button>
-      </a>
+      <div class="profile-attributes-wrapper">
+        <article class="profile-name">
+          <h4 ng-bind="user.name || '@'+user.username"></h4>
+          <span ng-show="user.name" ng-bind="'@' + user.username"></span>
+        </article>
+        <hr />
+        <article class="profile-location" ng-show="user.location" >
+          <span class="glyphicon glyphicon-map-marker"></span>
+          <span ng-bind="user.location"></span>         
+        </article>
+        <article class="profile-email" ng-show="user.email">
+          <span class="glyphicon glyphicon-envelope"></span>
+          <a href="mailto://{{user.email}}" ng-bind="user.email"></a>
+        </article>
+        <article class="profile-website" ng-show="user.website">
+          <span class="glyphicon glyphicon-link"></span>
+          <a href="{{user.website}}" target="_blank" ng-bind="user.website"></a>
+        </article>
+        <div class="edit-profile">
+          <a ui-sref="app.editProfile()">
+            <button class="btn btn-default btn-sm">Edit profile</button>
+          </a>
+        </div>
+      </div>
     </section>
   </header>
 

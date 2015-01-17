@@ -74,11 +74,14 @@
 	</div>
 	
 	<main class="messages">
-		<div class="event-postmessage">
+		<div class="new-post-button-wrapper">
 			<a ui-sref="app.event.post({username: username, slug: slug})">
-				<button class="btn btn-success btn-lg event-postmessage-button">+</button>
+				<button class="btn btn-default btn-sm" style="margin: 5px;">
+					<span class="glyphicon glyphicon-plus"></span> Post
+				</button>
 			</a>
 		</div>
 		<article class="message" ng-repeat="message in messages | orderBy:'sent':true" ng-include="'modules/core/views/message.view.html'" />
+		
 	</main>
 </div>

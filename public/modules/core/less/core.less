@@ -28,7 +28,6 @@
 }
 
 .message {
-	padding-top: @padding-large-vertical;
 	margin-bottom: @padding-large-vertical;
 	position: relative;
 	border-bottom: 1px solid #EEE;
@@ -36,7 +35,6 @@
 }
 
 .message-text {
-
 	font-size: @font-size-base;
 
 	h1, h2, h3, h4, h5, h6 {
@@ -81,6 +79,10 @@
 		}
 	}
 
+}
+
+.message-text :first-child {
+	margin-top: 0;
 }
 
 .message-footer {
