@@ -24,6 +24,7 @@
 
   	$scope.login = function () {
   		if($scope.username && $scope.password) {
+        Token.set();
   			new Login({ username: $scope.username, password: $scope.password }).$save(function (result) {
   				Token.set(result.token);
           $scope.updateMe(new User(result.user));

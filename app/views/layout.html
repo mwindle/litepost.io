@@ -41,16 +41,16 @@
 				</div>
 				<div class="identity-status pull-right" ng-controller="IdentityStatusController">
 					{% raw %}
-					<div class="dropdown">
-						<a ng-if="me.username" href="/app#/{{me.username}}">
+					<div>
+						<a ng-if="me.username" href="/app/{{me.username}}">
 							<img class="avatar identity-status-avatar" ng-if="me.emailHash" ng-src="//www.gravatar.com/avatar/{{me.emailHash}}?s=30&d=mm" />
 							<span ng-bind="me.name || '@'+me.username"></span>
 						</a>
 
 						<span ng-if="!me.username">
-							<a href="/app#/join">Join</a>
+							<a href="/app/join">Join</a>
 							<span> | </span>
-							<a href="/app#/login">Sign in</a>
+							<a href="/app/login">Sign in</a>
 						</span>
 					</div>
 					{% endraw %}
