@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  angular.module('viewevent').controller('EventController', 
+  angular.module('event').controller('EventController', 
   	function ($scope, $stateParams, $location, $anchorScroll, 
       parallaxHelper, $timeout, Token, User, Event, Message, EventSocket, title, $document) {
     

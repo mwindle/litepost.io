@@ -1,9 +1,9 @@
 /*
-* Register the viewevent module
+* Register the profile module
 */
 (function () {
 	'use strict';
 
 	// Use Applicaion configuration module to register a new module
-	ApplicationConfiguration.registerModule('viewevent');
+	ApplicationConfiguration.registerModule('profile');
 })();

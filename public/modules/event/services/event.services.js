@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  angular.module('viewevent')
+  angular.module('event')
 
   // Service for socket.io Event sockets
   .factory('EventSocket', function (socketFactory) {

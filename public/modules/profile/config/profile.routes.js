@@ -1,30 +1,30 @@
 /*
-* Setup routes for myevents
+* Setup routes for profile
 */
 (function () {
   'use strict';
 
   // Setting up route
-  angular.module('myevents').config(function ($stateProvider) {
+  angular.module('profile').config(function ($stateProvider) {
     $stateProvider
 
       .state('app.create', {
         url: '/create',
-        templateUrl: 'modules/myevents/views/newevent.view.html',
+        templateUrl: 'modules/profile/views/newevent.view.html',
         controller: 'CreateEventController',
         data: { title: 'New Event - LitePost.io' }
       })
 
       .state('app.editProfile', {
         url: '/settings',
-        templateUrl: 'modules/myevents/views/settings.view.html',
+        templateUrl: 'modules/profile/views/settings.view.html',
         controller: 'ProfileSettingsController',
         data: { title: 'Edit Profile - LitePost.io' }
       })
 
       .state('app.profile', {
         url: '/:username',
-        templateUrl: 'modules/myevents/views/myevents.view.html',
+        templateUrl: 'modules/profile/views/profile.view.html',
         controller: 'MyEventsController',
         data: { title: 'Your Events - LitePost.io' }
       });

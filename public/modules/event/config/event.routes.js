@@ -1,16 +1,16 @@
 /*
-* Routes for viewevent module
+* Routes for event module
 */
 (function () {
 	'use strict';
 
 	// Setting up route
-	angular.module('viewevent').config(function ($stateProvider) {
+	angular.module('event').config(function ($stateProvider) {
 	  $stateProvider
 
 	    .state('app.event', {
 	      url: '/:username/:slug',
-	      templateUrl: 'modules/viewevent/views/event.view.html',
+	      templateUrl: 'modules/event/views/event.view.html',
 	      controller: 'EventController'
 	    })
 
@@ -19,14 +19,14 @@
       */
       .state('app.editEventWithHash', {
         url: '/:username/:slug/settings#:hash',
-        templateUrl: 'modules/viewevent/views/eventsettings.html',
+        templateUrl: 'modules/event/views/eventsettings.html',
         controller: 'EventSettingsController',
         data: { title: 'Event Settings - LitePost.io' }
       })
 
       .state('app.editEvent', {
         url: '/:username/:slug/settings',
-        templateUrl: 'modules/viewevent/views/eventsettings.html',
+        templateUrl: 'modules/event/views/eventsettings.html',
         controller: 'EventSettingsController',
         data: { title: 'Event Settings - LitePost.io' }
       });

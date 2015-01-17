@@ -1,9 +1,9 @@
 /*
-* Register the myevents module
+* Register the event module
 */
 (function () {
 	'use strict';
 
 	// Use Applicaion configuration module to register a new module
-	ApplicationConfiguration.registerModule('myevents');
+	ApplicationConfiguration.registerModule('event');
 })();

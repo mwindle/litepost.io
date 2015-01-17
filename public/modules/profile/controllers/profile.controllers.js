@@ -1,10 +1,10 @@
 /*
-* Controllers for the myevents module
+* Controllers for the profile module
 */
 (function () {
   'use strict';
 
-  angular.module('myevents')
+  angular.module('profile')
 
   /**
   * Controller to load and expose the users events

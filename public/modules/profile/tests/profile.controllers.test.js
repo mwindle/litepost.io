@@ -1,10 +1,10 @@
 /**
-* Unit tests for the myevents controllers 
+* Unit tests for the profile controllers 
 */
 (function () {
 	'use strict';
 
-	describe('myevents controllers', function () {
+	describe('profile controllers', function () {
 
 		var $httpBackend, $scope, $controller, createController, mocks;
 
