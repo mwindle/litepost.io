@@ -1,12 +1,14 @@
-{% set ngAppName = 'liveBlogApp' %}
 <!DOCTYPE html>
+{% set ngAppName = 'liveBlogApp' %}
 <html lang="en"{% if ngAppName %} ng-app="{{ngAppName}}"{% endif %}>
 
 <head>
 	<title{% if page === 'app' %} ng-bind="title"{% endif %}>{{title}}</title>
-
+	
+	{% if page === 'app' %}
 	<!-- Base for HTML5 Angular App -->
 	<base href="/app/">
+	{% endif %}
 
 	<!-- General META -->
 	<meta charset="utf-8">
@@ -31,7 +33,7 @@
 		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
 </head>
-<body{% if ngAppName %} ng-class="pageClass ? pageClass : ''"{% endif %}>
+<body{% if ngAppName %} ng-class="pageClass"{% endif %}>
 	<div class="container-fluid">
 			
 		<div class="wrapper main-header-wrapper">

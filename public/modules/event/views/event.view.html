@@ -1,21 +1,3 @@
-<!--
-<div class="pending-event-view" ng-show="!isEventInPast()">
-	<h1 class="text-center event-title">
-		<span class="emphasize" ng-bind="event.name" />
-	</h1>
-	<div class="text-center">
-		<br />
-		<h3 class="text-muted">will start...</h3>
-		<br />
-		<div id="countdown-clock" />
-		<div id="countdown-text" am-time-ago="event.start" />
-		<br />
-		<h5 class="text-muted">on {{event.start | amDateFormat:'dddd, MMMM Do YYYY [at] h:mm a'}}.</h5>
-		<button class="btn btn-info btn-xlrg">Subscribe and get a reminder</button>
-	</div>
-</div>
--->
-
 <div ui-view></div>
 <header ng-show="unread.length" class="unread-status-bar" style="">
 	<div>
@@ -52,7 +34,7 @@
 			</div>
 		</div>
 	</header>
-	<div class="event-status-bar" in-view="showUnread($inview)">
+	<div class="event-status-bar" ng-show="messages.length" in-view="showUnread($inview)">
 		<div class="status-panel message-count-panel">
 			<header>Posts</header>
 			<span class="status-number" ng-bind="messages.length || 0" />
@@ -82,6 +64,25 @@
 			</a>
 		</div>
 		<article class="message" ng-repeat="message in messages | orderBy:'sent':true" ng-include="'modules/core/views/message.view.html'" />
-		<dir-disqus disqus-shortname="litepostio" disqus-identifier="{{ event._id }}" disqus-url="{{ disqusUrl }}" ready-to-bind="{{ event.$resolved }}"></dir-disqus>
+		<dir-disqus ng-if="messages.length" disqus-shortname="litepostio" disqus-identifier="{{ event._id }}" disqus-url="{{ disqusUrl }}" ready-to-bind="{{ messages.length && event.$resolved }}"></dir-disqus>
 	</main>
+
+	<section class="no-messages-yet" ng-if="!messages.length">
+		<header><h5>Nothing to see here yet.</h5></header>
+		<article class="time-till-event" ng-if="timeTillEvent">
+			Things will get started <span id="countdown-text" am-time-ago="event.start" />
+			<section class="event-start-calendar">
+				<header>
+					<article class="event-start-day" ng-bind="event.start | amDateFormat: 'dddd'" />
+					<article class="event-start-month" ng-bind="event.start | amDateFormat: 'MMM'" />
+				</header>
+				<section>
+					<article class="event-start-date" ng-bind="event.start | amDateFormat: 'D'" />
+					<article class="event-start-time" ng-bind="event.start | amDateFormat: 'h:mm a'" />
+					<article class="event-start-year" ng-bind="event.start | amDateFormat: 'YYYY'" />
+				</article>
+			</section>
+		</article>
+	</section>
+	
 </div>

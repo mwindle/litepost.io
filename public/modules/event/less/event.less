@@ -1,46 +1,6 @@
 
 @import "../../../less/variables.less";
 
-#countdown-text {
-	width: 100%;
-	max-width: 100%;
-	
-	.text-center;
-
-	/*
-	* Show this text countdown by default for mobile, upgrade to FlipClock.js on medium+ displays. 
-	*/
-	display: block;
-		@media (@md) {
-			display: none;
-		}
-}
-
-#countdown-clock {
-	width: 650px;
-	max-width: 90%;
-	margin-left: auto;
-	margin-right: auto;
-
-	.text-center;
-
-	/*
-	*	FlipClock.js is not responsive. 
-	* 	https://github.com/objectivehtml/FlipClock/issues/161
-	* Only show the fancy countdown on medium+ displays.
-	* 	Fallback to a less specific textual version of the time until event start. 
-	*/
-	display: none;
-		@media (@md) {
-			display: block;
-		}
-
-	.flip-clock-label, .flip-clock-divider {
-		font-size: 1.2em;
-		font-weight: @font-weight-bold;
-		font-family: 'Oswald';
-	}
-}
 
 .unread-status-bar {
 	background: #DFF0D8; 
@@ -196,3 +156,50 @@
 	text-align: right;
 }
 
+.no-messages-yet {
+	text-align: center;
+}
+
+.time-till-event {
+	width: 90%;
+	padding: 20px;
+	text-align: center;
+	margin: auto;
+}
+
+.event-start-calendar {
+	width: 250px;
+	max-width: 90%;
+	margin: auto;
+	margin-top: 30px;
+	text-transform: uppercase;
+	border: 1px solid @gray-dark;
+	border-radius: 30px;
+	font-weight: @font-weight-light;
+}
+
+.event-start-calendar header {
+	padding: 5px;
+	background: linear-gradient(0deg, #C5444B, #DC6266);
+	border-top-left-radius: 30px;
+	border-top-right-radius: 30px;
+	color: white;
+}
+
+.event-start-day {
+	font-size: @font-size-small;
+}
+
+.event-start-month {
+	font-size: 30px;
+}
+
+.event-start-date {
+	font-size: 120px;
+	line-height: 120px;
+}
+
+.event-start-year {
+	color: @gray-light;
+	font-size: @font-size-small;
+}

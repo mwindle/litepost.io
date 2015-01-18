@@ -26,6 +26,22 @@
     // Load the owner of this event
     $scope.user = User.get({ username: $scope.username });
 
+    function updateTimeTillEvent ($scope) {
+      if($scope.event.start) {
+        $scope.timeTillEvent = Math.max(0, moment($scope.event.start).diff(moment(), 'second'));
+        if($scope.timeTillEvent) {
+          var secondsTillNextUpdate = Math.round($scope.timeTillEvent / 2);
+          (function ($scope) {
+            $timeout(function () {
+              updateTimeTillEvent($scope);
+            }, secondsTillNextUpdate * 1000);
+          })($scope);
+        }
+      } else {
+        $scope.timeTillEvent = 0;
+      }
+    }
+
     // Load the event with the provided username and slug
     $scope.event = Event.get({ 
       username: $scope.username, 
@@ -33,6 +49,7 @@
     }, function (event) {
       $scope.setupSocket();
       $scope.messages = Message.query({ event: event._id, populate: 'author' });
+      updateTimeTillEvent($scope);
     });
 
 
@@ -139,27 +156,6 @@
     $scope.$watch('event.$resolved', $scope.setPageTitle);
     $scope.$watch('user.$resolved', $scope.setPageTitle);
     $scope.$watch('unread.length', $scope.setPageTitle);
-
-    $scope.isEventInPast = function () {
-      return !!$scope.event.start && moment($scope.event.start).unix() < moment().unix();
-    };
-
-    $scope.isEventInFuture = function () {
-      return !!$scope.event.start && moment($scope.event.start).unix() > moment().unix();
-    };
-
-    /**
-    * Start a countdown to the event if it's in the future
-    */
-    $scope.updateCountdown = function () {
-      if($scope.isEventInFuture()) {
-        var duration = moment.duration(moment($scope.event.start).diff(moment(), 'milliseconds', true));
-        $scope.countdownClock = angular.element('#countdown-clock').FlipClock(duration.asSeconds(), {
-          clockFace: 'DailyCounter',
-          countdown: true
-        });
-      }
-    };
 
   })
 
