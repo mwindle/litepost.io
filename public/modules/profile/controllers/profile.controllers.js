@@ -9,7 +9,7 @@
   /**
   * Controller to load and expose the users events
   */
-  .controller('MyEventsController', function ($scope, $state, $stateParams, User, Event, Token) {
+  .controller('MyEventsController', function ($scope, $location, $state, $stateParams, User, Event, Token) {
     $scope.username = $stateParams.username;
     $scope.user = User.get({ username: $scope.username });
     $scope.events = Event.query({ username: $scope.username });
@@ -19,6 +19,15 @@
       $scope.updateMe();
       $state.go('app.login');
     };
+
+    $scope.getDisplayUrlForEvent = function (event) {
+      return $location.host() + '/app/' + $scope.username + '/' + event.slug;
+    };
+
+    $scope.canEditProfile = function () {
+      return $scope.me && $scope.user && $scope.me._id && $scope.user._id && $scope.me._id === $scope.user._id;
+    };
+
   })
 
   /**

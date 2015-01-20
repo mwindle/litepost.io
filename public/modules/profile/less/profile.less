@@ -62,6 +62,10 @@
 			padding: 0.25em;
 			min-height: 4em;
 			border-bottom: 1px solid @gray-lighter;
+			
+			&:hover {
+				background-color: @gray-lighter;
+			}
 
 			.event-summary-icon {
 				display: inline-block;
@@ -80,6 +84,24 @@
 
 		}
 	}
+}
+
+
+.new-event-button-container {
+  width: 100%;
+  text-align: right;
+  padding: 10px;
+}
+.no-events {
+  text-align: center;
+  padding: 20px;
+}
+.event-summary-url {
+  font-size: @font-size-small;
+  color: @gray-light;
+}
+.event-summary-start {
+ font-size: @font-size-small;
 }
 
 .dashboard-container {

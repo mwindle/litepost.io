@@ -1,4 +1,4 @@
-<a style="position: absolute; top: 20px; right: 20px; " ng-click="logout()">
+<a ng-if="canEditProfile()" style="position: absolute; top: 20px; right: 20px; " ng-click="logout()">
   <button class="btn btn-default btn-sm">Sign out</button>
 </a>
 
@@ -25,7 +25,7 @@
           <a href="{{user.website}}" target="_blank" ng-bind="user.website"></a>
         </article>
         <div class="edit-profile">
-          <a ui-sref="app.editProfile()">
+          <a ng-if="canEditProfile()" ui-sref="app.editProfile()">
             <button class="btn btn-default btn-sm">Edit profile</button>
           </a>
         </div>
@@ -34,26 +34,37 @@
   </header>
 
   <div class="event-summary-panel panel panel-default">
-    <div class="panel-heading"><h5 class="event-summary-heading">Events</h5></div>
     <div class="panel-body">
-      <div class="event-summary-row" ng-repeat="event in events">
+
+      <div class="event-summary-row" ng-repeat="event in events | orderBy:'_id':false">
         <span class="event-summary-icon" />
         <span class="event-summary-name">
           <a ui-sref="app.event({username: username, slug: event.slug})">{{event.name}}</a>
           <br />
-          <span class="event-summary-description">
-             /{{event.slug}}
-          </span>
+          <span class="event-summary-url" ng-bind="getDisplayUrlForEvent(event)"></span>
           <br />
-        <span am-time-ago="event.start" />
-        </span>
-        <span class="event-summary-stats">
-          <span class="event-summary-follower-count"></span>
+          <span class="event-summary-start">
+            <span class="glyphicon glyphicon-time" />
+            <span am-time-ago="event.start" />
+          </span>
         </span>
       </div>
+
+      <div class="no-events" ng-if="events.$resolved && !events.length">
+        <span ng-bind="user.name || '@'+user.username"></span> doesn't have any events yet. 
+      </div>
+
+      <div class="new-event-button-container">
+        <a ng-if="canEditProfile()" ui-sref="app.create">
+          <button class="btn btn-primary btn-sm">
+            <span class="glyphicon glyphicon-plus"></span> Event
+          </button>
+        </a>
+      </div>
+
     </div>
   </div>
   <div>
-    <a ui-sref="app.create"><button class="btn btn-primary">New event</button></a>
+    
   </div>
 </div>
