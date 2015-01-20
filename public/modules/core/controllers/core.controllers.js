@@ -18,6 +18,10 @@
       }
     };
     $rootScope.updateMe();
+
+    $rootScope.reload = function (force) {
+      document.location.reload(force);
+    };
   })
 
   .controller('LoginController', function ($scope, $state, Login, Token, User) {

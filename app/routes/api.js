@@ -25,4 +25,9 @@ module.exports = function (app) {
 	events(app);
 	messages(app);
 
+	app.use(function (err, req, res, next) {
+		res.statusCode = err.status;
+		res.json({ error: err.name });
+	});
+
 };

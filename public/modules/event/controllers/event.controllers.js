@@ -50,6 +50,11 @@
       $scope.setupSocket();
       $scope.messages = Message.query({ event: event._id, populate: 'author' });
       updateTimeTillEvent($scope);
+    }, function (err) {
+      $scope.event = null;
+      $scope.error = $scope.error || {};
+      $scope.error.failedToLoadEvent = true;
+      $scope.error.status = err.status;
     });
 
 
@@ -156,6 +161,10 @@
     $scope.$watch('event.$resolved', $scope.setPageTitle);
     $scope.$watch('user.$resolved', $scope.setPageTitle);
     $scope.$watch('unread.length', $scope.setPageTitle);
+
+    $scope.canEditEvent = function () {
+      return $scope.me && $scope.user && $scope.me._id && $scope.user._id && $scope.me._id === $scope.user._id;
+    };
 
   })
 

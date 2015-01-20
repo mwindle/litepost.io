@@ -84,6 +84,47 @@ button, .btn {
 	border-radius: 100%;
 }
 
+.animate {
+
+	&.ng-hide-add.ng-hide-add-active, &.ng-hide-remove.ng-hide-remove-active {
+	  transition: all linear 0.3s;
+	}
+
+	&.ng-hide {
+	  line-height: 0;
+	  opacity: 0;
+	  padding: 0 10px;
+	}
+
+	&.ng-enter, &.ng-move {
+	  transition: all 0.3s ease-in;
+	  opacity: 0.7;
+	  max-height: 0;
+	}
+
+	&.ng-enter.ng-enter-active, &.ng-move.ng-move-active {
+	  opacity: 1;
+	  max-height: 5000px;
+	}
+
+	&.ng-leave {
+		animation: 0.3s fadeaway;
+	}
+
+}
+
+@keyframes fadeaway {
+	from { 
+		opacity: 1;
+		max-height: 5000px;
+	}
+	to { 
+		opacity: 0.7;
+		max-height: 0;
+	}
+}
+
+
 .wrapper {
 	.make-row();
 }

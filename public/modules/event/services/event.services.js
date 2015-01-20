@@ -67,7 +67,6 @@
         if(!service.socket) { return false; }
         service.socket.removeAllListeners();
         service.socket.emit('leave', service.room);
-        service.socket.disconnect();
         service.socket = service.room = null; 
       },
 

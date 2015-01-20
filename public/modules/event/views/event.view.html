@@ -1,5 +1,5 @@
 <div ui-view></div>
-<header ng-show="unread.length" class="unread-status-bar" style="">
+<header ng-show="unread.length" class="unread-status-bar animate" style="">
 	<div>
 		<span ng-bind="unread.length"></span> new 
 		<span ng-pluralize count="unread.length" when="{'1': 'message.', 'other': 'messages.'}" ></span>
@@ -7,19 +7,14 @@
 	</div>
 </header>
 <div class="active-event-view">
-	<header class="event-header textured-carbon-bg">
+	<header class="event-header textured-carbon-bg" ng-show="event.$resolved">
 		<h3 class="event-title">
-			<a ui-sref="app.editEvent({username: username, slug: slug})">
-				<span class="emphasize" ng-bind="event.name" />
-			</a>
+			<span class="emphasize" ng-bind="event.name" />
 		</h3>
 		<div class="event-description" ng-bind="event.description" />
-		<div class="set-cover-button-wrapper">
-			<a ui-sref="app.editEventWithHash({username: username, slug: slug, 'hash': 'coverPhoto'})">
-				<button class="set-cover-button">
-					<span ng-if="event.coverPhoto">Update cover photo</span>
-					<span ng-if="!event.coverPhoto">Set cover photo</span>
-				</button>
+		<div class="edit-event-button-wrapper" ng-if="canEditEvent()">
+			<a ui-sref="app.editEvent({username: username, slug: slug})">
+				<button class="set-cover-button btn btn-default btn-xs">Edit Event</button>
 			</a>
 		</div>
 		<div class="event-owner" ng-show="user.$resolved">
@@ -33,8 +28,19 @@
 				</a>
 			</div>
 		</div>
+		<div class="event-metadata-container">
+			<div class="event-start" ng-if="event.start">
+				<span class="glyphicon glyphicon-time" />
+				<span ng-if="timeTillEvent">Starts</span>
+				<span ng-if="!timeTillEvent">Started</span>
+				<span am-time-ago="event.start" />
+			</div>
+			<div class="event-location" ng-if="event.location">
+				<span class="glyphicon glyphicon-map-marker" /> <span ng-bind="event.location" />
+			</div>
+		</div>
 	</header>
-	<div class="event-status-bar" ng-show="messages.length" in-view="showUnread($inview)">
+	<div class="event-status-bar animate" ng-show="messages.length" in-view="showUnread($inview)">
 		<div class="status-panel message-count-panel">
 			<header>Posts</header>
 			<span class="status-number" ng-bind="messages.length || 0" />
@@ -43,34 +49,30 @@
 			<header>Viewers</header>
 			<span class="status-number" ng-bind="viewers || 1" />
 		</div>
-		<div class="event-start pull-right" ng-if="event.start">
-			<span class="glyphicon glyphicon-time" /> Starts <span am-time-ago="event.start" />
-		</div>
-		<div class="event-location pull-right" ng-if="event.location">
-			<span class="glyphicon glyphicon-map-marker" /> <span ng-bind="event.location" />
-		</div>
-		<div class="typing-status" ng-show="typing">
-			<span ng-show="typing.author" ng-bind="(typing.author.name || '@'+typing.author.username) + ' is '" />
-			<span ng-bind="'typing a message...'" />
-		</div>
 	</div>
 	
-	<main class="messages">
-		<div class="new-post-button-wrapper">
+	<main class="messages" ng-show="event.$resolved && messages.$resolved">
+		<div class="new-post-button-wrapper" ng-if="canEditEvent()">
 			<a ui-sref="app.event.post({username: username, slug: slug})">
 				<button class="btn btn-default btn-sm" style="margin: 5px;">
 					<span class="glyphicon glyphicon-plus"></span> Post
 				</button>
 			</a>
 		</div>
-		<article class="message" ng-repeat="message in messages | orderBy:'sent':true" ng-include="'modules/core/views/message.view.html'" />
+		<div class="typing-status" >
+			<span ng-show="typing" class="animate">
+				<span ng-show="typing.author" ng-bind="(typing.author.name || '@'+typing.author.username) + ' is '" />
+				<span ng-bind="'typing a message...'" />
+			</span>
+		</div>
+		<article class="message animate" ng-repeat="message in messages | orderBy:'sent':true" ng-include="'modules/core/views/message.view.html'" />
 		<dir-disqus ng-if="messages.length" disqus-shortname="litepostio" disqus-identifier="{{ event._id }}" disqus-url="{{ disqusUrl }}" ready-to-bind="{{ messages.length && event.$resolved }}"></dir-disqus>
 	</main>
 
-	<section class="no-messages-yet" ng-if="!messages.length">
+	<section class="no-messages-yet" ng-if="messages.$resolved && !messages.length">
 		<header><h5>Nothing to see here yet.</h5></header>
 		<article class="time-till-event" ng-if="timeTillEvent">
-			Things will get started <span id="countdown-text" am-time-ago="event.start" />
+			Things will get started <span id="countdown-text" am-time-ago="event.start" />.
 			<section class="event-start-calendar">
 				<header>
 					<article class="event-start-day" ng-bind="event.start | amDateFormat: 'dddd'" />
@@ -84,5 +86,31 @@
 			</section>
 		</article>
 	</section>
-	
+	<style>
+
+	</style>
+	<section class="error-loading-event" ng-if="error.failedToLoadEvent">
+		<article ng-if="error.status===404">
+			<header>
+				<h1>Uh oh <span class="sad-face" /></h1>
+			</header>
+			<section>
+				It looks like the event you're trying to view doesn't exist. 
+				<br />
+				Head to our <a href="/">home page</a><span ng-if="user.username">
+				 or vist the profile page of 
+				 <a href="#" ui-sref="app.profile({ username: user.username })" ng-bind="'@' + user.username"></a></span>. 
+			</section>
+		</article>
+		<article ng-if="error.status!==404">
+			<header>
+				<h1>Oops... <span class="sad-face" /></h1>
+			</header>
+			<section>
+				Something went wrong. Try 
+				<a href="#" ng-click="reload()">refreshing this page</a>
+				to see if that fixes it.   
+			</section>
+		</article>
+	</section>
 </div>

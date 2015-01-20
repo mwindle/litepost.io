@@ -37,6 +37,7 @@
   * Also provides redirection services when an authorization failure (401) 
   * is received from the server. 
   * Thanks to https://auth0.com/blog/2014/01/07/angularjs-authentication-with-cookies-vs-token
+  * for some of the code below. 
   */
   .factory('AuthTokenInterceptor', function (Token, $injector, $q) {
     return {
@@ -54,7 +55,7 @@
         if(response.status === 401) {
          $injector.get('$state').go('app.login');
         }
-        return response || $q.when(response);
+        return $q.reject(response);
       }
 
     };
