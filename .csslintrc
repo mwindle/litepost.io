@@ -5,6 +5,7 @@
 	"floats": false,
 	"ids": false,
 	"font-sizes": false,
+	"font-faces": false,
 	"important": false,
 	"known-properties": false,
 	"overqualified-elements": false,

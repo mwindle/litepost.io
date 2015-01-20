@@ -43,7 +43,7 @@ module.exports = function(grunt) {
 			},
 			clientLESS: {
 				files: watchFiles.clientLESS,
-				tasks: ['lesslint', 'less', 'autoprefixer'],
+				tasks: ['build:less'],
 				options: {
 					livereload: true
 				}
@@ -81,6 +81,14 @@ module.exports = function(grunt) {
 				}
 			}
 		},
+		clean: {
+			less: ['public/dist/**/*.less']
+		},
+		wget: {
+			'public/dist/fonts/Oxygen.less': 'https://fonts.googleapis.com/css?family=Oxygen:300,400,700',
+			'public/dist/fonts/Oswald.less': 'https://fonts.googleapis.com/css?family=Oswald:300,400,700',
+			'public/dist/lib/highlight.github.min.less': 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/github.min.css'
+		},
 		less: {
 	    production: {
         options: {
@@ -97,6 +105,16 @@ module.exports = function(grunt) {
 			single_file: {
 				src: 'public/dist/application.min.css',
 				dest: 'public/dist/application.min.css'
+			}
+		},
+		cssUrlEmbed: {
+			encodeWithBaseDir: {
+				options: {
+					baseDir: './public'
+				},
+				files: {
+					'public/dist/application.min.css': 'public/dist/application.min.css'
+				}
 			}
 		},
 		nodemon: {
@@ -197,8 +215,14 @@ module.exports = function(grunt) {
 	// Lint task(s).
 	grunt.registerTask('lint', ['jshint:client', 'jshint:server', 'lesslint']);
 
+	// Build LESS
+	grunt.registerTask('build:less', ['clean:less', 'wget', 'lesslint', 'loadConfig', 'less', 'autoprefixer', 'cssUrlEmbed']);
+
+	// Build Js
+	grunt.registerTask('build:js', ['jshint:client', 'jshint:server', 'loadConfig', 'ngAnnotate', 'uglify']);
+
 	// Build task(s).
-	grunt.registerTask('build', ['lint', 'loadConfig', 'ngAnnotate', 'uglify', 'less', 'autoprefixer']);
+	grunt.registerTask('build', ['build:js', 'build:less']);
 
 	// Test task.
 	grunt.registerTask('test', ['env:test', 'jasmine_node', 'karma:unit']);
@@ -207,5 +231,5 @@ module.exports = function(grunt) {
 	grunt.registerTask('test:build', ['env:production', 'jasmine_node', 'karma:production']);
 
 	// Run in production
-	grunt.registerTask('heroku:production', ['lint', 'loadConfig', 'ngAnnotate', 'uglify', 'less', 'autoprefixer']);
+	grunt.registerTask('heroku:production', ['build']);
 };
