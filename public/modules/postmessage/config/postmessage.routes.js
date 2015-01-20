@@ -9,14 +9,14 @@
     $stateProvider
 
       .state('app.event.post', {
-        url: '/:username/:slug/post',
+        url: '/post',
         templateUrl: 'modules/postmessage/views/postmessage.view.html',
         controller: 'PostController',
         data: { title: 'New Message - LitePost.io' }
       })
 
       .state('app.event.editPost', {
-        url: '/:username/:slug/post/:messageId',
+        url: '/post/:messageId',
         templateUrl: 'modules/postmessage/views/postmessage.view.html',
         controller: 'PostController',
         data: { title: 'Edit Message - LitePost.io' }
