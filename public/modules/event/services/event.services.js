@@ -88,5 +88,18 @@
 
     };
     return service;
+  })
+
+  .directive('slug', function () {
+    var onlyLettersAndDashes = /^[a-z0-9_\-]*$/i;
+    return {
+      require: 'ngModel',
+      link: function (scope, elm, attrs, ctrl) {
+        ctrl.$validators.slug = function (modelValue, viewValue) {
+          return onlyLettersAndDashes.test(viewValue);
+        };
+      }
+    };
   });
+
 })();

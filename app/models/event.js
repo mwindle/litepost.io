@@ -22,7 +22,6 @@ var EventSchema = mongoose.Schema({
 		type: String, 
 		required: true, 
 		trim: true,
-		lowercase: true,
 		validate: [
 			{
 				validator: function (str) {
@@ -32,9 +31,9 @@ var EventSchema = mongoose.Schema({
 			},
 			{
 				validator: function (str) {
-					return validator.isLength(str, 3, 30);
+					return validator.isLength(str, 3, 60);
 				},
-				msg: 'Must have a length between [3,30] characters.'
+				msg: 'Must have a length between [3,60] characters.'
 			}
 		]
 	},

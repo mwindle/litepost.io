@@ -22,13 +22,13 @@
     };
 
     $scope.getDisplayUrlForEvent = function (event) {
-      var relativeUrl = $state.href('app.event', { username: $scope.username, slug: event.slug })
+      var relativeUrl = $state.href('app.event', { username: $scope.username, slug: event.slug });
       return $location.host() + relativeUrl;
     };
 
     $scope.canEditProfile = function () {
-      return AuthService.isLoggedIn() && $scope.user && $scope.user._id 
-        && AuthService.user()._id === $scope.user._id;
+      return AuthService.isLoggedIn() && $scope.user && $scope.user._id && 
+        AuthService.user()._id === $scope.user._id;
     };
 
   })
@@ -96,7 +96,8 @@
       }, function (err) {
         console.log('failed to join');
       });
-    }
+    };
+    
   })
 
   /**

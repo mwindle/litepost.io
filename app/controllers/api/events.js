@@ -21,10 +21,7 @@ var clean = function (req, res, next) {
 
 	// If slug isn't provided, generate it from the name
 	if(!req.body.slug && req.body.name) {
-		req.body.slug = req.body.name
-			.substring(0, 25)
-			.toLowerCase()
-			.replace(/[^a-z0-9\-]/g, '-');
+		req.body.slug = req.body.name.replace(/[^a-z0-9\-]/ig, '-');
 	}
 
 	// Make sure the slug is unique, or massage it to be unique

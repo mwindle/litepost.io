@@ -163,8 +163,8 @@
     $scope.$watch('unread.length', $scope.setPageTitle);
 
     $scope.canEditEvent = function () {
-      return AuthService.isLoggedIn() && $scope.user && $scope.user._id 
-        && AuthService.user()._id === $scope.user._id;
+      return AuthService.isLoggedIn() && $scope.user && 
+        $scope.user._id && AuthService.user()._id === $scope.user._id;
     };
 
   })
@@ -173,75 +173,43 @@
   /**
   * Controller for managing the settings of an event
   */
-  .controller('EventSettingsController', function ($scope, $location, $state, $stateParams, Event) {
+  .controller('EventSettingsController', function ($scope, $location, $state, $stateParams, $timeout, Event) {
     $scope.username = $stateParams.username;
     $scope.slug = $stateParams.slug;
-    $scope.baseEventUrl = $location.host() + '/' + $scope.username + '/';
+    $scope.baseEventUrl = $location.host() + 
+      $state.href('app.event', { username: $scope.username, slug: '' });
     $scope.event = Event.get({ username: $scope.username, slug: $scope.slug }, function () {
       $scope.updatedEvent = angular.copy($scope.event);
+
+      if($stateParams.s) {
+        eventSaved();
+      }
     });
 
+    function eventSaved () {
+      $scope.savingEvent = $scope.savingEvent || {};
+      $scope.savingEvent.pending = false;
+      $scope.savingEvent.success = true;
+      $scope.eventForm.$setPristine();
+      $timeout.cancel($scope.savedEventTimeout);
+      $scope.savedEventTimeout = $timeout(function () {
+        $scope.savingEvent = {};
+      }, 3000);
+    }
+
     $scope.save = function () {
+      $scope.savingEvent = { pending: true };
       $scope.updatedEvent.$save(function (event) {
         // If the event slug has changed, we need to re-route
         if($scope.event.slug !== event.slug) {
-          return $state.go('app.editEvent', { username: $scope.username, slug: event.slug });
+          return $state.go('app.editEvent', { username: $scope.username, slug: event.slug, s: true });
         }
         $scope.event = angular.copy(event);
+        eventSaved();
       });
-    };
-
-    $scope.isRenameDisabled = function () {
-      return !$scope.updatedEvent || !$scope.updatedEvent.name || $scope.updatedEvent.name===$scope.event.name;
-    };
-
-    $scope.rename = function () {
-      $scope.event.name = $scope.updatedEvent.name;
-      $scope.event.$save();
-    };
-
-    $scope.isSetStartDisabled = function () {
-      return !$scope.updatedEvent || !$scope.updatedEvent.start || $scope.updatedEvent.start===$scope.event.start;
-    };
-
-    $scope.isRemoveStartDisabled = function () {
-      return !$scope.event || !$scope.event.start;
-    };
-
-    $scope.setStart = function () {
-      $scope.event.start = $scope.updatedEvent.start;
-      $scope.event.$save(function (event) {
-        $scope.updatedEvent.start = $scope.event.start;
-      });
-    };
-
-    $scope.removeStart = function () {
-      $scope.event.start = $scope.updatedEvent.start = null;
-      $scope.event.$save();
-    };
-
-    $scope.isSetDescriptionDisabled = function () {
-      return !$scope.updatedEvent || $scope.updatedEvent.description===$scope.event.description;
-    };
-
-    $scope.setDescription = function () {
-      $scope.event.description = $scope.updatedEvent.description;
-      $scope.event.$save();
-    };
-
-    $scope.isEventInPast = function () {
-      return $scope.event.start && moment($scope.event.start).unix() < moment().unix();
-    };
-
-    $scope.setHidden = function () {
-      $scope.event.hidden = $scope.updatedEvent.hidden;
-      $scope.event.$save();
     };
 
     $scope.delete = function () {
-      if($scope.deleteConfirmationName !== $scope.event.name) { 
-        return; 
-      }
       $scope.event.$delete(function (event) {
         $state.go('app.profile', { username: $scope.username });
       });
