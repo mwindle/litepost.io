@@ -10,12 +10,12 @@ var mongoose = require('mongoose'),
 validator.extend('isPassword', function (str) {
 	/**
 	* Passwords must:
-	* - contain at least 6 characters (but not more than 30)
+	* - contain at least 6 characters (but not more than 20)
 	* - contain at least one lowercase letter
 	* - contain at least one uppercase letter
 	* - contain at least one number
 	*/
-	return str.match(/(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,30}/);
+	return str.match(/(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}/);
 });
 
 var UserSchema = new mongoose.Schema({
@@ -29,13 +29,13 @@ var UserSchema = new mongoose.Schema({
 		validate: [
 			{
 				validator: validator.isAlphanumeric,
-				msg: '{VALUE} is invalid because it contains non-alphanumeric characters'
+				msg: 'Contains non-alphanumeric characters.'
 			},
 			{
 				validator: function (str) {
-					return validator.isLength(str, 3, 30);
+					return validator.isLength(str, 3, 15);
 				},
-				msg: '{VALUE} length is not in [3,30]'
+				msg: 'Must have a length between [3,15] characters.'
 			}
 		]
 	},
@@ -49,7 +49,7 @@ var UserSchema = new mongoose.Schema({
 		validate: [
 			{
 				validator: validator.isEmail,
-				msg: '{VALUE} is not a valid email.'
+				msg: 'Invalid email.'
 			}
 		]
 	},
@@ -63,7 +63,7 @@ var UserSchema = new mongoose.Schema({
 		validate: [
 			{
 				validator: validator.isPassword,
-				msg: '{VALUE] does not meet minimum password requirements.'
+				msg: 'Does not meet minimum requirements.'
 			}
 		]
 	},
@@ -72,14 +72,10 @@ var UserSchema = new mongoose.Schema({
 		trim: true,
 		validate: [
 			{
-				validator: validator.isAscii,
-				msg: '{VALUE} is invalid because it contains non-ASCII characters'
-			},
-			{
 				validator: function (str) {
 					return validator.isLength(str, 0, 30);
 				},
-				msg: '{VALUE} length is not in [0,30]'
+				msg: 'Must have a length between [0,30] characters.'
 			}
 		]
 	},
@@ -91,17 +87,17 @@ var UserSchema = new mongoose.Schema({
 				validator: function (str) {
 					return validator.isLength(str, 0, 200);
 				},
-				msg: '{VALUE} length is not in [0,200]'
+				msg: 'Must have a length between [0,200] characters.'
 			},
 			{
 				validator: function (str) {
-					return validator.isURL(str, {
+					return str.length===0 || validator.isURL(str, {
 						protocols: ['http', 'https'],
 						require_protocol: true,
 						allow_underscores: true
 					});
 				},
-				msg: '{VALUE} is not a valid URL'
+				msg: 'Not a valid URL.'
 			}
 		]
 	},
@@ -113,19 +109,7 @@ var UserSchema = new mongoose.Schema({
 				validator: function (str) {
 					return validator.isLength(str, 0, 30);
 				},
-				msg: '{VALUE} length is not in [0,30]'
-			}
-		]
-	},
-	bio: {
-		type: String,
-		trim: true,
-		validate: [
-			{
-				validator: function (str) {
-					return validator.isLength(str, 0, 200);
-				},
-				msg: '{VALUE} length is not in [0,200]'
+				msg: 'Must have a length between [0,30] characters.'
 			}
 		]
 	}
@@ -188,5 +172,11 @@ UserSchema.methods.comparePassword = function (password, cb) {
 		cb(null, authenticated);
 	});
 };
+
+UserSchema.virtual('displayName').get(function () {
+	return this.name || '@' + this.username;
+});
+UserSchema.set('toObject', { virtuals: true });
+UserSchema.set('toJSON', { virtuals: true });
 
 module.exports = restful.model('User', UserSchema);

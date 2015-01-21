@@ -124,6 +124,46 @@ button, .btn {
 	}
 }
 
+.notification-bar {
+	width: 100%; 
+	padding: 10px; 
+	position: fixed; 
+	top: 0; 
+	left: 0; 
+	right: 0; 
+	z-index: 199; 
+	text-align: center;
+	background: @body-bg;
+	border: 1px solid black;
+	font-weight: @font-weight-light;
+
+	a, a:hover {
+		color: black;
+	}
+}
+
+.notification-bar-success {
+  background: @btn-success-bg; 
+	color: @btn-success-color; 
+	border-color: @btn-success-border;
+}
+
+.notification-bar-warning {
+  background: @btn-warning-bg; 
+	color: @btn-warning-color; 
+	border-color: @btn-warning-border;
+}
+
+.notification-bar-danger {
+  background: @btn-danger-bg; 
+	color: @btn-danger-color; 
+	border-color: @btn-danger-border;
+}
+
+.notification-bar-bottom {
+	top: auto;
+	bottom: 0;
+}
 
 .wrapper {
 	.make-row();

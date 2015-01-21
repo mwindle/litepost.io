@@ -8,7 +8,7 @@
     <section class="profile-attributes">
       <div class="profile-attributes-wrapper">
         <article class="profile-name">
-          <h4 ng-bind="user.name || '@'+user.username"></h4>
+          <h4 ng-bind="user.displayName"></h4>
           <span ng-show="user.name" ng-bind="'@' + user.username"></span>
         </article>
         <hr />
@@ -43,7 +43,7 @@
           <br />
           <span class="event-summary-url" ng-bind="getDisplayUrlForEvent(event)"></span>
           <br />
-          <span class="event-summary-start">
+          <span class="event-summary-start" ng-if="event.start">
             <span class="glyphicon glyphicon-time" />
             <span am-time-ago="event.start" />
           </span>
@@ -51,7 +51,7 @@
       </div>
 
       <div class="no-events" ng-if="events.$resolved && !events.length">
-        <span ng-bind="user.name || '@'+user.username"></span> doesn't have any events yet. 
+        <span ng-bind="user.displayName"></span> doesn't have any events yet. 
       </div>
 
       <div class="new-event-button-container">

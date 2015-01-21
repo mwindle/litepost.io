@@ -117,11 +117,48 @@
   })
 
   /**
-  * Resource for obtaining the currently authenticated user
+  * Service for managing currently authenticated user
   */
-  .factory('Me', function (resource) {
-    //var cache = $cacheFactory('me');
-    return resource('/api/me');
+  .factory('AuthService', function (resource, Token, Login) {
+    var user = null;
+    var me = resource('/api/me');
+    return {
+      authenticate: function (username, password, success, failure) {
+        // Clear any existing token that may be there
+        Token.set();
+
+        // Send a post to login
+        new Login({ username: username, password: password }).$save(function (result) {
+          Token.set(result.token);
+          user = result.user;
+          if(success && 'function' === typeof success) {
+            success.apply(this, arguments);
+          }
+        }, function () {
+          if(failure && 'function' === typeof failure) {
+            failure.apply(this, arguments);
+          }
+        });
+      },
+      login: function (usr) {
+        if(usr) {
+          user = usr;
+        } else if(Token.get()) {
+          user = me.get();
+        }
+        return user;
+      },
+      logout: function () {
+        user = null;
+        Token.set();
+      },
+      isLoggedIn: function () {
+        return !!user && !!user._id;
+      },
+      user: function () {
+        return user;
+      }
+    };
   })
 
   /**

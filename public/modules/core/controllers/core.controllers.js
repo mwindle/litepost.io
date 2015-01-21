@@ -6,41 +6,31 @@
 
   angular.module('core')
 
-  .controller('CoreController', function ($rootScope, Token, Me) {
-    
-    $rootScope.updateMe = function (me) {
-      if(me) {
-        $rootScope.me = me;
-      } else if(Token.get()) {
-        $rootScope.me = Me.get();
-      } else {
-        $rootScope.me = null;
-      }
-    };
-    $rootScope.updateMe();
-
-    $rootScope.reload = function (force) {
-      document.location.reload(force);
-    };
+  .controller('CoreController', function (AuthService) {
+    AuthService.login();
   })
 
-  .controller('LoginController', function ($scope, $state, Login, Token, User) {
+  .controller('LoginController', function ($scope, $state, $stateParams, AuthService) {
+
+    $scope.username = $stateParams.u || '';
 
   	$scope.login = function () {
   		if($scope.username && $scope.password) {
-        Token.set();
-  			new Login({ username: $scope.username, password: $scope.password }).$save(function (result) {
-  				Token.set(result.token);
-          $scope.updateMe(new User(result.user));
-          $state.go('app.profile', { username: $scope.me.username });
-  			});
+        AuthService.authenticate($scope.username, $scope.password, function () {
+          $state.go('app.profile', { username: AuthService.user().username });
+        }, function (err) {
+          console.log('auth failed');
+        });
   		}
   	};
 
   })
 
-  .controller('IdentityStatusController', function ($scope, Token, Me) {
-
+  .controller('IdentityStatusController', function ($scope, AuthService) {
+    AuthService.login();
+    $scope.$watch(AuthService.user, function () {
+      $scope.me = AuthService.user();
+    });
   });
 
 })();

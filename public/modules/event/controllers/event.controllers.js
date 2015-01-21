@@ -7,7 +7,7 @@
 
   angular.module('event').controller('EventController', 
   	function ($scope, $stateParams, $location, $anchorScroll, 
-      parallaxHelper, $timeout, Token, User, Event, Message, EventSocket, title, $document) {
+      parallaxHelper, $timeout, AuthService, Token, User, Event, Message, EventSocket, title, $document) {
     
     // Grab the username and event slug from the current state
     $scope.username = $stateParams.username;
@@ -163,7 +163,8 @@
     $scope.$watch('unread.length', $scope.setPageTitle);
 
     $scope.canEditEvent = function () {
-      return $scope.me && $scope.user && $scope.me._id && $scope.user._id && $scope.me._id === $scope.user._id;
+      return AuthService.isLoggedIn() && $scope.user && $scope.user._id 
+        && AuthService.user()._id === $scope.user._id;
     };
 
   })

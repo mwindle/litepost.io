@@ -40,6 +40,13 @@ var makeOneWithUsername = function (req, res, next) {
 	next();
 };
 
+var makeOneWithEmail = function (req, res, next) {
+	if(req.query.email) {
+		r.single(req, res, r.ensureResult.bind(null, req, res, next));
+	}
+	next();
+};
+
 var checkLogin = function (req, res, next) {
 	if(!req.body.username || !req.body.password) {
 		return next(new errors.InvalidRequestError(' '));
@@ -75,7 +82,8 @@ var setToken = function (req, res, next) {
 	var token = jwt.sign({
 		_id: res.locals.result._id,
 		username: res.locals.result.username,
-		name: res.locals.result.name
+		name: res.locals.result.name,
+		displayName: res.locals.result.displayName
 	}, config.jwtSecret, 
 	{
 		expiresInMinutes: config.jwtLifetimeInMin
@@ -114,6 +122,21 @@ var hashPassword = function (req, res, next) {
 	}
 };
 
+var hashEmail = function (req, res, next) {
+	if(req.body.email) {
+		User.hashEmail(req.body.email, function (err, hashed) {
+			if(err) {
+				next(new errors.ServerError());
+			} else {
+				req.body.emailHash = hashed;
+				next();
+			}
+		});
+	} else {
+		next();
+	}
+};
+
 var authorize = function (req, res, next) {
 	if(req.params.id !== req.user._id.toString()) {
 		next(new errors.ForbiddenError());
@@ -125,9 +148,9 @@ var authorize = function (req, res, next) {
 module.exports = function (app) {
 
 	app.get('/api/users/:id', r.get);
-	app.get('/api/users', r.get, makeOneWithUsername);
-	app.post('/api/users', clean, hashPassword, r.post);
-	app.put('/api/users/:id', r.auth, authorize, clean, hashPassword, r.put);
+	app.get('/api/users', r.get, makeOneWithUsername, makeOneWithEmail);
+	app.post('/api/users', clean, r.post, setToken);
+	app.put('/api/users/:id', r.auth, authorize, clean, hashPassword, hashEmail, r.validate, r.put);
 	app.delete('/api/users/:id', r.auth, authorize, r.del);
 	app.all('/api/users*', prune, r.flush);
 

@@ -15,6 +15,13 @@
         data: { title: 'New Event - LitePost.io' }
       })
 
+      .state('app.join', {
+        url: '/join',
+        templateUrl: 'modules/profile/views/join.view.html',
+        controller: 'JoinController',
+        data: { title: 'Join us - LitePost.io' }
+      })
+
       .state('app.editProfile', {
         url: '/settings',
         templateUrl: 'modules/profile/views/settings.view.html',
@@ -25,8 +32,7 @@
       .state('app.profile', {
         url: '/:username',
         templateUrl: 'modules/profile/views/profile.view.html',
-        controller: 'MyEventsController',
-        data: { title: 'Your Events - LitePost.io' }
+        controller: 'ProfileController'
       });
       
   });

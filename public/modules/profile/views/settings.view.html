@@ -1,43 +1,91 @@
-<form role="form" class="responsive-content">
+<main class="responsive-content">
   <header>
-    <h2>
-      <span class="emphasize"></span> Edit profile
-    </h2>
+    <h2>Edit your stuff</h2>
   </header>
 
   <div class="panel panel-default">
-  	<header class="panel-heading">Profile</header>
+  	<header class="panel-heading">Profile settings</header>
   	<div class="panel-body">
+  		<form role="form" name="profile" novalidate>
 
-		  <div class="form-group">
-		    <label for="name">Name</label>
-		    <input type="text" class="form-control" id="name" name="name" placeholder="Full name" ng-model="updatedMe.name" autofocus />
-		  </div>
-		  <div class="form-group">
-		    <label for="location">Location</label>
-		    <input type="text" class="form-control" id="location" name="location" placeholder="Location" ng-model="updatedMe.location" />
-		  </div>
-		  <div class="form-group">
-		    <label for="website">Website</label>
-		    <input type="url" class="form-control" id="website" name="website" placeholder="Website" ng-model="updatedMe.website" />
-		  </div>
-		  <div class="form-group">
-		    <label for="bio">Bio</label>
-		    <textarea class="form-control" id="bio" name="bio" placeholder="Thoughts, hopes, dreams..." ng-model="updatedMe.bio" />
-		  </div>
-		  <div class="form-group">
-		  	<button class="btn btn-success" ng-click="save()">Save profile settings</button>
-		  </div>
+  			<!-- profile pic -->
+			  <div class="form-group">
+			    <label for="name">Profile picture</label>
+			    <div>
+			    	<img class="avatar profile-avatar" ng-show="updatedMe.emailHash" ng-src="//www.gravatar.com/avatar/{{updatedMe.emailHash}}?s=100&d=mm" />
+			    </div>
+			    <p class="text-muted">
+			    	Profile pictures come from <a href="http://gravatar.com" target="_blank">Gravatar</a>. To add or update your profile picture, go to Gravatar and setup one there. Make sure you use the same
+			    	email address with them as you have used here ({{updatedMe.email}}).
+			    </p>
+			  </div>
+
+  			<!-- name -->
+			  <div class="form-group" ng-class="{ 'has-error': profile.name.$invalid && profile.name.$dirty }">
+			    <label for="name">Name</label>
+			    <input type="text" class="form-control" name="name" placeholder="Full name" ng-model="updatedMe.name" ng-maxlength="30" autofocus />
+			    <p class="help-block" ng-show="profile.name.$error.maxlength">Too long.</p>
+			  </div>
+
+			  <!-- location -->
+			  <div class="form-group" ng-class="{ 'has-error': profile.location.$invalid && profile.location.$dirty }">
+			    <label for="location">Location</label>
+			    <input type="text" class="form-control" name="location" placeholder="Location" ng-model="updatedMe.location" ng-maxlength="30" />
+			    <p class="help-block" ng-show="profile.location.$error.maxlength">Too long.</p>
+			  </div>
+
+			  <!-- website -->
+			  <div class="form-group" ng-class="{ 'has-error': profile.website.$invalid && profile.website.$touched }">
+			    <label for="website">Website</label>
+			    <input type="url" class="form-control" name="website" placeholder="Website" ng-model="updatedMe.website" ng-maxlength="200" />
+			    <p class="help-block" ng-show="profile.website.$error.url">Invalid URL.</p>
+			    <p class="help-block" ng-show="profile.website.$error.maxlength">Too long.</p>
+			  </div>
+
+			  <!-- Save button -->
+			  <div class="form-group">
+			  	<button class="btn btn-success" ng-disabled="profile.$invalid || profile.$pristine" ng-click="save()" ng-show="!savingProfile.pending">Save profile settings</button>
+			  	<div ng-show="savingProfile.pending">Saving...</div>
+			  </div>
+
+		  </form>
 		</div>
 	</div>
 
   <div class="panel panel-danger">
   	<div class="panel-heading">Danger Zone</div>
   	<div class="panel-body">
-	  	<div class="form-group">
-				<label for="delete">Delete your account</label>
-				TODO
-			</div>
+	  	<form role="form" name="deleteAccount" novalidate>
+
+		  	<!-- Enter delete mode -->
+		  	<div class="form-group" ng-show="!deleting">
+					<button class="btn btn-danger" ng-click="deleting=true">Delete your account...</button>
+				</div>
+		
+		  	<!-- Confirm username -->
+		  	<div class="form-group" ng-show="deleting">
+					<label for="username">Confirm your username</label>
+		    	<input type="text" class="form-control" name="username" placeholder="Your username" ng-model="confirmUsername" />
+				</div>
+		
+		  	<!-- Confirm username -->
+		  	<div class="form-group" ng-show="deleting">
+					<p>
+						Are you super duper sure you want to delete your account? This action cannot be undone. No magical undo, no backups, no going back. All events, messages, and anything else you've done here will be gone forever.
+					</p>
+					<button class="btn btn-default" ng-click="confirmUsername=''; deleting=false">Cancel</button>
+					<button class="btn btn-danger" ng-disabled="confirmUsername!==me.username" ng-click="delete()">Delete your account forever</button>
+				</div>
+
+			</form>
   	</div>
 	</div>
-</form>
+</main>
+
+<footer class="notification-bar notification-bar-success notification-bar-bottom animate" ng-show="savingProfile.success">
+	Profile settings saved. 
+</footer>
+
+<footer class="notification-bar notification-bar-danger notification-bar-bottom animate" ng-show="savingProfile.error">
+	Failed to save profile settings. Correct any errors and try again. 
+</footer>

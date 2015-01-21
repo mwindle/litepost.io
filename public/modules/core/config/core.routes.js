@@ -22,7 +22,7 @@
 	    })
 
 		   .state('app.login', {
-		   		url: '/login',
+		   		url: '/login?u',
 		   		templateUrl: 'modules/core/views/login.view.html',
 		   		controller: 'LoginController',
 		   		data: { title: 'Login - LitePost.io' }

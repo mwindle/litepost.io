@@ -3,7 +3,7 @@
 	<span class="message-author">
 		<a ui-sref="app.profile({username: username})"><img class="message-author-img" ng-src="//www.gravatar.com/avatar/{{message.author.emailHash}}?s=30&d=mm" /></a>
 		<a ui-sref="app.profile({username: username})">
-			<span ng-bind="message.author.name || '@'+message.author.username" />
+			<span ng-bind="message.author.displayName" />
 		</a>
 	</span>
 	<span class="message-footer-divider"> | </span>

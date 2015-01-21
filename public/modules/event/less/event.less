@@ -1,32 +1,9 @@
 
 @import "../../../less/variables.less";
 
-.unread-status-bar {
-	background: #DFF0D8; 
-	color: #3C763D; 
-	border: 1px solid #3C763D; 
-	width: 100%; 
-	padding: 10px; 
-	position: fixed; 
-	top: 0; 
-	left: 0; 
-	right: 0; 
-	z-index: 199; 
-	border-top: 0; 
-	border-left: 0; 
-	border-right: 0; 
-	text-align: center;
-
-	a, a:hover {
-		color: @gray-dark;
-		cursor: pointer;
-	}
-}
-
 .event-header {
 	position: relative;
 	width: 100%;
-	/*background: @gray-lightest;*/
 	padding: 1em;
 	padding-bottom: 0;
 
@@ -56,11 +33,13 @@
 		top: 0;
 
 		button {
+			background-color: @gray;
 			background-color: rgba(255, 255, 255, 0.1);
 			color: #FFF;
 		}
 
 		button:hover {
+			background-color: @gray-light;
 			background-color: rgba(255, 255, 255, 0.3);
 			color: #FFF;
 		}

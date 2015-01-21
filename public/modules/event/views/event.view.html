@@ -1,9 +1,9 @@
 <div ui-view></div>
-<header ng-show="unread.length" class="unread-status-bar animate" style="">
+<header ng-show="unread.length" class="notification-bar notification-bar-success animate">
 	<div>
 		<span ng-bind="unread.length"></span> new 
 		<span ng-pluralize count="unread.length" when="{'1': 'message.', 'other': 'messages.'}" ></span>
-		<a style="color: black; cursor: pointer;" ng-click="scrollToUnread()"> View now</a>
+		<a href="#" ng-click="scrollToUnread()"> View now</a>
 	</div>
 </header>
 <div class="active-event-view">
@@ -24,7 +24,7 @@
 			<div class="event-owner-name">
 				by 
 				<a ui-sref="app.profile({username: username})">
-					<span ng-bind="user.name || '@'+user.username" />
+					<span ng-bind="user.displayName" />
 				</a>
 			</div>
 		</div>
@@ -61,11 +61,13 @@
 		</div>
 		<div class="typing-status" >
 			<span ng-show="typing" class="animate">
-				<span ng-show="typing.author" ng-bind="(typing.author.name || '@'+typing.author.username) + ' is '" />
+				<span ng-show="typing.author && typing.author.displayName" ng-bind="(typing.author.displayName) + ' is '" />
 				<span ng-bind="'typing a message...'" />
 			</span>
 		</div>
+		
 		<article class="message animate" ng-repeat="message in messages | orderBy:'sent':true" ng-include="'modules/core/views/message.view.html'" />
+		
 		<dir-disqus ng-if="messages.length" disqus-shortname="litepostio" disqus-identifier="{{ event._id }}" disqus-url="{{ disqusUrl }}" ready-to-bind="{{ messages.length && event.$resolved }}"></dir-disqus>
 	</main>
 
@@ -97,9 +99,9 @@
 			<section>
 				It looks like the event you're trying to view doesn't exist. 
 				<br />
-				Head to our <a href="/">home page</a><span ng-if="user.username">
+				Head to our <a href="/">home page</a><span ng-if="user.displayName">
 				 or vist the profile page of 
-				 <a href="#" ui-sref="app.profile({ username: user.username })" ng-bind="'@' + user.username"></a></span>. 
+				 <a href="#" ui-sref="app.profile({ username: user.username })" ng-bind="user.displayName"></a></span>. 
 			</section>
 		</article>
 		<article ng-if="error.status!==404">
@@ -108,7 +110,7 @@
 			</header>
 			<section>
 				Something went wrong. Try 
-				<a href="#" ng-click="reload()">refreshing this page</a>
+				<a href="#" ng-click="document.location.reload()">refreshing this page</a>
 				to see if that fixes it.   
 			</section>
 		</article>
