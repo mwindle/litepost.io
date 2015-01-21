@@ -1,8 +1,8 @@
 <section class="message-text" ng-bind-html="message.html | unsafe" compile-template id="{{message._id}}" />
 <footer class="message-footer">
 	<span class="message-author">
-		<a ui-sref="app.profile({username: username})"><img class="message-author-img" ng-src="//www.gravatar.com/avatar/{{message.author.emailHash}}?s=30&d=mm" /></a>
-		<a ui-sref="app.profile({username: username})">
+		<a ui-sref="app.profile({username: message.author.username})"><img class="message-author-img" ng-src="//www.gravatar.com/avatar/{{message.author.emailHash}}?s=30&d=mm" /></a>
+		<a ui-sref="app.profile({username: message.author.username})">
 			<span ng-bind="message.author.displayName" />
 		</a>
 	</span>

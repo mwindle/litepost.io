@@ -21,9 +21,9 @@ module.exports = function (app) {
 
 	app.all('/api*', r.sanitize);
 
-	users(app);
-	events(app);
-	messages(app);
+	users.route(app);
+	events.route(app);
+	messages.route(app);
 
 	app.use(function (err, req, res, next) {
 		res.statusCode = err.status;

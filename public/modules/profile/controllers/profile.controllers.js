@@ -37,11 +37,11 @@
   * Controller to edit current user's profile
   */
   .controller('ProfileSettingsController', function ($scope, $state, $stateParams, $timeout, $window, AuthService, User) {
-    
-    $scope.$watch(AuthService.isLoggedIn, function () {
-      $scope.me = AuthService.user();
+
+    $scope.me = AuthService.user();
+    $scope.$watch('me', function () {
       $scope.updatedMe = new User(angular.copy($scope.me));
-    });
+    }, true);
 
     $scope.save = function () {
       $scope.savingProfile = { pending: true };

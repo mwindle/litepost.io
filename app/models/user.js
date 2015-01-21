@@ -67,6 +67,10 @@ var UserSchema = new mongoose.Schema({
 			}
 		]
 	},
+	verified: {
+		type: Boolean,
+		default: false
+	},
 	name: {
 		type: String,
 		trim: true,

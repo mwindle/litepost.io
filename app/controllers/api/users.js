@@ -6,42 +6,50 @@
 var User = require('mongoose').model('User'),
 	errors = require('../../errors/errors'),
  	jwt = require('jsonwebtoken'),
- 	config = require('../../../config/config'), 
+ 	config = require('../../../config/config'),
+ 	emitter = require('../../../config/emitter'),
  	r = require('./rest').model(User),
  	validator = require('validator');
 
+module.exports.pruneUser = function (user, principal) {
+		if(!user) {
+			return user;
+		}
+
+		var u = {};
+		u.username = user.username;
+		u.name = user.name;
+		u.displayName = user.displayName;
+		u.emailHash = user.emailHash;
+		u.location = user.location;
+		u.website = user.website;
+
+		if(principal && principal._id && user._id && principal._id.toString() === user._id.toString()) {
+			u.id = user.id;
+			u._id = user._id;
+			u.email = user.email;
+			u.verified = user.verified;
+		}
+		return u;
+};
 
 var prune = function (req, res, next) {
 	if(!res.locals.result) {
 		return next();
 	}
-	var p = function (user) {
-		if('function' === typeof user.toObject) {
-			user = user.toObject();
-		}
-		delete user.password;
-		return user;
-	};
 
 	if(Array.isArray(res.locals.result)) {
 		for(var i=0; i<res.locals.result.length; i++) {
-			res.locals.result[i] = p(res.locals.result[i]);
+			res.locals.result[i] = module.exports.pruneUser(res.locals.result[i]);
 		}
 	} else {
-		res.locals.result = p(res.locals.result);
+		res.locals.result = module.exports.pruneUser(res.locals.result, req.user);
 	}
 	next();
 };
 
-var makeOneWithUsername = function (req, res, next) {
-	if(req.query.username) {
-		r.single(req, res, r.ensureResult.bind(null, req, res, next));
-	}
-	next();
-};
-
-var makeOneWithEmail = function (req, res, next) {
-	if(req.query.email) {
+var makeOneWithUsernameOrEmail = function (req, res, next) {
+	if(req.query.username || req.query.email) {
 		r.single(req, res, r.ensureResult.bind(null, req, res, next));
 	}
 	next();
@@ -58,7 +66,7 @@ var massageLogin = function (req, res, next) {
 	// Start with a pristine req.query
 	req.query = {};
 
-	// Copy req.body username/email to query so vanilla get can be used
+	// Copy req.body username/email to query so vanilla r.get can be used
 	// Username can have an email or a username
 	if(validator.isEmail(req.body.username)) {
 		req.query.email = req.body.username;
@@ -66,6 +74,14 @@ var massageLogin = function (req, res, next) {
 		req.query.username = req.body.username;
 	}
 	next();
+};
+
+var ensureLoginResult = function (req, res, next) {
+	if(!res.locals.result) {
+		next(new errors.UnauthorizedError());
+	} else {
+		next();
+	}
 };
 
 var verifyPassword = function (req, res, next) {
@@ -90,7 +106,7 @@ var setToken = function (req, res, next) {
 	});
 	res.locals.result = { 
 		token: token,
-		user: res.locals.result
+		user: module.exports.pruneUser(res.locals.result, res.locals.result)
 	};
 	next();
 };
@@ -102,8 +118,25 @@ var meQuery = function (req, res, next) {
 	next();
 };
 
-var clean = function (req, res, next) {
-	//TODO
+var cleanPost = function (req, res, next) {
+	// Remove properties that are not settable when creating a user
+	delete req.body._id;
+	delete req.body.emailHash;
+	delete req.body.verified;
+	next();
+}
+
+var cleanPut = function (req, res, next) {
+	// Remove properties that can't be changed directly
+	delete req.body._id;
+	delete req.body.emailHash;
+	delete req.body.verified;
+
+	// Changing these is not currently supported, but should be at some point
+	delete req.body.username;
+	delete req.body.email;
+	delete req.body.password;
+
 	next();
 };
 
@@ -145,16 +178,31 @@ var authorize = function (req, res, next) {
 	}
 };
 
-module.exports = function (app) {
+var welcomeNewUser = function (req, res, next) {
+	var emailVerificationToken = jwt.sign({
+		_id: res.locals.result._id,
+		currentEmail: res.locals.result.email,
+		newEmail: res.locals.result.email
+	}, config.jwtSecret, 
+	{
+		expiresInMinutes: config.jwtLifetimeInMin
+	});
+	emitter.newUser(res.locals.result, emailVerificationToken);
+	next();
+};
 
-	app.get('/api/users/:id', r.get);
-	app.get('/api/users', r.get, makeOneWithUsername, makeOneWithEmail);
-	app.post('/api/users', clean, r.post, setToken);
-	app.put('/api/users/:id', r.auth, authorize, clean, hashPassword, hashEmail, r.validate, r.put);
-	app.delete('/api/users/:id', r.auth, authorize, r.del);
-	app.all('/api/users*', prune, r.flush);
 
-	app.post('/api/login', checkLogin, massageLogin, r.get, r.single, verifyPassword, prune, setToken, r.flush);
+
+module.exports.route = function (app) {
+
+	app.get('/api/users/:id', r.get, prune);
+	app.get('/api/users', r.get, makeOneWithUsernameOrEmail, prune);
+	app.post('/api/users', cleanPost, r.post, welcomeNewUser, setToken);
+	app.put('/api/users/:id', r.auth, authorize, cleanPut, hashPassword, hashEmail, r.validate, r.put, prune);
+	app.delete('/api/users/:id', r.auth, authorize, r.del, prune);
+	app.all('/api/users*', r.flush);
+
+	app.post('/api/login', checkLogin, massageLogin, r.get, r.single, ensureLoginResult, verifyPassword, setToken, r.flush);
 	app.get('/api/me', r.auth, meQuery, r.get, prune, r.flush);
 
 };

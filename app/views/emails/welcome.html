@@ -1,0 +1,53 @@
+
+<style>
+.main {
+	width: 90%;
+	max-width: 800px;
+	border: 1px solid #EFEFEF;
+	margin: auto;
+	padding: 20px;
+	color: #666;
+	font-family: "Arial", "sans-serif";
+}
+
+h1 {
+	width: 100%;
+	color: black;
+	text-align: center;
+}
+
+pre {
+	max-width: 80%;
+	word-wrap: break-word;
+}
+</style>
+
+<div class="main">
+	<h1>Welcome to LitePost.io</h1>
+
+	<p>
+		Here's what's next:  
+	<p>
+
+	<ul>
+		<li><a href="{{verificationLink}}">Verify your email address</a>. You'll need to take care of this before you can start creating events. If you can't access the link above, you can: 
+			<ol>
+				<li>Copy and paste the following link into your browser's address bar: <pre>{{verificationLinkBase}}</pre></li>
+				<li>Copy and paste this verification code into that page: <pre>{{verificationToken}}</pre></li>
+			</ol>
+		</li>
+		<li>Check out the sample event and post we've made for you to get a feel for how you can author events and posts within them.</li>
+		<li>On that note, posts on LitePost.io are authored in <a href="http://en.wikipedia.org/wiki/Markdown">Markdown</a>. You may want to familiarize yourself with <a href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">Markdown syntax</a>. 
+	</ul>
+
+	<p>
+		You can access your account anytime by signing in <a href="{{signInLink}}">here</a>.
+	</p>
+
+	<p>
+		<br />
+		Cheers,
+		<br /><br />
+		Marc at LitePost.io
+	</p>
+</div>

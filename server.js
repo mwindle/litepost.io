@@ -19,6 +19,9 @@ require('./config/jwt')(app);
 // Setup Socket.IO config
 require('./config/socket')(server);
 
+// Setup email notifications
+require('./config/emails')(app);
+
 // Setup routes
 require('./app/routes/core')(app);
 require('./app/routes/api')(app);

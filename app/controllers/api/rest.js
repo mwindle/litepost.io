@@ -20,7 +20,7 @@ rest.ensureResult = function (req, res, next) {
 };
 
 rest.auth = function (req, res, next) {
-	if(!req.user) {
+	if(!req.user || !req.user._id) {
 		next(new errors.UnauthorizedError());
 	} else {
 		next();

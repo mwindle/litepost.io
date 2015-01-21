@@ -5,9 +5,38 @@
  */
 var Event = require('mongoose').model('Event'),
 	r = require('./rest').model(Event),
-	errors = require('../../errors/errors');
+	errors = require('../../errors/errors'),
+	users = require('./users');
+
+module.exports.pruneEvent = function (event, principal) {
+	var e = {};
+	e._id = event._id;
+	e.name = event.name;
+	e.slug = event.slug;
+	e.socket = event.socket;
+	e.username = event.username;
+	e.start = event.start;
+	e.description = event.description;
+	e.location = event.location;
+
+	if(event.owner && event.owner._id) {
+		e.owner = users.pruneUser(event.owner, principal);
+	}
+	return e;
+};
 
 var prune = function (req, res, next) {
+	if(!res.locals.result) {
+		return next();
+	}
+
+	if(Array.isArray(res.locals.result)) {
+		for(var i=0; i<res.locals.result.length; i++) {
+			res.locals.result[i] = module.exports.pruneEvent(res.locals.result[i], req.user);
+		}
+	} else {
+		res.locals.result = module.exports.pruneEvent(res.locals.result, req.user);
+	}
 	next();
 };
 
@@ -52,7 +81,7 @@ var makeOneWithUsernameAndSlug = function (req, res, next) {
 	next();
 };
 
-module.exports = function (app) {
+module.exports.route = function (app) {
 
 	app.get('/api/events/:id', r.get);
 	app.get('/api/events', r.get, makeOneWithUsernameAndSlug);

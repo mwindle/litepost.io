@@ -36,4 +36,15 @@ emitter.deleteMessage = function (socket, message) {
 	});
 };
 
+emitter.onNewUser = function (cb) {
+	emitter.on('new-user', cb);
+};
+emitter.newUser = function (user, emailVerificationToken) {
+	var data = {
+		user: user,
+		verificationToken: emailVerificationToken
+	};
+	emitter.emit('new-user', data);
+};
+
 module.exports = emitter;

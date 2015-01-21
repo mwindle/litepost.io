@@ -27,6 +27,7 @@
     "node-restful": "^0.1.17",
     "passport": "^0.2.1",
     "passport-local": "^1.0.0",
+    "postmark": "^0.2.6",
     "socket.io": "^1.2.0",
     "swig": "^1.4.2",
     "validator": "^3.27.0"
