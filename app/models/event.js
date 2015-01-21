@@ -1,25 +1,42 @@
 'use strict';
 
 var mongoose = require('mongoose'),
-	restful = require('node-restful');
+	restful = require('node-restful'),
+	validator = require('validator');
 
 var EventSchema = mongoose.Schema({
 	name: { 
 		type: String, 
 		required: true, 
 		trim: true,
-
-		// Allow all characters. Must be 3-50 characters long (inclusive). 
-		match: /^[\s\S]{3,50}$/
+		validate: [
+			{
+				validator: function (str) {
+					return validator.isLength(str, 3, 50);
+				},
+				msg: 'Must have a length between [3,50] characters.'
+			}
+		]
 	},
 	slug: { 
 		type: String, 
 		required: true, 
 		trim: true,
 		lowercase: true,
-
-		// Allow alphanumeric, _ (underscore), and - (dash) characters. Must be 3-30 characters long (inclusive).
-		match: /^[a-z0-9_\-]{3,30}$/i
+		validate: [
+			{
+				validator: function (str) {
+					return /^[a-z0-9_\-]*$/i.test(str);
+				},
+				msg: 'Must contain only alphanumeric, _, and - characters.'
+			},
+			{
+				validator: function (str) {
+					return validator.isLength(str, 3, 30);
+				},
+				msg: 'Must have a length between [3,30] characters.'
+			}
+		]
 	},
 	owner: {
 		type: mongoose.Schema.ObjectId,
@@ -39,20 +56,26 @@ var EventSchema = mongoose.Schema({
 	description: {
 		type: String,
 		trim: true,
-
-		// Allow all characters. Must be less than or equal to 200 characters long.
-		match: /^[\s\S]{0,200}$/
+		validate: [
+			{
+				validator: function (str) {
+					return validator.isLength(str, 0, 200);
+				},
+				msg: 'Must have a length between [0,200] characters.'
+			}
+		]
 	},
 	location: {
 		type: String,
 		trim: true,
-
-		// Allow all characters. Must be less than or equal to 30 characters long. 
-		match: /^[\s\S]{0,30}$/
-	},
-	coverPhoto: {
-		type: String,
-		trim: true
+		validate: [
+			{
+				validator: function (str) {
+					return validator.isLength(str, 0, 30);
+				},
+				msg: 'Must have a length between [0,30] characters.'
+			}
+		]
 	}
 });
 

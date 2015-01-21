@@ -1,17 +1,26 @@
- <form role="form" class="responsive-content">
-  <header>
-    <h2>
-      <span class="emphasize">Create Event</span>
-    </h2>
+ <main>
+   <header>
+    <h2>New event</h2>
   </header>
-  <div class="form-group">
-    <label for="name">Name</label>
-    <input type="name" class="form-control" id="name" name="name" placeholder="Name" ng-model="name" autofocus />
-  </div>
-  <div class="form-group">
-    <label for="channel">Channel</label>
-    <input type="text" class="form-control" id="channel" placeholder="Channel" ng-model="channel" />
-    <small>Channel names cannot be changed later.</small>
-  </div>
-  <button type="submit" class="btn btn-primary login-btn" ng-click="createEvent()">Create event</button>
-</form>
+  <form role="form" name="createEvent" novalidate>
+
+    <!-- name -->
+    <div class="form-group" ng-class="{ 'has-error': createEvent.name.$invalid && createEvent.name.$touched }">
+      <label for="name">Name</label>
+      <input type="name" class="form-control" name="name" placeholder="Pick an event name" ng-model="name" ng-required="true" ng-minlength="3" ng-maxlength="50" autofocus />
+      <p class="help-block" ng-show="createEvent.name.$touched && createEvent.name.$error.required">Required.</p>
+      <p class="help-block" ng-show="createEvent.name.$touched && createEvent.name.$error.minlength">Too short.</p>
+      <p class="help-block" ng-show="createEvent.name.$error.maxlength">Too long.</p>
+    </div>
+    
+    <!-- Submit -->
+    <div class="form-group">
+      <button type="submit" class="btn btn-primary" ng-disabled="createEvent.$invalid || creatingEvent.pending" ng-click="create()">Create event</button>
+      <span ng-show="creatingEvent.pending" ng-bind="'Creating...'"></span>
+    </div>
+  </form>
+  
+  <footer class="notification-bar notification-bar-danger notification-bar-bottom animate" ng-show="creatingEvent.error">
+    Failed to create event. Correct any errors and try again. 
+  </footer>
+</main>

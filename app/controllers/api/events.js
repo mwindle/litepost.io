@@ -12,6 +12,9 @@ var prune = function (req, res, next) {
 };
 
 var clean = function (req, res, next) {
+	if(!req.body.name) {
+		return next(new errors.SchemaValidationError());
+	}
 	// Set event owner details with the current user
 	req.body.owner = req.user._id;
 	req.body.username = req.user.username;

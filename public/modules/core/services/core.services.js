@@ -122,7 +122,7 @@
   .factory('AuthService', function (resource, Token, Login) {
     var user = null;
     var me = resource('/api/me');
-    return {
+    var service = {
       authenticate: function (username, password, success, failure) {
         // Clear any existing token that may be there
         Token.set();
@@ -144,7 +144,7 @@
         if(usr) {
           user = usr;
         } else if(Token.get()) {
-          user = me.get();
+          user = me.get(angular.noop, service.logout);
         }
         return user;
       },
@@ -153,12 +153,13 @@
         Token.set();
       },
       isLoggedIn: function () {
-        return !!user && !!user._id;
+        return !!user;
       },
       user: function () {
         return user;
       }
     };
+    return service;
   })
 
   /**

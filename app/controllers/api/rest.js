@@ -30,7 +30,7 @@ rest.auth = function (req, res, next) {
 rest.mongoCallback = function (res, req, next, err, result) {
 	if(err) {
 		if(err.name === 'ValidationError') {
-			next(new errors.InvalidRequestError(err.message));
+			next(new errors.SchemaValidationError(err.errors));
 		} else {
 			next(new errors.ServerError());
 		}

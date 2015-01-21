@@ -102,16 +102,23 @@
   /**
   * Controller to create a new event
   */
-  .controller('CreateEventController', function ($scope, $state, Event) {
-
-    $scope.createEvent = function () {
-      if($scope.name) {
-        new Event({
-          name: $scope.name
-        }).$save(function (event) {
-          $state.go('app');
-        });
+  .controller('CreateEventController', function ($scope, $state, AuthService, Event) {
+    
+    // Must be authenticated to create events
+    $scope.$watch(AuthService.isLoggedIn, function () {
+      if(!AuthService.isLoggedIn()) {
+        $state.go('app.login');
       }
+    });
+
+    $scope.create = function () {
+      $scope.creatingEvent = { pending: true };
+      new Event({ name: $scope.name }).$save(function (event) {
+        $state.go('app.event', { username: AuthService.user().username, slug: event.slug });
+      }, function (err) {
+        $scope.creatingEvent.pending = false;
+        $scope.creatingEvent.error = err.data;
+      });
     };
 
   });
