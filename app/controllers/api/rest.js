@@ -78,20 +78,26 @@ rest.model = function (Model) {
 	};
 
 	r.validate = function (req, res, next) {
+		var errs = [];
 		var onSchemaError = function (err) {
 			if(err) {
-				return next(new errors.SchemaValidationError(err));
+				errs.push(err);
 			}
 		};
 		for(var property in req.body) {
 			if(req.body.hasOwnProperty(property)) {
 				var attribute = Model.schema.path(property);
 				if(attribute) {
+					// The callback is actually sync
 					attribute.doValidate(req.body[property], onSchemaError);
 				}
 			}
 		}
-		next();
+		if(errs.length) {
+			next(new errors.SchemaValidationError(errs));
+		} else {
+			next();
+		}
 	};
 
 	r.get = function (req, res, next) {

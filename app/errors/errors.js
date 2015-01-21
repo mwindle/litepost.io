@@ -35,10 +35,18 @@ function ServerError () {
 
 ServerError.prototype = Object.create(Error.prototype);
 
-function SchemaValidationError () {
-  Error.call(this, arguments);
+function SchemaValidationError (errors) {
   this.name = 'SchemaValidationError';
   this.status = 400;
+  this.errors = {};
+  var self = this;
+  if(errors && errors.length) {
+    errors.forEach(function (err) {
+      self.errors[err.path] = {
+        message: err.message
+      };
+    });
+  }
 }
 
 SchemaValidationError.prototype = Object.create(Error.prototype);
