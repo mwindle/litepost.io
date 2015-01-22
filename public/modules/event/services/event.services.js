@@ -91,7 +91,7 @@
   })
 
   .directive('slug', function () {
-    var onlyLettersAndDashes = /^[a-z0-9_\-]*$/i;
+    var onlyLettersAndDashes = /^[a-z0-9\-]*$/i;
     return {
       require: 'ngModel',
       link: function (scope, elm, attrs, ctrl) {

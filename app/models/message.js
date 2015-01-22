@@ -1,7 +1,13 @@
 'use strict';
 
+
+/**
+ * Module dependencies.
+ */
 var mongoose = require('mongoose'),
-	restful = require('node-restful');
+	restful = require('node-restful'),
+	validator = require('validator');
+
 
 var MessageSchema = new mongoose.Schema({
 	event: {
@@ -17,9 +23,14 @@ var MessageSchema = new mongoose.Schema({
 	text: {
 		type: String,
 		required: true,
-
-		// Allow all characters. Must be 1-1000 characters long (inclusive). 
-		match: /^[\s\S]{1,1000}$/
+		validate: [
+			{
+				validator: function (str) {
+					return validator.isLength(str, 1, 1000);
+				},
+				msg: 'Must have a length between [1,1000] characters.'
+			}
+		]
 	},
 	html: {
 		type: String,
@@ -31,7 +42,8 @@ var MessageSchema = new mongoose.Schema({
 		default: Date.now
 	},
 	updated: {
-		type: Date
+		type: Date,
+		default: Date.now
 	},
 	published: {
 		type: Boolean,
@@ -39,6 +51,7 @@ var MessageSchema = new mongoose.Schema({
 	}
 });
 
+// De-normalized copy of the socket identifier for this event
 MessageSchema.virtual('eventSocket').get(function () {
 	return this.event;
 });

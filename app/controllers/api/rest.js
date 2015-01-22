@@ -1,6 +1,9 @@
 'use strict';
 
 
+/**
+ * Module dependencies.
+ */
 var debug = require('debug')('rest'),
 	sanitize = require('mongo-sanitize'),
 	errors = require('../../errors/errors'),
@@ -83,7 +86,6 @@ rest.single = function (req, res, next) {
 	}
 	next();
 };
-
 
 /**
 * Callback used to bind as Express middleware to handle the response

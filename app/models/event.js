@@ -1,6 +1,11 @@
 'use strict';
 
-var mongoose = require('mongoose'),
+
+/**
+ * Module dependencies.
+ */
+var debug = require('debug')('Event'),
+	mongoose = require('mongoose'),
 	restful = require('node-restful'),
 	validator = require('validator');
 
@@ -25,9 +30,9 @@ var EventSchema = mongoose.Schema({
 		validate: [
 			{
 				validator: function (str) {
-					return /^[a-z0-9_\-]*$/i.test(str);
+					return /^[a-z0-9\-]*$/i.test(str);
 				},
-				msg: 'Must contain only alphanumeric, _, and - characters.'
+				msg: 'Must contain only alphanumeric and - characters.'
 			},
 			{
 				validator: function (str) {
@@ -81,6 +86,7 @@ var EventSchema = mongoose.Schema({
 // Quick retreival (most common way of getting an event), plus it ensures uniqueness of the tuple
 EventSchema.index({ username: 1, slug: 1}, { unique: true });
 
+// Publicly visible identifier for this event's socket connection
 EventSchema.virtual('socket').get(function () {
 	return this._id;
 });
@@ -95,14 +101,16 @@ module.exports = restful.model('Event', EventSchema);
 // Requiring circular dependencies has to be done after export
 var Message = require('./message');
 
-// Mongoose middleware to cascade delete to messages
+// Mongoose middleware to cascade delete to messages within this event
 EventSchema.pre('remove', function (next) {
 	var event = this;
 
 	Message.remove({ event: event._id }).exec(function (err) {
 		if(err) {
+			debug('Event remove failed to cascade to Messages: %j', err);
 			next(err);
 		} else {
+			debug('Event remove deleted its messages');
 			next();
 		}
 	});

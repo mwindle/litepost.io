@@ -1,6 +1,7 @@
 'use strict';
 
-var mongoose = require('mongoose'),
+var debug = require('debug')('User'),
+	mongoose = require('mongoose'),
 	restful = require('node-restful'),
 	bcrypt = require('bcrypt'),
 	crypto = require('crypto'),
@@ -129,6 +130,7 @@ UserSchema.pre('save', function (next) {
 
   UserSchema.statics.hashPassword(user.password, function (err, hash) {
   	if(err) {
+  		debug('unable to hash password %j', err);
   		return next(err);
   	}
 		user.password = hash;
@@ -146,6 +148,7 @@ UserSchema.pre('save', function (next) {
 
 	UserSchema.statics.hashEmail(user.email, function (err, hash) {
 		if(err) {
+			debug('unable to hash email %j', err);
 			return next(err);
 		}
 		user.emailHash = hash;
@@ -160,6 +163,7 @@ UserSchema.statics.hashEmail = function (email, cb) {
 UserSchema.statics.hashPassword = function (password, cb) {
   bcrypt.genSalt(ENCRYPTION_ROUNDS, function (err, salt) {
     if (err) {
+    	debug('unable to generate bcrypt salt %j', err);
     	return cb(err);
     }
 
@@ -171,6 +175,7 @@ UserSchema.statics.hashPassword = function (password, cb) {
 UserSchema.methods.comparePassword = function (password, cb) {
 	bcrypt.compare(password, this.password, function (err, authenticated) {
 		if(err) {
+			debug('unable to compare passwords %j', err);
 			return cb(err);
 		}
 		cb(null, authenticated);
@@ -195,6 +200,7 @@ UserSchema.pre('remove', function (next) {
 
 	Event.remove({ owner: user._id }).exec(function (err) {
 		if(err) {
+			debug('User failed to cascade delete to Events: %j', err);
 			next(err);
 		} else {
 			next();
@@ -208,10 +214,10 @@ UserSchema.pre('remove', function (next) {
 
 	Message.remove({ author: user._id }).exec(function (err) {
 		if(err) {
+			debug('User failed to cascade delete to Messages: %j', err);
 			next(err);
 		} else {
 			next();
 		}
 	});
 });
-
