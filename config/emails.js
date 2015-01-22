@@ -3,7 +3,8 @@
 /**
  * Module dependencies.
  */
-var config = require('./config'),
+var debug = require('debug')('emails'), 
+	config = require('./config'),
 	postmark = require('postmark')(config.POSTMARK_API_TOKEN),
 	emitter = require('./emitter');
 
@@ -19,7 +20,7 @@ module.exports = function (app) {
 		};
 		app.render('emails/welcome', locals, function (err, html) {
 			if(err) {
-				return console.error('Unable to generate welcome email from template: ' + err.message);
+				return debug('Unable to generate welcome email from template: %j', err);
 			}
 
 			postmark.send({
@@ -29,7 +30,7 @@ module.exports = function (app) {
 		    'HtmlBody': html
 			}, function (err, success) {
 		    if(err) {
-		      return console.error("Unable to send via postmark: " + err.message);
+		      return debug('Unable to send email via postmark: %j', err);
 		    }
 			});
 		});

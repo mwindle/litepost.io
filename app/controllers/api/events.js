@@ -1,14 +1,27 @@
 'use strict';
 
+
 /**
  * Module dependencies.
  */
-var Event = require('mongoose').model('Event'),
+var debug = require('debug')('api'),
+	Event = require('mongoose').model('Event'),
 	r = require('./rest').model(Event),
 	errors = require('../../errors/errors'),
 	users = require('./users');
 
+/**
+* Prunes the event based on what the principal is allowed to see.
+*
+* @param {Event} event instance of a Mongoose Event
+* @param {User} [principal] currently authenticated user
+* @return {object} pruned event
+*/
 module.exports.pruneEvent = function (event, principal) {
+	if(!event) {
+		return event;
+	}
+	
 	var e = {};
 	e._id = event._id;
 	e.name = event.name;
@@ -24,32 +37,30 @@ module.exports.pruneEvent = function (event, principal) {
 	}
 	return e;
 };
+r.setPruner(module.exports.pruneEvent);
 
-var prune = function (req, res, next) {
-	if(!res.locals.result) {
-		return next();
-	}
-
-	if(Array.isArray(res.locals.result)) {
-		for(var i=0; i<res.locals.result.length; i++) {
-			res.locals.result[i] = module.exports.pruneEvent(res.locals.result[i], req.user);
-		}
-	} else {
-		res.locals.result = module.exports.pruneEvent(res.locals.result, req.user);
-	}
-	next();
-};
-
-var clean = function (req, res, next) {
+/**
+* Express middleware to massage request body to prepare for
+* event creation. Sets derived properties that are not allowed
+* to be set from the request itself. This method requires there
+* be a currently authenticated user with _id and username properties. 
+*/
+var cleanPost = function (req, res, next) {
 	if(!req.body.name) {
 		return next(new errors.SchemaValidationError());
+	} else if (!req.user || !req.user._id || !req.user.username) {
+		return next(new errors.UnauthorizedError());
 	}
 	// Set event owner details with the current user
 	req.body.owner = req.user._id;
 	req.body.username = req.user.username;
 
+	// Requestor is not allowed to set the socket for an event
+	delete req.body.socket;
+
 	// If slug isn't provided, generate it from the name
 	if(!req.body.slug && req.body.name) {
+		// Replace non alphanumeric characters with dashes (-)
 		req.body.slug = req.body.name.replace(/[^a-z0-9\-]/ig, '-');
 	}
 
@@ -66,7 +77,10 @@ var clean = function (req, res, next) {
 	});
 };
 
-var trimImmutable = function (req, res, next) {
+/**
+* Express middleware to clean req.body before its used to update an event
+*/
+var cleanPut = function (req, res, next) {
 	delete req.body._id;
 	delete req.body.owner;
 	delete req.body.username;
@@ -74,6 +88,10 @@ var trimImmutable = function (req, res, next) {
 	next();
 };
 
+/**
+* Express middleware to return a single event, instead of an array of one, if
+* username and slug are provided as query parameters (candidate key). 
+*/
 var makeOneWithUsernameAndSlug = function (req, res, next) {
 	if(req.query.username && req.query.slug) {
 		return r.single(req, res, r.ensureResult.bind(null, req, res, next));
@@ -81,14 +99,38 @@ var makeOneWithUsernameAndSlug = function (req, res, next) {
 	next();
 };
 
+/**
+* Express middleware that ensures the currently authenticated user is allowed to
+* edit the event. Requires that the event is at req.params.id. The function is
+* conservative; no id, no current user, or unable to get the data it needs, access
+* denied. 
+*/
+var authorizeUpdate = function (req, res, next) {
+	if(req.params.id && req.user._id) {
+		Event.findOne({ _id: req.params.id, owner: req.user._id }, function (err, event) {
+			if(event) {
+				next();
+			} else {
+				debug('forbidding event update, could not find event with that owner');
+				next(new errors.ForbiddenError());
+			}
+		});
+	} else {
+		debug('forbidding event update, no id or current user id');
+		next(new errors.ForbiddenError());
+	}
+};
+
 module.exports.route = function (app) {
+
+	app.all('/api/events*', r.sanitize);
 
 	app.get('/api/events/:id', r.get);
 	app.get('/api/events', r.get, makeOneWithUsernameAndSlug);
-	app.post('/api/events', clean, r.post);
-	app.put('/api/events/:id', /*r.auth, */trimImmutable, r.validate, r.put);
-	app.delete('/api/events/:id', /*r.auth, */r.del);
+	app.post('/api/events', r.auth, cleanPost, r.post);
+	app.put('/api/events/:id', r.auth, authorizeUpdate, cleanPut, r.validate, r.put);
+	app.delete('/api/events/:id', r.auth, authorizeUpdate, r.del);
 
-	app.all('/api/events*', prune, r.flush);
+	app.all('/api/events*', r.prune, r.flush);
 };
 

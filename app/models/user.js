@@ -184,3 +184,34 @@ UserSchema.set('toObject', { virtuals: true });
 UserSchema.set('toJSON', { virtuals: true });
 
 module.exports = restful.model('User', UserSchema);
+
+// Requiring circular dependencies has to be done after export
+var Event = require('./event'),
+	Message = require('./message');
+
+// Mongoose middleware to cascade delete to Events owned by this user
+UserSchema.pre('remove', function (next) {
+	var user = this;
+
+	Event.remove({ owner: user._id }).exec(function (err) {
+		if(err) {
+			next(err);
+		} else {
+			next();
+		}
+	});
+});
+
+// Mongoose middleware to cascade delete to any Messages authored by this user
+UserSchema.pre('remove', function (next) {
+	var user = this;
+
+	Message.remove({ author: user._id }).exec(function (err) {
+		if(err) {
+			next(err);
+		} else {
+			next();
+		}
+	});
+});
+

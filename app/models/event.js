@@ -91,3 +91,19 @@ EventSchema.statics.findOneBySocket = function (socket, cb) {
 };
 
 module.exports = restful.model('Event', EventSchema);
+
+// Requiring circular dependencies has to be done after export
+var Message = require('./message');
+
+// Mongoose middleware to cascade delete to messages
+EventSchema.pre('remove', function (next) {
+	var event = this;
+
+	Message.remove({ event: event._id }).exec(function (err) {
+		if(err) {
+			next(err);
+		} else {
+			next();
+		}
+	});
+});
