@@ -53,7 +53,7 @@ var MessageSchema = new mongoose.Schema({
 
 // De-normalized copy of the socket identifier for this event
 MessageSchema.virtual('eventSocket').get(function () {
-	return this.event;
+	return this.event.toString();
 });
 MessageSchema.set('toObject', { virtuals: true });
 MessageSchema.set('toJSON', { virtuals: true });

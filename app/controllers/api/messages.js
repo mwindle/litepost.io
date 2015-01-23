@@ -39,27 +39,50 @@ module.exports.pruneMessage = function (message, principal) {
 
 	if(message.event && message.event._id) {
 		m.event = events.pruneEvent(message.event, principal);
+	} else {
+		m.event = message.event;
 	}
 	if(message.author && message.author._id) {
 		m.author = users.pruneUser(message.author, principal);
+	} else {
+		m.author = message.author;
 	}
 	return m;
 };
 r.setPruner(module.exports.pruneMessage);
 
 /**
+* Express middleware to ensure post is valid
+*/
+var checkPost = function (req, res, next) {
+	if(!req.body.text || !req.body.event) {
+		next(new errors.InvalidRequestError('text and event are required'));
+	} else {
+		next();
+	}
+};
+
+/**
 * Express middleware to massage request body to prepare for
 * message creation/update. 
 */
 var clean = function (req, res, next) {
-
 	req.body.author = req.user._id.toString();
 	delete req.body._id;
+	delete req.body.id;
 	delete req.body.html;
 	delete req.body.sent;
 	delete req.body.updated;
 	delete req.body.eventSocket;
 
+	next();
+};
+
+/**
+*	Express middleware to do additional cleaning for put
+*/
+var cleanPut = function (req, res, next) {
+	delete req.body.event;
 	next();
 };
 
@@ -132,8 +155,8 @@ module.exports.route = function (app) {
 
 	app.get('/api/messages/:id', r.get);
 	app.get('/api/messages', r.get);
-	app.post('/api/messages', r.auth, authorizeCreate, clean, markedRequest, r.post, notifyChange.bind(null, 'newMessage'));
-	app.put('/api/messages/:id', r.auth, authorizeUpdate, clean, markedRequest, r.put, notifyChange.bind(null, 'updateMessage'));
+	app.post('/api/messages', r.auth, checkPost, authorizeCreate, clean, markedRequest, r.post, notifyChange.bind(null, 'newMessage'));
+	app.put('/api/messages/:id', r.auth, authorizeUpdate, clean, cleanPut, markedRequest, r.put, notifyChange.bind(null, 'updateMessage'));
 	app.delete('/api/messages/:id', r.auth, authorizeUpdate, r.del, notifyChange.bind(null, 'deleteMessage'));
 
 	app.all('/api/messages*', r.prune, r.flush);

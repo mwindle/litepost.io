@@ -42,6 +42,18 @@ mocks.setup = function () {
 
 	mocks.tooLongMessageText = getStringOfLength(1001);
 
+	var noop = function () {};
+	mocks.emitter = {
+		onNewMessage: noop,
+		newMessage: noop,
+		onUpdateMessage: noop,
+		updateMessage: noop,
+		onDeleteMessage: noop,
+		deleteMessage: noop,
+		onNewUser: noop,
+		newUser: noop
+	};
+
 	beforeEach(function (done) {
 		mockgoose.reset();
 		done();
@@ -59,20 +71,45 @@ mocks.setup = function () {
 	});
 
 	beforeEach(function (done) {
+		new User({
+			username: 'empty',
+			email: 'empty@valid.com',
+			password: 'T3sting'
+		}).save(function (err, user) {
+			mocks.emptyUser = user;
+			done();
+		});
+	});
+
+	beforeEach(function (done) {
 		mocks.event = new Event({
 			name: 'Test Event',
-			channel: 'test-event',
-			users: [{
-				user: mocks.user,
-				role: 'creator'
-			}],
-			start: new Date(),
-			description: 'Test description'
+			slug: 'test-event',
+			owner: mocks.user._id,
+			username: mocks.user.username,
+			description: 'Test description',
+			location: 'Test location'
 		}).save(function (err, event) {
 			mocks.event = event;
 			done();
 		});
 	});
+
+	beforeEach(function (done) {
+		mocks.message = new Message({
+			event: mocks.event,
+			author: mocks.user,
+			text: 'This is a test message\nwith a newline.',
+			html: '<p>This is a test message</p>\n<p>with a newline.</p>',
+		}).save(function (err, message) {
+			mocks.message = message;
+			done();
+		});
+	});
+
+	/*
+
+
 
 	mocks.updatedEvent = new Event({
 		name: 'Updated Event Name',
@@ -84,19 +121,6 @@ mocks.setup = function () {
 		coverPhoto: 'https://someurl.com/image.png'
 	});
 
-	beforeEach(function (done) {
-		mocks.message = new Message({
-			event: mocks.event,
-			author: mocks.user,
-			text: 'This is a test message\nwith a newline.',
-			html: '<p>This is a test message</p>\n<p>with a newline.</p>',
-			sent: new Date(),
-			updated: null,
-			published: false
-		}).save(function (err, message) {
-			mocks.message = message;
-			done();
-		});
-	});
+	*/
 
 };

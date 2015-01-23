@@ -23,17 +23,20 @@ module.exports = function (app) {
 			if(err) {
 				return debug('Unable to generate welcome email from template: %j', err);
 			}
-
-			postmark.send({
-		    'From': 'marc@mwindle.com', 
-		    'To': data.user.email, 
-		    'Subject': 'Welcome to LitePost.io - Verify your email address', 
-		    'HtmlBody': html
-			}, function (err, success) {
-		    if(err) {
-		      return debug('Unable to send email via postmark: %j', err);
-		    }
-			});
+			if(config.POSTMARK_API_TOKEN) {
+				postmark.send({
+			    'From': config.fromEmail, 
+			    'To': data.user.email, 
+			    'Subject': 'Welcome to LitePost.io - Verify your email address', 
+			    'HtmlBody': html
+				}, function (err, success) {
+			    if(err) {
+			      return debug('Unable to send email via postmark: %j', err);
+			    }
+				});
+			} else {
+				debug('skipping welcome email since no api token configured');
+			}
 		});
 	});
 };

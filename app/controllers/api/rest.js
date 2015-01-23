@@ -98,6 +98,10 @@ var mongoCallback = function (req, res, next, err, result) {
 		if(err.name === 'ValidationError') {
 			debug('mongoCallback triggering SchemaValidationError');
 			next(new errors.SchemaValidationError(err.errors));
+		} else if(err.code === 11000) {
+			// Failed unique constraint, err doesn't include the specific path failure
+			debug('failed unique constraint of model %j', err);
+			next(new errors.SchemaValidationError());
 		} else {
 			debug('mongo error %j', err);
 			next(new errors.ServerError());

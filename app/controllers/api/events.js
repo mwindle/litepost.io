@@ -24,6 +24,7 @@ module.exports.pruneEvent = function (event, principal) {
 	
 	var e = {};
 	e._id = event._id;
+	e.id = event.id;
 	e.name = event.name;
 	e.slug = event.slug;
 	e.socket = event.socket;
@@ -58,23 +59,25 @@ var cleanPost = function (req, res, next) {
 	// Requestor is not allowed to set the socket for an event
 	delete req.body.socket;
 
-	// If slug isn't provided, generate it from the name
+	// If slug isn't provided, generate it from the name and make sure it's unique
 	if(!req.body.slug && req.body.name) {
 		// Replace non alphanumeric characters with dashes (-)
 		req.body.slug = req.body.name.replace(/[^a-z0-9\-]/ig, '-');
-	}
 
-	// Make sure the slug is unique, or massage it to be unique
-	Event.find({
-		owner: req.user._id,
-		slug: new RegExp('^' + req.body.slug + '(-[0-9]*)?$')
-	}, function (err, events) {
-		// Don't hard fail on error here, just might have a hard validation error if the username+slug isn't unique
-		if(events && events.length) {
-			req.body.slug += '-' + events.length;
-		}
+		// Make sure the slug is unique, or massage it to be unique
+		Event.find({
+			owner: req.user._id,
+			slug: new RegExp('^' + req.body.slug + '(-[0-9]*)?$')
+		}, function (err, events) {
+			// Don't hard fail on error here, just might have a hard validation error if the username+slug isn't unique
+			if(events && events.length) {
+				req.body.slug += '-' + events.length;
+			}
+			next();
+		});
+	} else {
 		next();
-	});
+	}
 };
 
 /**

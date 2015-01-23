@@ -23,7 +23,7 @@ module.exports = function(grunt) {
 			},
 			serverJS: {
 				files: watchFiles.serverJS,
-				tasks: ['jshint'],
+				tasks: ['jshint', 'jasmine_node'],
 				options: {
 					livereload: true
 				}

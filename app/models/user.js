@@ -5,7 +5,9 @@ var debug = require('debug')('User'),
 	restful = require('node-restful'),
 	bcrypt = require('bcrypt'),
 	crypto = require('crypto'),
+	jwt = require('jsonwebtoken'),
 	validator = require('validator'),
+	config = require('../../config/config'),
 	ENCRYPTION_ROUNDS = 10;
 
 validator.extend('isPassword', function (str) {
@@ -156,10 +158,16 @@ UserSchema.pre('save', function (next) {
 	});
 });
 
+/**
+* Generate an md5 hash of an email for use with Gravatar
+*/
 UserSchema.statics.hashEmail = function (email, cb) {
 	cb(null, crypto.createHash('md5').update(email).digest('hex'));
 };
 
+/**
+* Generates a hash of the provided password so it can be safely stored
+*/
 UserSchema.statics.hashPassword = function (password, cb) {
   bcrypt.genSalt(ENCRYPTION_ROUNDS, function (err, salt) {
     if (err) {
@@ -172,6 +180,10 @@ UserSchema.statics.hashPassword = function (password, cb) {
   });
 };
 
+/**
+* Hash the provided plaintext password and compare it against the instance's 
+* stored password hash. 
+*/
 UserSchema.methods.comparePassword = function (password, cb) {
 	bcrypt.compare(password, this.password, function (err, authenticated) {
 		if(err) {
@@ -180,6 +192,39 @@ UserSchema.methods.comparePassword = function (password, cb) {
 		}
 		cb(null, authenticated);
 	});
+};
+
+/**
+* Generates an authenticate token (JWT) for later request authorization
+*/
+UserSchema.methods.getAuthToken = function () {
+	var token = jwt.sign({
+		_id: this._id,
+		username: this.username,
+		name: this.name,
+		displayName: this.displayName
+	}, config.jwtSecret, 
+	{
+		expiresInMinutes: config.jwtLifetimeInMin
+	});
+	debug('generated auth token ' + token);
+	return token;
+};
+
+/**
+* Generates a token that can be used for validating a user's email address.
+*/
+UserSchema.methods.getEmailToken = function (newEmail) {
+	var token = jwt.sign({
+		_id: this._id,
+		currentEmail: this.email,
+		newEmail: newEmail
+	}, config.jwtSecret, 
+	{
+		expiresInMinutes: config.jwtLifetimeInMin
+	});
+	debug('generated email token ' + token);
+	return token;
 };
 
 UserSchema.virtual('displayName').get(function () {
@@ -194,7 +239,9 @@ module.exports = restful.model('User', UserSchema);
 var Event = require('./event'),
 	Message = require('./message');
 
-// Mongoose middleware to cascade delete to Events owned by this user
+/**
+* Mongoose middleware to cascade delete to Events owned by this user
+*/
 UserSchema.pre('remove', function (next) {
 	var user = this;
 
@@ -208,7 +255,9 @@ UserSchema.pre('remove', function (next) {
 	});
 });
 
-// Mongoose middleware to cascade delete to any Messages authored by this user
+/**
+* Mongoose middleware to cascade delete to any Messages authored by this user
+*/
 UserSchema.pre('remove', function (next) {
 	var user = this;
 

@@ -44,14 +44,15 @@ module.exports.pruneUser = function (user, principal) {
 r.setPruner(module.exports.pruneUser);
 
 /**
-* Express middleware to return a single user, instead of an array of one, if
-* username or email are provided as query parameters (candidate keys). 
+* Express middleware to enforce either username or email are provided as
+* query parameters (candidate keys). Blocks 'searching' all users.
 */
-var makeOneWithUsernameOrEmail = function (req, res, next) {
-	if(req.query.username || req.query.email) {
-		r.single(req, res, r.ensureResult.bind(null, req, res, next));
+var insistOnUsernameOrEmail = function (req, res, next) {
+	if(!req.query.username && !req.query.email) {
+		next(new errors.InvalidRequestError('username or email is required'));
+	} else {
+		next();
 	}
-	next();
 };
 
 /**
@@ -109,16 +110,7 @@ var verifyPassword = function (req, res, next) {
 * Express middleware that generates a JWT with res.locals.result user.
 */
 var setToken = function (req, res, next) {
-	var token = jwt.sign({
-		_id: res.locals.result._id,
-		username: res.locals.result.username,
-		name: res.locals.result.name,
-		displayName: res.locals.result.displayName
-	}, config.jwtSecret, 
-	{
-		expiresInMinutes: config.jwtLifetimeInMin
-	});
-	debug('generated token ' + token);
+	var token = res.locals.result.getAuthToken();
 	res.locals.result = { 
 		token: token,
 		user: module.exports.pruneUser(res.locals.result, res.locals.result)
@@ -216,15 +208,8 @@ var authorize = function (req, res, next) {
 * Generate email verification link and emit an event with the details
 */
 var welcomeNewUser = function (req, res, next) {
-	var emailVerificationToken = jwt.sign({
-		_id: res.locals.result._id,
-		currentEmail: res.locals.result.email,
-		newEmail: res.locals.result.email
-	}, config.jwtSecret, 
-	{
-		expiresInMinutes: config.jwtLifetimeInMin
-	});
-	emitter.newUser(res.locals.result, emailVerificationToken);
+	var token = res.locals.result.getEmailToken(res.locals.result.email);
+	emitter.newUser(res.locals.result, token);
 	next();
 };
 
@@ -233,7 +218,7 @@ var welcomeNewUser = function (req, res, next) {
 module.exports.route = function (app) {
 
 	app.get('/api/users/:id', r.get, r.prune);
-	app.get('/api/users', r.get, makeOneWithUsernameOrEmail, r.prune);
+	app.get('/api/users', r.get, insistOnUsernameOrEmail, r.single, r.prune);
 	app.post('/api/users', cleanPost, r.post, welcomeNewUser, setToken);
 	app.put('/api/users/:id', r.auth, authorize, cleanPut, hashPassword, hashEmail, r.validate, r.put, r.prune);
 	app.delete('/api/users/:id', r.auth, authorize, r.del, r.prune);
