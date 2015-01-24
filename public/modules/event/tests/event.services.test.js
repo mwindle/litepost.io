@@ -4,12 +4,11 @@
 (function () {
 	'use strict';
 
+	// Load the main application module from the global app config
+	beforeEach(module(ApplicationConfiguration.applicationModuleName));
 
 	describe('EventSocket service', function () {
 		var $rootScope, service, mocks;
-
-		// Load the main application module from the global app config
-		beforeEach(module(ApplicationConfiguration.applicationModuleName));
 
 		// Setup mocked connection instance
 		beforeEach(function () {
@@ -40,10 +39,8 @@
 			});
 
 			it('should return false if io.connect() fails', function () {
-				var oldConnect = io.connect;
-				io.connect = function () { };
+				spyOn(io, 'connect').and.returnValue(false);
 				expect(service.connect('test')).toBe(false);
-				io.connect = oldConnect;
 			});
 
 			it('should join the provided room', function () {
@@ -113,4 +110,35 @@
 		});
 
 	});
+
+	describe('slug directive', function() {
+	  var $scope, form;
+
+	  beforeEach(inject(function($compile, $rootScope) {
+	    $scope = $rootScope;
+	    var element = angular.element(
+	      '<form name="form">' +
+	        '<input ng-model="model.slug" name="slug" slug />' +
+	      '</form>'
+	    );
+	    $scope.model = { slug: null };
+	    $compile(element)($scope);
+	    $scope.$digest();
+	    form = $scope.form;
+	  }));
+
+    it('should pass with all lowercase letters', function() {
+      form.slug.$setViewValue('something');
+      expect($scope.model.slug).toEqual('something');
+      expect(form.slug.$valid).toBe(true);
+    });
+
+    it('should not pass with invalid characters', function() {
+      form.slug.$setViewValue('**invalid**');
+      expect($scope.model.slug).toBeUndefined();
+      expect(form.slug.$valid).toBe(false);
+    });
+
+	});
+
 })();

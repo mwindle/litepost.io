@@ -30,11 +30,9 @@
 	</section>
 
 	<footer class="editor-action-panel">
-		<a ui-sref="app.event({username: username, slug: slug})">
-			<button type="button" class="btn btn-default btn-sm">
-				<span class="glyphicon glyphicon-remove"></span> Cancel
-			</button>
-		</a>
+		<button type="button" class="btn btn-default btn-sm" ng-click="disableEditing()">
+			<span class="glyphicon glyphicon-remove"></span> Cancel
+		</button>
 		<span class="pull-right" ng-show="isMessageLoaded()">
 			<button id="delete" type="button" class="btn btn-danger btn-sm" ng-click="delete()" ng-show="isUpdatingExisting()">
 				<span class="glyphicon glyphicon-trash"></span> Delete

@@ -23,7 +23,7 @@ module.exports = function(grunt) {
 			},
 			serverJS: {
 				files: watchFiles.serverJS,
-				tasks: ['jshint', 'jasmine_node'],
+				tasks: ['jshint:server', 'jasmine_node'],
 				options: {
 					livereload: true
 				}
@@ -36,7 +36,7 @@ module.exports = function(grunt) {
 			},
 			clientJS: {
 				files: watchFiles.clientJS,
-				tasks: ['jshint'],
+				tasks: ['jshint:client', 'karma:unit'],
 				options: {
 					livereload: true
 				}

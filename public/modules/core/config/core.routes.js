@@ -28,7 +28,7 @@
 		   		data: { title: 'Login - LitePost.io' }
 		   });
 
-	  $urlRouterProvider.otherwise('/events');
+	  $urlRouterProvider.otherwise('/app.login');
 	  $urlMatcherFactoryProvider.strictMode(false);
 	  $locationProvider.html5Mode(true).hashPrefix('!');
 	});

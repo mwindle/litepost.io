@@ -29,7 +29,6 @@ module.exports.pruneMessage = function (message, principal) {
 	}
 
 	var m = {};
-	m._id = message._id;
 	m.id = message.id;
 	m.text = message.text;
 	m.html = message.html;
@@ -38,11 +37,13 @@ module.exports.pruneMessage = function (message, principal) {
 	m.eventSocket = message.eventSocket;
 
 	if(message.event && message.event._id) {
+		debug('message pruner pruning event');
 		m.event = events.pruneEvent(message.event, principal);
 	} else {
 		m.event = message.event;
 	}
 	if(message.author && message.author._id) {
+		debug('message pruner pruning author');
 		m.author = users.pruneUser(message.author, principal);
 	} else {
 		m.author = message.author;
@@ -67,7 +68,7 @@ var checkPost = function (req, res, next) {
 * message creation/update. 
 */
 var clean = function (req, res, next) {
-	req.body.author = req.user._id.toString();
+	req.body.author = req.user.id;
 	delete req.body._id;
 	delete req.body.id;
 	delete req.body.html;
@@ -120,8 +121,8 @@ var notifyChange = function (type, req, res, next) {
 * create a message within an event. 
 */
 var authorizeCreate = function (req, res, next) {
-	if(req.body.event && req.user && req.user._id) {
-		Event.findOne({ _id: req.body.event, owner: req.user._id }, function (err, event) {
+	if(req.body.event && req.user && req.user.id) {
+		Event.findOne({ _id: req.body.event, owner: req.user.id }, function (err, event) {
 			if(!event) {
 				next(new errors.ForbiddenError());
 			} else {
@@ -138,8 +139,8 @@ var authorizeCreate = function (req, res, next) {
 * update a message.
 */
 var authorizeUpdate = function (req, res, next) {
-	if(req.params.id && req.user && req.user._id) {
-		Message.findOne({ _id: req.params.id, author: req.user._id }, function (err, message) {
+	if(req.params.id && req.user && req.user.id) {
+		Message.findOne({ _id: req.params.id, author: req.user.id }, function (err, message) {
 			if(!message) {
 				next(new errors.ForbiddenError());
 			} else {

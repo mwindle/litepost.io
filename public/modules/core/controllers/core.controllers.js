@@ -6,8 +6,30 @@
 
   angular.module('core')
 
-  .controller('CoreController', function (AuthService) {
+  .controller('CoreController', function ($scope, AuthService) {
     AuthService.login();
+
+    /**
+    * Users can edit events when they own them. 
+    */
+    $scope.canEditEvent = function (event) {
+      return AuthService.isLoggedIn() && 
+        AuthService.user().id && 
+        event &&
+        event.owner &&
+        AuthService.user().id === event.owner;
+    };
+
+    /**
+    * Users can edit messages they are the author of. 
+    */
+    $scope.canEditMessage = function (message) { 
+      return AuthService.isLoggedIn() && 
+        AuthService.user().id && 
+        message &&
+        message.author &&
+        ( AuthService.user().id === message.author || AuthService.user().id === message.author.id );
+    };
   })
 
   .controller('LoginController', function ($scope, $state, $stateParams, AuthService) {
@@ -16,10 +38,18 @@
 
   	$scope.login = function () {
   		if($scope.username && $scope.password) {
-        AuthService.authenticate($scope.username, $scope.password, function () {
-          $state.go('app.profile', { username: AuthService.user().username });
-        }, function (err) {
-          console.log('auth failed');
+        AuthService.login({
+          credentials: {
+            username: $scope.username,
+            password: $scope.password
+          },
+          success: function () {
+            $state.go('app.profile', { username: AuthService.user().username });
+          },
+          failure: function () {
+            // TODO
+            console.log('auth failed');
+          }
         });
   		}
   	};

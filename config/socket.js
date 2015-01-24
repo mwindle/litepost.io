@@ -3,7 +3,8 @@
 /**
  * Module dependencies.
  */
-var io = require('socket.io'),
+var debug = require('debug')('socket'),
+	io = require('socket.io'),
 	jwt = require('jsonwebtoken'),
 	config = require('./config'),
 	emitter = require('./emitter'),
@@ -25,6 +26,7 @@ module.exports = function (server) {
 		if(socket.handshake.query && socket.handshake.query.token) {
 			jwt.verify(socket.handshake.query.token, config.jwtSecret, function (err, decoded) {
 				if(!err) {
+					debug('socket handshake succeeded for user %j', decoded);
 					socket.handshake.user = decoded;
 				}
 				next(null, true);
@@ -36,21 +38,25 @@ module.exports = function (server) {
 
 	// Send newly created messages to all connected clients
 	emitter.onNewMessage(function (data) {
+		debug('sending a new message');
 		io.to(roomPrefix + data.room).emit('new-message', data.message);
 	});
 
 	// Send updated messages to all connected clients
 	emitter.onUpdateMessage(function (data) {
+		debug('sending an updated message');
 		io.to(roomPrefix + data.room).emit('update-message', data.message);
 	});
 
 	// Send deleted messages to all connected clients
 	emitter.onDeleteMessage(function (data) {
+		debug('sending a delete message');
 		io.to(roomPrefix + data.room).emit('delete-message', data.message);
 	});
 
 	// Handle individual client connections
 	io.on('connection', function (socket) {
+		debug('socket connected');
 		var room;
 
 		// Join client to event-specific room
@@ -59,31 +65,37 @@ module.exports = function (server) {
 				Event.findOneBySocket(rm, function (err, event) {
 					if(event) {
 						socket.join(room = roomPrefix + rm);
+						debug('opened a new room: ' + room);
 					} else {
+						debug('join attempt refused, disconnecting');
 						socket.disconnect();
 					}
 				});
 			} else {
 				socket.join(room = roomPrefix + rm);
+				debug('joined client to room ' + room);
 			}
 		});
 
 		// Remove client from event room
 		socket.on('leave', function (rm) {
+			debug('client leaving room ' + room);
 			socket.leave(room);
 			room = null;
 		});
 
 		// Event author is typing, inform all clients
 		socket.on('typing', function () {
-			if(room && socket.handshake.user) { 
+			if(room && socket.handshake.user) {
+				debug('typing in ' + room);
 				io.to(room).emit('typing', { author: socket.handshake.user }); 
 			}
 		});
 
 		// Event author stopped typing, inform all clients
 		socket.on('stop-typing', function () {
-			if(room && socket.handshake.user) { 
+			if(room && socket.handshake.user) {
+				debug('stop-typing in room ' + room);
 				io.to(room).emit('stop-typing'); 
 			}
 		});
@@ -114,6 +126,7 @@ module.exports = function (server) {
 				if(!roomPrefixTest.test(room)) {
 					return;
 				}
+				debug('sending meta update to room ' + room);
 				io.to(room).emit('event-meta-update', getEventMeta(room));
 			});
 			refreshEventMeta();

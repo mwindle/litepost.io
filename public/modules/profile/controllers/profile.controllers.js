@@ -27,8 +27,8 @@
     };
 
     $scope.canEditProfile = function () {
-      return AuthService.isLoggedIn() && $scope.user && $scope.user._id && 
-        AuthService.user()._id === $scope.user._id;
+      return AuthService.isLoggedIn() && $scope.user && $scope.user.id && 
+        AuthService.user().id === $scope.user.id;
     };
 
   })
@@ -38,16 +38,17 @@
   */
   .controller('ProfileSettingsController', function ($scope, $state, $stateParams, $timeout, $window, AuthService, User) {
 
-    $scope.me = AuthService.user();
-    $scope.$watch('me', function () {
-      $scope.updatedMe = new User(angular.copy($scope.me));
+    $scope.$watch(AuthService.user, function () {
+      $scope.me = AuthService.user();
+      $scope.updatedMe = angular.copy($scope.me);
     }, true);
 
     $scope.save = function () {
       $scope.savingProfile = { pending: true };
       $scope.updatedMe.$save(function (me) {
-        $scope.me = me;
-        AuthService.login(me);
+        // Refresh the user details and auth token from the server
+        AuthService.login({ refresh: true });
+        
         $scope.savingProfile.success = true;
         $scope.savingProfile.pending = false;
         $scope.profile.$setPristine();

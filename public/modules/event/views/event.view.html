@@ -12,7 +12,7 @@
 			<span class="emphasize" ng-bind="event.name" />
 		</h3>
 		<div class="event-description" ng-bind="event.description" />
-		<div class="edit-event-button-wrapper" ng-if="canEditEvent()">
+		<div class="edit-event-button-wrapper" ng-if="canEditEvent(event)">
 			<a ui-sref="app.editEvent({username: username, slug: slug})">
 				<button class="set-cover-button btn btn-default btn-xs">Edit Event</button>
 			</a>
@@ -52,7 +52,7 @@
 	</div>
 	
 	<main class="messages" ng-show="event.$resolved && messages.$resolved">
-		<div class="new-post-button-wrapper" ng-if="canEditEvent()">
+		<div class="new-post-button-wrapper" ng-if="canEditEvent(event)">
 			<a ui-sref="app.event.post({username: username, slug: slug})">
 				<button class="btn btn-default btn-sm" style="margin: 5px;">
 					<span class="glyphicon glyphicon-plus"></span> Post
@@ -68,7 +68,7 @@
 		
 		<article class="message animate" ng-repeat="message in messages | orderBy:'sent':true" ng-include="'modules/core/views/message.view.html'" />
 		
-		<dir-disqus ng-if="messages.length" disqus-shortname="litepostio" disqus-identifier="{{ event._id }}" disqus-url="{{ disqusUrl }}" ready-to-bind="{{ messages.length && event.$resolved }}"></dir-disqus>
+		<dir-disqus ng-if="messages.length" disqus-shortname="litepostio" disqus-identifier="{{ event.id }}" disqus-url="{{ disqusUrl }}" ready-to-bind="{{ messages.length && event.$resolved }}"></dir-disqus>
 	</main>
 
 	<section class="no-messages-yet" ng-if="messages.$resolved && !messages.length">

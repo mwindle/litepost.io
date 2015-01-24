@@ -6,94 +6,55 @@
 
 
 	describe('PostController', function () {
-		var $httpBackend, $scope, $state, $stateParams, $controller, $timeout, createController, mocks, EventSocket;
-
-		// Setup data-only equals comparison to ignore injected $resource methods when comparing
-		// mocked objects
-		beforeEach(function() {
-			jasmine.addMatchers({
-				toEqualData: function(util, customEqualityTesters) {
-					return {
-						compare: function(actual, expected) {
-							return {
-								pass: angular.equals(actual, expected)
-							};
-						}
-					};
-				}
-			});
-		});
+		var $scope, $state, $stateParams, $timeout, createController, mocks = {}, Event, Message, EventSocket;
 
 		// Load the main application module from the global app config
 		beforeEach(module(ApplicationConfiguration.applicationModuleName));
 
 		// Setup injected services
 		beforeEach(inject(function ($injector) {
-			$httpBackend = $injector.get('$httpBackend');
 			$scope = $injector.get('$rootScope');
-			$controller = $injector.get('$controller');
+			$state = $injector.get('$state');
+			$stateParams = $injector.get('$stateParams');
 			$timeout = $injector.get('$timeout');
-		}));
-
-		// Expose method to create a controller
-		beforeEach(function () {
+			Event = $injector.get('Event');
+			Message = $injector.get('Message');
+			EventSocket = $injector.get('EventSocket');
+			var $controller = $injector.get('$controller');
 			createController = function () {
 				return $controller('PostController', {
-					$scope: $scope,
-					$stateParams: $stateParams,
-					$state: $state,
-					EventSocket: EventSocket
+					$scope: $scope
 				});
 			};
-		});
+		}));
 
-		// Setup socket service mock
 		beforeEach(function () {
-			EventSocket = {};
-			EventSocket.connect = function (channel) {};
-			EventSocket.disconnect = function () {};
-			EventSocket.handlers = {};
-
-			// Setup event handlers, deliberately not doing any scope binding to ensure
-			// the controller doesn't rely on it. 
-			EventSocket.on = function (event, callback) {
-				if(!EventSocket[event]) {
-					EventSocket[event] = [];
-				}
-				EventSocket[event].push(callback);
+			// Mocked user
+			mocks.user = {
+				id: 'abcdef',
+				username: 'someone'
 			};
-			EventSocket.emit = function (event, message, callback) {
-				if(EventSocket[event]) {
-					EventSocket[event].forEach(function(callback) {
-						callback.call(this, message, callback);
-					});
-				}
-			};
-		});
 
-		// Setup mock objects
-		beforeEach(function () {
-			mocks = {};
 			// Mocked Event object
 			mocks.event = {
-				_id: '123456789', 
+				id: '123456789',
+				socket: 'event-socket-id',
 				name: 'Mocked Event',
-				channel: 'mocked-event',
+				username: mocks.user.username,
+				owner: mocks.user.id,
+				slug: 'mocked-event',
 				start: new Date(),
-				hidden: false,
-				users: [{
-					user: '1111',
-					role: 'creator',
-					_id: 'no matter'
-				}]
+				hidden: false
 			};
 
-			// Mock a new Message object
-			mocks.message = {
-				_id: 'new-id',
-				event: mocks.event._id,
-				text: 'New Message!',
-				html: '<p>New Message!</p>',
+			// Mocked Message object array
+			mocks.message =	{
+				id: 'id-one',
+				event: mocks.event.id,
+				eventSocket: mocks.event.socket,
+				author: mocks.user.id,
+				text: 'Hello World!',
+				html: '<p>Hello World!</p>',
 				sent: new Date()
 			};
 
@@ -101,177 +62,88 @@
 
 		// Setup state mocks
 		beforeEach(function () {
-			$state = {
-				go: function () {}
-			};
-			$stateParams = {
-				channel: mocks.event.channel
-			};
+			$stateParams.username = mocks.user.username;
+			$stateParams.slug = mocks.event.slug;
 		});
 
-		// Setup request handlers
 		beforeEach(function () {
-			mocks.eventGetRequest = 'api/events?channel=' + mocks.event.channel;
-			$httpBackend.when('GET', mocks.eventGetRequest).respond(mocks.event);
-
-			mocks.messageGetRequest = 'api/events/' + mocks.event.channel + '/messages/' + mocks.message._id;
-			$httpBackend.when('GET', mocks.messageGetRequest).respond(mocks.message);
-
-			mocks.messagePostRequest = 'api/events/' + mocks.event.channel + '/messages';
-			$httpBackend.when('POST', mocks.messagePostREquest).respond(mocks.message);
-
-			mocks.updateMessagePostRequest = mocks.messageGetRequest;
-			$httpBackend.when('POST', mocks.updateMessagePostRequest).respond(mocks.message);
-
-			mocks.messageDeleteRequest = mocks.messageGetRequest;
-			$httpBackend.when('DELETE', mocks.messageDeleteRequest).respond(mocks.message);
-		});
-
-		afterEach(function() {
-			$httpBackend.verifyNoOutstandingExpectation();
-			$httpBackend.verifyNoOutstandingRequest();
-		});
-
-		it('should get the event from the service', function () {
-			$httpBackend.expectGET(mocks.eventGetRequest);
-			var controller = createController();
-			$httpBackend.flush();
-			expect($scope.event).toEqualData(mocks.event);
-		});
-
-		it('should tolerate no event from the service', function () {
-			$httpBackend.expectGET(mocks.eventGetRequest).respond();
-			var controller = createController();
-			$httpBackend.flush();
-			expect($scope.event).toEqualData({});
-		});
-
-		it('should connect to the EventSocket on the event channel', function () {
-			spyOn(EventSocket, 'connect');
-			var controller = createController();
-			$httpBackend.flush();
-			expect(EventSocket.connect).toHaveBeenCalledWith(mocks.event.channel);
-		});
-
-		it('should disconnect from the EventSocket when its scope is destroyed', function () {
-			var controller = createController();
-			$httpBackend.flush();
+			spyOn(Event, 'get');
+			spyOn(Message, 'get');
+			spyOn(EventSocket, 'connect').and.callFake(function () { return true; });
 			spyOn(EventSocket, 'disconnect');
-			$scope.$destroy();
-			expect(EventSocket.disconnect).toHaveBeenCalled();
+			spyOn(EventSocket, 'on');
+			spyOn(EventSocket, 'emit');
 		});
 
 		it('should know when it\'s updating an existing or creating a new message', function () {
-			var controller = createController();
-			$httpBackend.flush();
+			createController();
 			expect($scope.isUpdatingExisting()).toBeFalsy();
-			$stateParams.messageId = mocks.message._id;
-			controller = createController();
-			$httpBackend.flush();
-			expect($scope.isUpdatingExisting()).toBe(true);
+
+			$stateParams.messageId = mocks.message.id;
+			createController();
+			expect($scope.isUpdatingExisting()).toBeTruthy();
 		});
 
 		it('should load a message for editing if provided', function () {
-			$httpBackend.expectGET(mocks.messageGetRequest);
-			$stateParams.messageId = mocks.message._id;
-			var controller = createController();
-			$httpBackend.flush();
-			expect($scope.editingMessage).toEqualData(mocks.message);
-		});
-
-		it('should know when a message is still loading', function () {
-			$stateParams.messageId = mocks.message._id;
-			var controller = createController();
-			expect($scope.isMessageLoaded()).toBeFalsy();
-			$httpBackend.flush();
-			expect($scope.isMessageLoaded()).toBe(true);
+			$stateParams.messageId = mocks.message.id;
+			createController();
+			expect(Message.get.calls.mostRecent().args[0]).toEqual(jasmine.objectContaining({ 
+				id: mocks.message.id,
+				populate: 'author'
+			}));
 		});
 
 		it('should update the editingMessage when content is edited', function () {
-			var controller = createController();
-			$httpBackend.flush();
-			var str = 'new message content';
-			$scope.edited(str);
-			expect($scope.editingMessage.text).toEqual(str);
-		});
-
-		it('should call marked to set the editingMessage html when content is edited', function () {
-			var str = 'custom string';
-			window.marked = function () { return str; };
-			var controller = createController();
-			$httpBackend.flush();
-			$scope.edited('whatever');
-			expect($scope.editingMessage.html).toEqual(str);
+			createController();
+			$scope.editingMessage = new Message(mocks.message);
+			$scope.editingMessage.html = null;
+			$scope.edited('new content');
+			expect($scope.editingMessage.html).not.toBe(null);
 		});
 
 		it('should call startTyping when content is first edited', function () {
-			var controller = createController();
-			$httpBackend.flush();
+			createController();
 			spyOn($scope, 'startTyping');
-			$scope.edited('whatever');
+			$scope.editingMessage = new Message(mocks.message);
+			$scope.editingMessage.html = null;
+			$scope.edited('new content');
 			expect($scope.startTyping).toHaveBeenCalled();
 		});
 
-		it('should call stopTyping when content hasn\'t been edited in a while', function () {
-			var controller = createController();
-			$httpBackend.flush();
-			$scope.edited('whatever');
-			spyOn($scope, 'stopTyping');
-			$timeout.flush();
-			expect($scope.stopTyping).toHaveBeenCalled();
-		});
-
-		it('should not be in the typing state by default', function () {
-			var controller = createController();
-			$httpBackend.flush();
-			expect($scope.isTyping()).toBeFalsy();
-		});
-
 		it('should send a socket typing message when startTyping is called', function () {
-			var controller = createController();
-			$httpBackend.flush();
-			spyOn(EventSocket, 'emit');
+			createController();
 			$scope.startTyping();
 			expect(EventSocket.emit).toHaveBeenCalled();
 		});
 
 		it('should send a socket stop-typing message when stopTyping is called', function () {
-			var controller = createController();
-			$httpBackend.flush();
-			$scope.startTyping();
-			spyOn(EventSocket, 'emit');
+			createController();
 			$scope.stopTyping();
 			expect(EventSocket.emit).toHaveBeenCalled();
 		});
 
 		it('should save a new message to the server when publish is called', function () {
-			var controller = createController();
-			$httpBackend.flush();
-			$httpBackend.expectPOST(mocks.messagePostREquest);
-			$scope.editingMessage.text = 'Whatever';
-			$scope.editingMessage.html = 'Whatever';
+			createController();
+			$scope.editingMessage = new Message(mocks.message);
+			spyOn($scope.editingMessage, '$save');
 			$scope.publish();
-			$httpBackend.flush();
+			expect($scope.editingMessage.$save).toHaveBeenCalled();		
 		});
 
 		it('should save an existing message to the server when update is called', function () {
-			$stateParams.messageId = mocks.message._id;
-			var controller = createController();
-			$httpBackend.flush();
-			expect($scope.editingMessage).toEqualData(mocks.message);
-			$httpBackend.expectPOST(mocks.updateMessagePostRequest);
+			createController();
+			$scope.editingMessage = new Message(mocks.message);
+			spyOn($scope.editingMessage, '$save');
 			$scope.update();
-			$httpBackend.flush();
+			expect($scope.editingMessage.$save).toHaveBeenCalled();	
 		});
 
 		it('should delete an existing message from the server when delete is called', function () {
-			$stateParams.messageId = mocks.message._id;
-			var controller = createController();
-			$httpBackend.flush();
-			expect($scope.editingMessage).toEqualData(mocks.message);
-			$httpBackend.expectDELETE(mocks.messageDeleteRequest);
+			createController();
+			$scope.editingMessage = new Message(mocks.message);
+			spyOn($scope.editingMessage, '$delete');
 			$scope.delete();
-			$httpBackend.flush();
+			expect($scope.editingMessage.$delete).toHaveBeenCalled();	
 		});
 
 	});

@@ -26,7 +26,6 @@ module.exports.pruneUser = function (user, principal) {
 		}
 
 		var u = {};
-		u._id = user._id;
 		u.id = user.id;
 		u.username = user.username;
 		u.name = user.name;
@@ -35,7 +34,7 @@ module.exports.pruneUser = function (user, principal) {
 		u.location = user.location;
 		u.website = user.website;
 
-		if(principal && principal._id && user._id && principal._id.toString() === user._id.toString()) {
+		if(principal && principal.id && user.id && principal.id === user.id) {
 			u.email = user.email;
 			u.verified = user.verified;
 		}
@@ -57,9 +56,18 @@ var insistOnUsernameOrEmail = function (req, res, next) {
 
 /**
 * Express middleware to setup request parameters to prepare them for getting one
-* user and checking their password. 
+* user and checking their password. If the user is currently authenticated and
+* no username and password are set, the user will be fetched so the token can be
+* refreshed for them. 
 */
 var massageLogin = function (req, res, next) {
+	if(req.user && !req.body.username && !req.body.password) {
+		req.params.id = req.user.id;
+		return next();
+	}
+	// If username or password is provided, disregard the current user. 
+	req.user = null;
+
 	if(!req.body.username || !req.body.password) {
 		debug('invalid login request');
 		return next(new errors.InvalidRequestError());
@@ -93,9 +101,15 @@ var ensureLoginResult = function (req, res, next) {
 };
 
 /**
-* Express middleware to verifiy the password against the fetched user. 
+* Express middleware to verifiy the password against the fetched user. Only
+* does verification if req.user is not set. 
 */
 var verifyPassword = function (req, res, next) {
+	if(req.user) {
+		debug('login user already authenticated, skipping password verification to refresh token');
+		return next();
+	}
+
 	res.locals.result.comparePassword(req.body.password, function (err, match) {
 		if(!match) {
 			debug('passwords did not match, triggering UnauthorizedError');
@@ -119,21 +133,9 @@ var setToken = function (req, res, next) {
 };
 
 /**
-* Set request parameters to get currently authenticated user
-*/
-var meQuery = function (req, res, next) {
-	req.params.id = req.user._id;
-	req.query = {};
-	req.body = {};
-	next();
-};
-
-/**
 * Remove properties that are not settable when creating a user
 */
 var cleanPost = function (req, res, next) {
-	
-	delete req.body._id;
 	delete req.body.emailHash;
 	delete req.body.verified;
 	next();
@@ -144,6 +146,7 @@ var cleanPost = function (req, res, next) {
 */
 var cleanPut = function (req, res, next) {
 	delete req.body._id;
+	delete req.body.id;
 	delete req.body.emailHash;
 	delete req.body.verified;
 
@@ -196,8 +199,8 @@ var hashEmail = function (req, res, next) {
 * Ensure the current user is allowed to edit this user
 */
 var authorize = function (req, res, next) {
-	if(req.params.id !== req.user._id.toString()) {
-		debug('User %s is not authorized to change user %s', req.user._id, req.params.id);
+	if(req.params.id !== req.user.id) {
+		debug('User %s is not authorized to change user %s', req.user.id, req.params.id);
 		next(new errors.ForbiddenError());
 	} else {
 		next();
@@ -225,6 +228,5 @@ module.exports.route = function (app) {
 	app.all('/api/users*', r.flush);
 
 	app.post('/api/login', massageLogin, r.get, r.single, ensureLoginResult, verifyPassword, setToken, r.flush);
-	app.get('/api/me', r.auth, meQuery, r.get, r.prune, r.flush);
 
 };

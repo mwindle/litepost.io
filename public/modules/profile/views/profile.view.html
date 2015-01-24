@@ -36,7 +36,7 @@
   <div class="event-summary-panel panel panel-default">
     <div class="panel-body">
 
-      <div class="event-summary-row" ng-repeat="event in events | orderBy:'_id':false">
+      <div class="event-summary-row" ng-repeat="event in events | orderBy:'id':false">
         <span class="event-summary-icon" />
         <span class="event-summary-name">
           <a ui-sref="app.event({username: username, slug: event.slug})">{{event.name}}</a>

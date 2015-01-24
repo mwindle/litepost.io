@@ -43,7 +43,7 @@ rest.ensureResult = function (req, res, next) {
 * Triggers error pipeline with UnauthorizedError if no user present. 
 */
 rest.auth = function (req, res, next) {
-	if(!req.user || !req.user._id) {
+	if(!req.user || !req.user.id) {
 		debug('auth triggering UnauthorizedError');
 		next(new errors.UnauthorizedError());
 	} else {

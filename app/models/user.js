@@ -199,7 +199,7 @@ UserSchema.methods.comparePassword = function (password, cb) {
 */
 UserSchema.methods.getAuthToken = function () {
 	var token = jwt.sign({
-		_id: this._id,
+		id: this.id,
 		username: this.username,
 		name: this.name,
 		displayName: this.displayName
@@ -216,7 +216,7 @@ UserSchema.methods.getAuthToken = function () {
 */
 UserSchema.methods.getEmailToken = function (newEmail) {
 	var token = jwt.sign({
-		_id: this._id,
+		id: this.id,
 		currentEmail: this.email,
 		newEmail: newEmail
 	}, config.jwtSecret, 

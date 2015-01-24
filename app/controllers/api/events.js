@@ -23,7 +23,6 @@ module.exports.pruneEvent = function (event, principal) {
 	}
 	
 	var e = {};
-	e._id = event._id;
 	e.id = event.id;
 	e.name = event.name;
 	e.slug = event.slug;
@@ -34,7 +33,10 @@ module.exports.pruneEvent = function (event, principal) {
 	e.location = event.location;
 
 	if(event.owner && event.owner._id) {
+		debug('event pruner pruning owner');
 		e.owner = users.pruneUser(event.owner, principal);
+	} else {
+		e.owner = event.owner;
 	}
 	return e;
 };
@@ -49,11 +51,11 @@ r.setPruner(module.exports.pruneEvent);
 var cleanPost = function (req, res, next) {
 	if(!req.body.name) {
 		return next(new errors.SchemaValidationError());
-	} else if (!req.user || !req.user._id || !req.user.username) {
+	} else if (!req.user || !req.user.id || !req.user.username) {
 		return next(new errors.UnauthorizedError());
 	}
 	// Set event owner details with the current user
-	req.body.owner = req.user._id;
+	req.body.owner = req.user.id;
 	req.body.username = req.user.username;
 
 	// Requestor is not allowed to set the socket for an event
@@ -66,7 +68,7 @@ var cleanPost = function (req, res, next) {
 
 		// Make sure the slug is unique, or massage it to be unique
 		Event.find({
-			owner: req.user._id,
+			owner: req.user.id,
 			slug: new RegExp('^' + req.body.slug + '(-[0-9]*)?$')
 		}, function (err, events) {
 			// Don't hard fail on error here, just might have a hard validation error if the username+slug isn't unique
@@ -85,6 +87,7 @@ var cleanPost = function (req, res, next) {
 */
 var cleanPut = function (req, res, next) {
 	delete req.body._id;
+	delete req.body.id;
 	delete req.body.owner;
 	delete req.body.username;
 	delete req.body.socket;
@@ -109,8 +112,8 @@ var makeOneWithUsernameAndSlug = function (req, res, next) {
 * denied. 
 */
 var authorizeUpdate = function (req, res, next) {
-	if(req.params.id && req.user._id) {
-		Event.findOne({ _id: req.params.id, owner: req.user._id }, function (err, event) {
+	if(req.params.id && req.user.id) {
+		Event.findOne({ _id: req.params.id, owner: req.user.id }, function (err, event) {
 			if(event) {
 				next();
 			} else {

@@ -52,6 +52,8 @@ module.exports = {
     tests: [
       'public/components/angular-mocks/angular-mocks.js',
       'public/components/angular-socket-io/mock/socket-io.js',
+      'public/js/test/ui-router.stateMock.js',
+      'public/js/test/matchers.js',
       'public/modules/*/tests/*.js'
     ]
   }

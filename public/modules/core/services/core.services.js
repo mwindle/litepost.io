@@ -77,7 +77,7 @@
       var resource = $resource(url, params, methods);
 
       resource.prototype.$save = function () {
-        if (!this._id) {
+        if (!this.id) {
           return this.$create.apply(this, arguments);
         }
         else {
@@ -99,54 +99,69 @@
   * User $resource from server REST API. 
   */
   .factory('User', function (resource) {
-    return resource('/api/users/:id', {id:'@_id'});
+    return resource('/api/users/:id', {id:'@id'});
   })
 
   /**
   * Event $resource from server REST API. 
   */
   .factory('Event', function (resource) {
-    return resource('/api/events/:id', {id:'@_id'});
+    return resource('/api/events/:id', {id:'@id'});
   })
 
   /**
   * Message $resource from server REST API. 
   */
   .factory('Message', function (resource) {
-    return resource('/api/messages/:id', {id:'@_id'});
+    return resource('/api/messages/:id', {id:'@id'});
   })
 
   /**
   * Service for managing currently authenticated user
   */
-  .factory('AuthService', function (resource, Token, Login) {
-    var user = null;
-    var me = resource('/api/me');
+  .factory('AuthService', function (User, Token, Login) {
+    var user = null,
+      requestPending = false;
     var service = {
-      authenticate: function (username, password, success, failure) {
-        // Clear any existing token that may be there
-        Token.set();
 
-        // Send a post to login
-        new Login({ username: username, password: password }).$save(function (result) {
-          Token.set(result.token);
-          user = result.user;
-          if(success && 'function' === typeof success) {
-            success.apply(this, arguments);
-          }
-        }, function () {
-          if(failure && 'function' === typeof failure) {
-            failure.apply(this, arguments);
-          }
-        });
-      },
-      login: function (usr) {
-        if(usr) {
-          user = usr;
-        } else if(Token.get()) {
-          user = me.get(angular.noop, service.logout);
+      /**
+      * General purpose login function. Called without arguments, will noop if the user is already
+      * logged in. If options.refresh is truthy, it will refresh the existing token and user details. 
+      * If credentails ( { username, password } ) are provided, any existing token will be cleared and
+      * a new login request will be issued against the service. When refresh or credentials are provided
+      * options.success and options.failure callbacks will be called if present. 
+      */
+      login: function (options) {
+        options = options || {};
+        
+        if(requestPending) {
+          return;
         }
-        return user;
+        // Make a login request to server if the user isn't set, refresh is set, or creds provided
+        if(!user || options.refresh || options.credentials) {
+          if(options.credentials) {
+           // Fresh login when credentials are provided
+            service.logout();
+          } else if (!Token.get()) {
+            // No credentials and no token set, nothing to do here. 
+            user = null;
+            return;
+          }
+          var post = options.credentials || {};
+          requestPending = !!new Login(post).$save(function (result) {
+            Token.set(result.token);
+            requestPending = false;
+            user = new User(result.user);
+            if(options.success && 'function' === typeof options.success) {
+              options.success.apply(this, arguments);
+            }
+          }, function () {
+            requestPending = false;
+            if(options.failure && 'function' === typeof options.failure) {
+              options.failure.apply(this, arguments);
+            }
+          });
+        }
       },
       logout: function () {
         user = null;
@@ -261,7 +276,7 @@
   */
   .filter('wordCount', function () {
     return function (value) {
-      return value ? (value.match(/[\s]+/g) || []).length : 0;
+      return value ? (value.match(/[\S]+/g) || []).length : 0;
     };
   });
 

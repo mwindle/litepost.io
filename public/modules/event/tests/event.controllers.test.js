@@ -4,214 +4,303 @@
 (function () {
 	'use strict';
 
+	var mocks = {};
+
+	// Setup mock objects
+	beforeEach(function () {
+		mocks.user = {
+			id: 'abcdef',
+			username: 'someone'
+		};
+
+		// Mocked Event object
+		mocks.event = {
+			id: '123456789',
+			socket: 'event-socket-id',
+			name: 'Mocked Event',
+			username: mocks.user.username,
+			owner: mocks.user.id,
+			slug: 'mocked-event',
+			start: new Date(),
+			hidden: false
+		};
+
+		// Mocked Message object array
+		mocks.messages = [
+			{
+				id: 'id-one',
+				eventSocket: mocks.event.socket,
+				author: mocks.user.id,
+				text: 'Hello World!',
+				html: '<p>Hello World!</p>',
+				sent: new Date()
+			},
+			{
+				id: 'id-two',
+				eventSocket: mocks.event.socket,
+				author: mocks.user.id,
+				text: 'Hello Again World!',
+				html: '<p>Hello Again World!</p>',
+				sent: new Date()					
+			}
+		];
+
+		// Mock a new Message object
+		mocks.newMessage = {
+			id: 'new-id',
+			eventSocket: mocks.event.socket,
+				author: mocks.user.id,
+			text: 'New Message!',
+			html: '<p>New Message!</p>',
+			sent: new Date()
+		};
+
+	});
 
 	describe('EventController', function () {
-		var $httpBackend, $scope, $controller, createController, mocks = {}, EventSocket;
-
-		// Setup data-only equals comparison to ignore injected $resource methods when comparing
-		// mocked objects
-		beforeEach(function() {
-			jasmine.addMatchers({
-				toEqualData: function(util, customEqualityTesters) {
-					return {
-						compare: function(actual, expected) {
-							return {
-								pass: angular.equals(actual, expected)
-							};
-						}
-					};
-				}
-			});
-		});
+		var $scope, $controller, $stateParams, createController, User, Event, Message, EventSocket;
 
 		// Load the main application module from the global app config
 		beforeEach(module(ApplicationConfiguration.applicationModuleName));
 
 		// Setup injected services
 		beforeEach(inject(function ($injector) {
-			$httpBackend = $injector.get('$httpBackend');
 			$scope = $injector.get('$rootScope');
 			$controller = $injector.get('$controller');
+			$stateParams = $injector.get('$stateParams');
+			User = $injector.get('User');
+			Event = $injector.get('Event');
+			Message = $injector.get('Message');
+			EventSocket = $injector.get('EventSocket');
 		}));
 
 		// Expose method to create a controller
 		beforeEach(function () {
 			createController = function () {
 				return $controller('EventController', {
-					$scope: $scope,
-					$stateParams: {
-						channel: mocks.event.channel
-					},
-					EventSocket: EventSocket
+					$scope: $scope
 				});
 			};
 		});
 
-		// Setup socket service mock
 		beforeEach(function () {
-			EventSocket = {};
-			EventSocket.connect = function (channel) {};
-			EventSocket.disconnect = function () {};
-			EventSocket.handlers = {};
-
-			// Setup event handlers, deliberately not doing any scope binding to ensure
-			// the controller doesn't rely on it. 
-			EventSocket.on = function (event, callback) {
-				if(!EventSocket[event]) {
-					EventSocket[event] = [];
-				}
-				EventSocket[event].push(callback);
-			};
-			EventSocket.emit = function (event, message) {
-				if(EventSocket[event]) {
-					EventSocket[event].forEach(function(callback) {
-						callback.call(this, message);
-					});
-				}
-			};
+			$stateParams.username = mocks.user.username;
+			$stateParams.slug = mocks.event.slug;
 		});
 
-		// Setup mock objects
-		beforeEach(function () {		
-			// Mocked Event object
-			mocks.event = {
-				_id: '123456789', 
-				name: 'Mocked Event',
-				channel: 'mocked-event',
-				start: new Date(),
-				hidden: false,
-				users: [{
-					user: '1111',
-					role: 'creator',
-					_id: 'no matter'
-				}]
-			};
-
-			// Mocked Message object array
-			mocks.messages = [
-				{
-					_id: 'id-one',
-					channel: mocks.event.channel,
-					text: 'Hello World!',
-					html: '<p>Hello World!</p>',
-					sent: new Date()
-				},
-				{
-					_id: 'id-two',
-					channel: mocks.event.channel,
-					text: 'Hello Again World!',
-					html: '<p>Hello Again World!</p>',
-					sent: new Date()					
-				}
-			];
-
-			// Mock a new Message object
-			mocks.newMessage = {
-				_id: 'new-id',
-				channel: mocks.event.channel,
-				text: 'New Message!',
-				html: '<p>New Message!</p>',
-				sent: new Date()
-			};
-
-		});
-
-		// Setup request handlers
 		beforeEach(function () {
-			mocks.eventGetRequest = 'api/events?channel=' + mocks.event.channel;
-			$httpBackend.when('GET', mocks.eventGetRequest).respond(mocks.event);
-
-			mocks.messagesGetRequest = 'api/events/' + mocks.event.channel + '/messages';
-			$httpBackend.when('GET', mocks.messagesGetRequest).respond(mocks.messages);
-		});
-
-		afterEach(function() {
-			$httpBackend.verifyNoOutstandingExpectation();
-			$httpBackend.verifyNoOutstandingRequest();
-		});
-
-		it('should get the event and its messages from the service', function () {
-			$httpBackend.expectGET(mocks.eventGetRequest);
-			$httpBackend.expectGET(mocks.messagesGetRequest);
-			var controller = createController();
-			$httpBackend.flush();
-			expect($scope.event).toEqualData(mocks.event);
-			expect($scope.messages).toEqualData(mocks.messages);
-		});
-
-		it('should tolerate no event from the service', function () {
-			$httpBackend.expectGET(mocks.eventGetRequest).respond();
-			$httpBackend.expectGET(mocks.messagesGetRequest).respond();
-			var controller = createController();
-			$httpBackend.flush();
-			expect($scope.event).toEqualData({});	
-			expect($scope.messages).toEqualData([]);		
-		});
-
-		it('should connect to the EventSocket on the event channel', function () {
+			spyOn(User, 'get');
+			spyOn(Event, 'get');
+			spyOn(Message, 'query');
 			spyOn(EventSocket, 'connect');
-			var controller = createController();
-			$httpBackend.flush();
-			expect(EventSocket.connect).toHaveBeenCalledWith(mocks.event.channel);
+			spyOn(EventSocket, 'disconnect');
+			spyOn(EventSocket, 'on');
+			spyOn(EventSocket, 'emit');
 		});
 
-		it('should disconnect from the EventSocket when its scope is destroyed', function () {
-			var controller = createController();
-			$httpBackend.flush();
-			spyOn(EventSocket, 'disconnect');
-			$scope.$destroy();
+		it('should load the event owner', function () {
+			createController();
+			expect(User.get).toHaveBeenCalled();
+			expect(User.get.calls.mostRecent().args[0]).toEqual(jasmine.objectContaining({ 
+				username: mocks.user.username 
+			}));
+		});
+
+		it('should not load the owner or event if no username provided', function () {
+			$stateParams.username = null;
+			createController();
+			expect(User.get).not.toHaveBeenCalled();
+			expect(Event.get).not.toHaveBeenCalled();
+		});
+
+		it('should load the event', function () {
+			createController();
+			expect(Event.get).toHaveBeenCalled();
+			expect(Event.get.calls.mostRecent().args[0])
+				.toEqual(jasmine.objectContaining({ 
+					username: mocks.user.username, 
+					slug: mocks.event.slug 
+				}));
+		});
+
+		it('should not load the event if slug is missing', function () {
+			$stateParams.slug = null;
+			createController();
+			expect(Event.get).not.toHaveBeenCalled();
+		});
+
+		it('should load the messages for the event', function () {
+			Event.get.and.callFake(function () {
+				$scope.event = mocks.event;
+				arguments[1](mocks.event);
+			});
+			createController();
+			expect(Message.query.calls.mostRecent().args[0]).toEqual(jasmine.objectContaining({
+				event: mocks.event.id
+			}));
+		});
+
+		it('should setup socket and listeners when event is loaded', function () {
+			Event.get.and.callFake(function () {
+				$scope.event = mocks.event;
+				arguments[1](mocks.event);
+			});
+			createController();
+			expect(EventSocket.connect).toHaveBeenCalled();
+		});
+
+		it('should disconnect from socket when scope is destroyed', function () {
+			Event.get.and.callFake(function () {
+				$scope.event = mocks.event;
+				arguments[1](mocks.event);
+				$scope.$destroy();
+			});
+			createController();
 			expect(EventSocket.disconnect).toHaveBeenCalled();
 		});
 
-		it('should default to not be in the typing state', function () {
-			var controller = createController();
-			$httpBackend.flush();
-			expect($scope.typing).toBeFalsy();
+		it('should set typing details when socket emits typing message', function () {
+			var typing = { author: 'whatever' };
+			EventSocket.on.and.callFake(function (event, cb) {
+				if(event === 'typing') {
+					cb(typing);
+					expect($scope.typing).toEqualData(typing);
+				}
+			});
+			Event.get.and.callFake(function () {
+				$scope.event = mocks.event;
+				arguments[1](mocks.event);
+			});
+			createController();
 		});
 
-		it('should enter typing state when EventSocket typing event is fired', function () {
-			var controller = createController();
-			$httpBackend.flush();
-			EventSocket.emit('typing');
-			expect($scope.typing).toBe(true);
+		it('should clear typing details when socket emits stop-typing message', function () {
+			EventSocket.on.and.callFake(function (event, cb) {
+				if(event === 'stop-typing') {
+					cb();
+					expect($scope.typing).toBeFalsy();
+				}
+			});
+			Event.get.and.callFake(function () {
+				$scope.event = mocks.event;
+				arguments[1](mocks.event);
+			});
+			createController();
 		});
 
-		it('should leave typing state when EventSocket stop-typing event is fired', function () {
-			var controller = createController();
-			$httpBackend.flush();
-			EventSocket.emit('typing');
-			EventSocket.emit('stop-typing');
-			expect($scope.typing).toBeFalsy();
+		it('should add message to unread when socket emits new-message', function () {
+			var message = { id: '1234', text: 'something' };
+			EventSocket.on.and.callFake(function (event, cb) {
+				if(event === 'new-message') {
+					var len = $scope.unread.length;
+					cb(message);
+					expect($scope.unread.length).toEqual(len + 1);
+				}
+			});
+			Event.get.and.callFake(function () {
+				$scope.event = mocks.event;
+				arguments[1](mocks.event);
+			});
+			createController();
 		});
 
-		it('should prepend new messages when EventSocket sends them', function () {
-			var controller = createController();
-			$httpBackend.flush();
-			EventSocket.emit('new-message', mocks.newMessage);
-			expect($scope.messages[0]).toEqualData(mocks.newMessage);
-		});
-
-		it('should remove messages when EventSocket sends delete-message', function () {
-			var controller = createController();
-			$httpBackend.flush();
-			EventSocket.emit('delete-message', mocks.messages[0]);
-			expect($scope.messages.length).toEqual(mocks.messages.length - 1);	
-		});
-
-		it('should update messages when EventSocket sends update-message', function () {
-			var controller = createController();
-			$httpBackend.flush();
-			mocks.messages[0].text = 'Updated!';
-			EventSocket.emit('update-message', mocks.messages[0]);
-			expect($scope.messages[0]).toEqualData(mocks.messages[0]);	
-		});
-
-		it('should update event viewer count when EventSocket sends event-meta-update', function () {
-			var controller = createController();
-			$httpBackend.flush();
-			EventSocket.emit('event-meta-update', { viewers: 101 });
-			expect($scope.viewers).toEqual(101);	
+		it('should delete a message when socket emits new-message', function () {
+			EventSocket.on.and.callFake(function (event, cb) {
+				if(event === 'delete-message') {
+					$scope.messages = [mocks.messages[0]];
+					cb($scope.messages[0]);
+					expect($scope.messages.length).toEqual(0);
+				}
+			});
+			Event.get.and.callFake(function () {
+				$scope.event = mocks.event;
+				arguments[1](mocks.event);
+			});
+			createController();
 		});
 
 	});
+
+	describe('EventSettingsController', function () {
+		var createController, $scope, $location, $state, $stateParams, $timeout, Event;
+
+		// Load the main application module from the global app config
+		beforeEach(module(ApplicationConfiguration.applicationModuleName));
+
+		// Setup injected services
+		beforeEach(inject(function ($injector) {
+			$scope = $injector.get('$rootScope');
+			$state = $injector.get('$state');
+			$stateParams = $injector.get('$stateParams');
+			Event = $injector.get('Event');
+			var $controller = $injector.get('$controller');
+			createController = function () {
+				return $controller('EventSettingsController', {
+					$scope: $scope
+				});
+			};
+		}));
+
+		beforeEach(function () {
+			$stateParams.username = mocks.user.username;
+			$stateParams.slug = mocks.event.slug;
+		});
+
+		beforeEach(function () {
+			spyOn(Event, 'get');
+			$scope.canEditEvent = jasmine.createSpy('canEditEvent');
+			$scope.canEditEvent.and.callFake(function () { return true; });
+		});
+
+		it('should load the event', function () {
+			createController();
+			expect(Event.get).toHaveBeenCalled();
+			expect(Event.get.calls.mostRecent().args[0]).toEqual(jasmine.objectContaining({ 
+				username: mocks.user.username,
+				slug: mocks.event.slug
+			}));
+		});
+
+		it('should change state when missing required stateParams', function () {
+			spyOn($state, 'go');
+			$stateParams.username = null;
+			createController();
+			expect($state.go).toHaveBeenCalled();
+		});
+
+		it('should change state when user is not authorized to edit the event', function () {
+			spyOn($state, 'go');
+			Event.get.and.callFake(function () {
+				$scope.canEditEvent.and.callFake(function () { return false; });
+				$scope.event = mocks.event;
+				arguments[1](mocks.event);
+				expect($state.go).toHaveBeenCalled();
+			});
+			createController();
+		});
+
+		it('should save the updated event', function () {
+			Event.get.and.callFake(function () {
+				$scope.event = new Event(mocks.event);
+				arguments[1]($scope.event);
+				spyOn($scope.updatedEvent, '$save');
+				$scope.save();
+				expect($scope.updatedEvent.$save).toHaveBeenCalled();
+			});
+			createController();
+		});
+
+		it('should delete an event', function () {
+			Event.get.and.callFake(function () {
+				$scope.event = new Event(mocks.event);
+				arguments[1]($scope.event);
+				spyOn($scope.event, '$delete');
+				$scope.delete();
+				expect($scope.event.$delete).toHaveBeenCalled();
+			});
+			createController();
+		});
+
+	});
+
 })();
