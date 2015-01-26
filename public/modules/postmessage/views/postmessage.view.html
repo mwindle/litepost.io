@@ -34,7 +34,7 @@
 			<span class="glyphicon glyphicon-remove"></span> Cancel
 		</button>
 		<span class="pull-right" ng-show="isMessageLoaded()">
-			<button id="delete" type="button" class="btn btn-danger btn-sm" ng-click="delete()" ng-show="isUpdatingExisting()">
+			<button type="button" class="btn btn-danger btn-sm" ng-show="isUpdatingExisting()" data-animation="am-fade-and-slide-top" data-template="modules/postmessage/views/confirm-delete.modal.view.html" bs-modal="modal">
 				<span class="glyphicon glyphicon-trash"></span> Delete
 			</button>
 			<button id="update" class="btn btn-primary btn-sm" ng-click="update()" ng-show="isUpdatingExisting()">
@@ -47,4 +47,3 @@
 	</footer>
 
 </section>
-

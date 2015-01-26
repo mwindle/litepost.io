@@ -9,7 +9,7 @@
   */
   angular.module('postmessage').controller('PostController', 
     function ($scope, $state, $stateParams, $timeout, Event, Message, EventSocket, 
-      parallaxHelper, title, pageClass) {
+      $modal, parallaxHelper, title, pageClass) {
 
     $scope.username = $stateParams.username;
     $scope.slug = $stateParams.slug;
@@ -175,4 +175,5 @@
     }
 
   });
+
 })();
