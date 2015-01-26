@@ -110,6 +110,8 @@
     $scope.$watch(AuthService.isLoggedIn, function () {
       if(!AuthService.isLoggedIn()) {
         $state.go('app.login');
+      } else {
+        $scope.me = AuthService.user();
       }
     });
 
@@ -121,6 +123,10 @@
         $scope.creatingEvent.pending = false;
         $scope.creatingEvent.error = err.data;
       });
+    };
+
+    $scope.cancel = function () {
+      $state.go('app.profile', { username: $scope.me.username });
     };
 
   });

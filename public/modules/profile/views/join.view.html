@@ -1,41 +1,41 @@
-<main>
-	<header>
+<main class="main-form">
+	<header class="main-form-header">
 		<h2>Join us</h2>
 	</header>
 	<form role="form" name="join" novalidate>
 
 		<!-- username -->
-		<div class="form-group" ng-class="{ 'has-error': join.username.$invalid && join.username.$touched }">
+		<div class="form-group" ng-class="{ 'has-error': join.username.$invalid && join.username.$dirty }">
 			<label for="username">Username</label>
-			<input type="text" class="form-control" name="username" placeholder="Pick a username" ng-model="user.username" ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }" ng-required="true" ng-minlength="3" ng-maxlength="15" only-lower-letters-and-numbers username autofocus />
-			<p class="help-block" ng-show="join.username.$touched && join.username.$error.required">Required.</p>
-			<p class="help-block" ng-show="join.username.$touched && join.username.$error.minlength">Too short.</p>
+			<input type="text" class="form-control" name="username" placeholder="Pick a username" ng-model="user.username" ng-model-options="{ updateOn: 'default', debounce: 500 }" ng-required="true" ng-minlength="3" ng-maxlength="15" only-lower-letters-and-numbers username autofocus />
+			<p class="help-block" ng-show="join.username.$dirty && join.username.$error.required">Required.</p>
+			<p class="help-block" ng-show="join.username.$dirty && join.username.$error.minlength">Too short.</p>
 			<p class="help-block" ng-show="join.username.$error.maxlength">Too long.</p>
 			<p class="help-block" ng-show="join.username.$error.onlyLowerLettersAndNumbers">Can only contain numbers and lowercase letters.</p>
 			<p class="help-block" ng-show="join.username.$error.username">Username already taken.</p>
 		</div>
 
 		<!-- email -->
-		<div class="form-group" ng-class="{ 'has-error': join.email.$invalid && join.email.$touched }">
+		<div class="form-group" ng-class="{ 'has-error': join.email.$invalid && join.email.$dirty }">
 			<label for="email">Email</label>
-			<input type="email" class="form-control" name="email" placeholder="Email" ng-model="user.email" ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }" ng-required="true" email-unique />
-			<p class="help-block" ng-show="join.email.$touched && join.email.$error.required">Required.</p>
-			<p class="help-block" ng-show="join.email.$touched && join.email.$error.email">Invalid email.</p>
+			<input type="email" class="form-control" name="email" placeholder="Email" ng-model="user.email" ng-model-options="{ updateOn: 'default blur', debounce: 500 }" ng-required="true" email-unique />
+			<p class="help-block" ng-show="join.email.$dirty && join.email.$error.required">Required.</p>
+			<p class="help-block" ng-show="join.email.$dirty && join.email.$error.email">Invalid email.</p>
 			<p class="help-block" ng-show="join.email.$error.emailUnique">
 				Email already in use. <a ui-sref="app.login({ u: join.email.$viewValue })">Sign in</a> instead?
 			</p>
 		</div>
 
 		<!-- password -->
-		<div class="form-group" ng-class="{ 'has-error': join.password.$invalid && join.password.$touched }">
+		<div class="form-group" ng-class="{ 'has-error': join.password.$invalid && join.password.$dirty }">
 			<label for="password">Password</label>
 			<input type="password" class="form-control" id="password" name="password" placeholder="Password" ng-model="user.password" ng-required="true" ng-minlength="6" ng-maxlength="20" password />
-			<p class="help-block" ng-show="join.password.$touched && join.password.$error.required">Required.</p>
-			<p class="help-block" ng-show="join.password.$touched && join.password.$error.minlength">Too short.</p>
+			<p class="help-block" ng-show="join.password.$dirty && join.password.$error.required">Required.</p>
+			<p class="help-block" ng-show="join.password.$dirty && join.password.$error.minlength">Too short.</p>
 			<p class="help-block" ng-show="join.password.$error.maxlength">Too long.</p>
-			<p class="help-block" ng-show="join.password.$touched && join.password.$error.hasNumber">Requires at least one number.</p>
-			<p class="help-block" ng-show="join.password.$touched && join.password.$error.hasUpperLetter">Requires at least one uppercase letter.</p>
-			<p class="help-block" ng-show="join.password.$touched && join.password.$error.hasLowerLetter">Requires at least one lowercase letter.</p>
+			<p class="help-block" ng-show="join.password.$dirty && join.password.$error.hasNumber">Requires at least one number.</p>
+			<p class="help-block" ng-show="join.password.$dirty && join.password.$error.hasUpperLetter">Requires at least one uppercase letter.</p>
+			<p class="help-block" ng-show="join.password.$dirty && join.password.$error.hasLowerLetter">Requires at least one lowercase letter.</p>
 		</div>
 
 		<!-- Submit button -->
@@ -44,7 +44,7 @@
 		</div>
 
 	</form>
-	<footer>
+	<footer class="main-form-footer">
 		Already have an account? <a ui-sref="app.login">Sign in</a>.</div>
 	</footer>
 </main>

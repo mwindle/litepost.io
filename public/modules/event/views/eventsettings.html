@@ -1,11 +1,15 @@
-<main>
-  <header>
-    <h2>
-   		<a ui-sref="app.event({username: username, slug: event.slug})" ng-bind="event.name"></a>
-      settings
-    </h2>
+<main class="main-form">
+  <header class="main-form-header">
+    <h2 ng-bind="event.name"></h2>
   </header>
   <div class="panel panel-default">
+  	<div class="back-link-header">
+  		<a ui-sref="app.event({username: username, slug: event.slug})">
+  		<h6>
+  			<span class="glyphicon glyphicon-arrow-left"></span> Back to event
+  		</h6>
+  		</a>
+  	</div>
   	<div class="panel-heading">Basics</div>
   	<div class="panel-body">
   		<form role="form" name="eventForm" novalidate>

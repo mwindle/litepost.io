@@ -1,9 +1,16 @@
-<main class="responsive-content">
-  <header>
+<main class="main-form">
+  <header class="main-form-header">
     <h2>Edit your stuff</h2>
   </header>
 
   <div class="panel panel-default">
+  	<div class="back-link-header">
+  		<a ui-sref="app.profile({username: me.username})">
+  		<h6>
+  			<span class="glyphicon glyphicon-arrow-left"></span> Back to your profile
+  		</h6>
+  		</a>
+  	</div>
   	<header class="panel-heading">Profile settings</header>
   	<div class="panel-body">
   		<form role="form" name="profile" novalidate>
@@ -14,9 +21,8 @@
 			    <div>
 			    	<img class="avatar profile-avatar" ng-show="updatedMe.emailHash" ng-src="//www.gravatar.com/avatar/{{updatedMe.emailHash}}?s=100&d=mm" />
 			    </div>
-			    <p class="text-muted">
-			    	Profile pictures come from <a href="http://gravatar.com" target="_blank">Gravatar</a>. To add or update your profile picture, go to Gravatar and setup one there. Make sure you use the same
-			    	email address with them as you have used here ({{updatedMe.email}}).
+			    <p class="help-block profile-avatar-help-text">
+			    	Provided by <a href="http://gravatar.com" target="_blank">Gravatar</a>.
 			    </p>
 			  </div>
 

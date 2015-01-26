@@ -77,12 +77,17 @@ rest.sanitize = function (req, res, next) {
 * Express middleware to convert any result present at res.locals.result to
 * a single value rather than an array. If multiple elements are present, the
 * first will be used and the rest will be discarded. Does nothing if the result
-* is not an array.
+* is not an array. If the result is an empty array, throw an error. 
 */
 rest.single = function (req, res, next) {
 	if(Array.isArray(res.locals.result)) {
-		debug('truncating result of length ' + res.locals.result.length + ' to single object');
-		res.locals.result = res.locals.result[0];
+		if(!res.locals.result.length) {
+			debug('rest.single sending 404');
+			next(new errors.NotFoundError());
+		} else {
+			debug('truncating result of length ' + res.locals.result.length + ' to single object');
+			res.locals.result = res.locals.result[0];
+		}
 	}
 	next();
 };

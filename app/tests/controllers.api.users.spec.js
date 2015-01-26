@@ -46,6 +46,22 @@ describe(p, function () {
 			});
 	});
 
+	it('should 404 when a username not found', function (done) {
+		request(app)
+			.get(p)
+			.query({ username: 'notfound' })
+			.expect('Content-type', /json/)
+			.expect(404, done);
+	});
+
+	it('should 404 when an email not found', function (done) {
+		request(app)
+			.get(p)
+			.query({ email: 'not@found.com' })
+			.expect('Content-type', /json/)
+			.expect(404, done);
+	});
+
 	it('should prune sensitive user attributes', function (done) {
 		request(app)
 			.get(p + '/' + mocks.user.id)

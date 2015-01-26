@@ -1,5 +1,5 @@
- <main>
-   <header>
+ <main class="main-form">
+   <header class="main-form-header">
     <h2>New event</h2>
   </header>
   <form role="form" name="createEvent" novalidate>
@@ -15,6 +15,7 @@
     
     <!-- Submit -->
     <div class="form-group">
+      <button type="button" class="btn btn-default" ng-click="cancel()">Cancel</button>
       <button type="submit" class="btn btn-primary" ng-disabled="createEvent.$invalid || creatingEvent.pending" ng-click="create()">Create event</button>
       <span ng-show="creatingEvent.pending" ng-bind="'Creating...'"></span>
     </div>

@@ -48,6 +48,7 @@ r.setPruner(module.exports.pruneUser);
 */
 var insistOnUsernameOrEmail = function (req, res, next) {
 	if(!req.query.username && !req.query.email) {
+		debug('invalid request to get users, username or email not provided');
 		next(new errors.InvalidRequestError('username or email is required'));
 	} else {
 		next();

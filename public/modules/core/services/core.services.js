@@ -157,6 +157,7 @@
             }
           }, function () {
             requestPending = false;
+            service.logout();
             if(options.failure && 'function' === typeof options.failure) {
               options.failure.apply(this, arguments);
             }

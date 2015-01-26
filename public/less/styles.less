@@ -171,7 +171,7 @@ button, .btn {
 
 .main-header { 
 	.make-xs-column(12, 0);
-	padding: floor((@font-size-base / 4));
+	padding: 5px;
 
 	.logo {
 		margin: 0;
@@ -185,6 +185,26 @@ button, .btn {
 		color: @font-color-on-bg;
 		text-decoration: none;
 		letter-spacing: 0.08em;
+		min-height: 35px;
+	}
+
+	.identity-status {
+		font-weight: 300;
+		text-transform: uppercase;
+		position: absolute;
+		top: 50%;
+		right: 5px;
+		@media (@md) {
+			right: 15px;
+		}
+		font-size: 14px;
+		line-height: 14px;
+		height: 14px;
+		margin-top: -7px;
+	}
+
+	.identity-status-avatar {
+		border-radius: 2px;
 	}
 }
 
@@ -196,44 +216,44 @@ button, .btn {
 		max-width: 90%;
 	}
 
-	form {
-		width: 600px;
-
-		text-align: left;
-		padding: @padding-small-vertical 0 @padding-small-vertical 0;
-			@media (@sm) {
-				padding: @padding-large-vertical 0 @padding-large-vertical 0;
-			}
-
-		> header h2 {
-			margin-top: 0;
-		}
-
-		input {
-			font-size: @font-size-large;
-			height: ceil((@font-size-large * 2));
-			@media (@sm) {
-				font-size: ceil((@font-size-large * 2));
-				height: ceil((@font-size-large * 3.5));
-			}
-		}
-		
-		label {
-			color: @gray-light;
-		}
-
-		.form-advice {
-			font-size: @font-size-small;
-			width: 100%;
-			text-align: center;
-			margin-top: 5em;
-				@media (@sm) {
-					margin-top: inherit;
-					text-align: right;
-				}
-		}
-	}
 }
+
+.main-form {
+	width: 90%;
+	@media (@md) {
+		max-width: 60%;
+	}
+	@media (@lg) {
+		max-width: 50%;
+	}
+
+	margin: auto;
+}
+
+.main-form-small {
+	width: 90%;
+	@media (@md) {
+		max-width: 40%;
+	}
+	@media (@lg) {
+		max-width: 30%;
+	}
+
+	margin: auto;
+}
+
+
+
+.main-form-header, .main-form-footer {
+	text-align: center;
+	padding: 10px;
+}
+
+.back-link-header {
+	padding: 5px; 
+	border-bottom: 1px solid @gray;
+}
+
 
 .main-footer {
 	.make-xs-column(12, 0);

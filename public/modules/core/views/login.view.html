@@ -1,8 +1,6 @@
- <form role="form" class="responsive-content">
-  <header>
-    <h2>
-      <span class="emphasize">Sign in</span>
-    </h2>
+<form role="form" class="main-form-small">
+  <header class="main-form-header">
+    <h2>Sign in</h2>
   </header>
   <div class="form-group">
     <label for="username">Username or email</label>
@@ -13,4 +11,7 @@
     <input type="password" class="form-control" id="password" placeholder="Password" ng-model="password" />
   </div>
   <button type="submit" class="btn btn-primary login-btn" ng-click="login()">Sign in</button>
+  <footer class="main-form-footer">
+    Don't have an account yet? <a ui-sref="app.join">Join us</a>.
+  </footer>
 </form>

@@ -41,11 +41,11 @@
 				<div class="pull-left">
 					<a class="logo" href="/">LitePost<span class="emphasize">.io</span></a>
 				</div>
-				<div class="identity-status pull-right" ng-controller="IdentityStatusController">
+				<div class="identity-status" ng-controller="IdentityStatusController">
 					{% raw %}
 					<div>
 						<a ng-if="me.username" href="/app/{{me.username}}">
-							<img class="avatar identity-status-avatar" ng-if="me.emailHash" ng-src="//www.gravatar.com/avatar/{{me.emailHash}}?s=30&d=mm" />
+							<img class="identity-status-avatar" ng-if="me.emailHash" ng-src="//www.gravatar.com/avatar/{{me.emailHash}}?s=20&d=mm" />
 							<span ng-bind="me.name || '@'+me.username"></span>
 						</a>
 
