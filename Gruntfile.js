@@ -216,7 +216,7 @@ module.exports = function(grunt) {
 	grunt.registerTask('lint', ['jshint:client', 'jshint:server', 'lesslint']);
 
 	// Build LESS
-	grunt.registerTask('build:less', ['clean:less', 'wget', 'lesslint', 'loadConfig', 'less', 'autoprefixer', 'cssUrlEmbed']);
+	grunt.registerTask('build:less', ['lesslint', 'loadConfig', 'less', 'autoprefixer']);
 
 	// Build Js
 	grunt.registerTask('build:js', ['jshint:client', 'jshint:server', 'loadConfig', 'ngAnnotate', 'uglify']);
