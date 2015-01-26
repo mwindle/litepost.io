@@ -31,3 +31,43 @@
 		}
 	}
 }
+
+.home-page-about {
+	width: 90%;
+	margin: auto;
+	padding: 15px;
+}
+.home-page-about > div {
+	width: 100%;
+	position: relative;
+	display: block;
+}
+
+.home-page-about article {
+	width: 100%;
+	@media (@md) {
+		width: 60%;
+	}
+	padding: 10px;
+	border: 1px solid @gray-light;
+	border-radius: 5px;
+	margin: 15px;
+}
+.home-page-about article h3 {
+	margin: 0;
+	margin-bottom: 5px;
+	color: @brand-primary;
+}
+.home-page-contact {
+	background-color: @brand-primary;
+	width: 100%;
+	margin: 0;
+	margin-top: 50px;
+	padding: 30px;
+	text-align: center;
+	color: white;
+	font-weight: @font-weight-light;
+}
+.home-page-contact a {
+	color: black;
+}

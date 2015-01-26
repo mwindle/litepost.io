@@ -3,7 +3,7 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-<div class="home-page-tagline textured-carbon-bg">
+<section class="home-page-tagline textured-carbon-bg">
 	<header class="hero-banner">
   	<h1>
   		Publish <span class="emphasize">instantly</span> to a <span class="emphasize">live</span> audience.
@@ -11,6 +11,31 @@
   	</h1>
   	<h5>or <a href="/app/login">sign in</a>.</h5>
   </header>
-</div>
-blah blah blah, this is where you learn more. 
+</section>
+<section id="about" class="home-page-about">
+	<div class="about-left">
+		<article>
+			<h3>A platform for live blogging.</h3>
+			<p>Think Twitter crossed with WordPress. Create an event, share it, then post beautifully-formatted messages to your viewers as the event unfolds.</p>
+		</article>
+	</div>
+	<div class="about-right clearfix">
+		<article class="pull-right">
+			<h3>Tell the whole story.</h3>
+			<p>Posts can be up to 1000 characters long, so you can communicate your message without mincing words. </p>
+		</article>
+	</div>
+	<div class="about-left">
+	<article>
+			<h3>More to come.</h3>
+			<p>This project is meant to showcase my web development capability. You're looking at a minimum viable product version of what I had in mind. If you'd like to see something added, <a href="mailto:marc.windle@gmail.com">let me know</a>. </p>
+		</article>
+	</div>
+</section>
+<section id="contact" class="home-page-contact">
+	<h3>Contact me</h3>
+	<p>
+		Feel free to reach out to me on <a href="http://ca.linkedin.com/pub/marc-windle/55/b30/908/" target="_blank">LinkedIn</a>, find me on <a href="https://github.com/mwindle" target="_blank">GitHub</a>, or <a href="mailto:marc.windle@gmail.com">send me an email</a>.
+	</p>
+</section> 
 {% endblock %}
