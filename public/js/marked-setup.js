@@ -27,6 +27,16 @@ Setup marked for both the client and the server to keep the options and override
     return out;
   };
 
+  // Make all links open up in a new tab/window
+  r.link = function (href, title, text) {
+    var out = '<a href="' + href + '" target="_blank" ';
+    if(title) {
+      out += ' title="' + title + '"';
+    }
+    out += '>' + text + '</a>';
+    return out;
+  };
+
   // Syntax highlighting of code blocks with highlight.js
   if(highlight) {
     highlight.configure({ useBR: true });
