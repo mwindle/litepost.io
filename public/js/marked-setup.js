@@ -8,22 +8,32 @@ Setup marked for both the client and the server to keep the options and override
 
 	var r = new marked.Renderer();
 
-	// Add support for parallax image scrolling through an Angular directive. Author must opt-in by
-	//	setting a title on the image that starts with parallax (case-insensitive, stripped from output)
+	/** 
+  * Enforce all image urls to be https to prevent security issues
+  *
+  * Add support for parallax image scrolling through an Angular directive. Author must opt-in by
+	*	setting a title on the image that starts with parallax (case-insensitive, stripped from output)
+  */
+  var ensureHttpsMatch = /^https/;
 	var enableParallaxMatch = /^parallax\s*/i;
   r.image = function (href, title, text) {
-    var out = '<img src="' + href + '" alt="' + text + '"';
-    var enableParallax = false;
-   	if(title) {
-   		enableParallax = !!title.match(enableParallaxMatch);
-   		if(enableParallax) { title = title.replace(enableParallaxMatch, ''); }
-   		out += ' title="' + title + '"';
-   	}
-   	if(enableParallax) {
-   		out = '<div class="parallax-image-wrapper">' + out + ' y="background" du-parallax="" /></div>';
-   	} else {
-   		out += ' />';
-   	}
+    var out = '';
+    if(ensureHttpsMatch.test(href)) {
+      out = '<img src="' + href + '" alt="' + text + '"';
+      var enableParallax = false;
+     	if(title) {
+     		enableParallax = !!title.match(enableParallaxMatch);
+     		if(enableParallax) { title = title.replace(enableParallaxMatch, ''); }
+     		out += ' title="' + title + '"';
+     	}
+     	if(enableParallax) {
+     		out = '<div class="parallax-image-wrapper">' + out + ' y="background" du-parallax="" /></div>';
+     	} else {
+     		out += ' />';
+     	}
+    } else {
+      out = '<div class="alert alert-danger" role="alert">Invalid image. Images must be over https.</div>';
+    }
     return out;
   };
 
