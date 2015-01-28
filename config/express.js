@@ -26,6 +26,14 @@ module.exports = function () {
 	app.locals.jsFiles = config.getJavaScriptAssets();
 	app.locals.cssFiles = config.getCSSAssets();
 
+	// Ensure HTTPS is used in production
+	app.use(function (req, res, next) {
+		if(config.env === 'production' && req.headers['x-forwarded-proto'] !== 'https') {
+			return res.redirect('https://' + req.get('Host') + req.url);
+		}
+		next();
+	});
+
 	// Passing the request url to environment locals
 	app.use(function (req, res, next) {
 		res.locals.url = req.protocol + '://' + req.headers.host + req.url;
